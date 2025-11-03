@@ -19,6 +19,8 @@ import VerifyOtp from "./Pages/Auth/verifyOtp";
 import Dashboard from "./Pages/Dashboard";
 import Template from "./Pages/Dashboard/template";
 import Design from "./Pages/Dashboard/design";
+import Social from "./Pages/Dashboard/social";
+import AddOn from "./Pages/Dashboard/addOns";
 
 function App() {
   const ProtectedRoute = ({ children }) => {
@@ -68,6 +70,8 @@ function App() {
               <Route path="detail" element={<Dashboard />} />
               <Route path="template" element={<Template />} />
               <Route path="design" element={<Design />} />
+              <Route path="social" element={<Social />} />
+              <Route path="addOns" element={<AddOn />} />
             </Route>
           </Route>
         </Route>

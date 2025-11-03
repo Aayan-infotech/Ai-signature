@@ -25,6 +25,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ReportIcon from "@mui/icons-material/Report";
+import { PlusCircleIcon } from "lucide-react";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -38,7 +39,7 @@ import { LayoutTemplate } from "lucide-react";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import { useNavigate, useLocation } from "react-router-dom"; // Add these imports
-
+import Button from "@mui/material/Button";
 const drawerWidth = 200;
 
 const openedMixin = (theme) => ({
@@ -196,7 +197,7 @@ export default function DashboardSidebar({ sidebarOpen }) {
     { text: "Template", icon: <LayoutTemplate />, link: "/dashboard/template" },
     { text: "Design", icon: <DesignServicesIcon />, link: "/dashboard/design" },
     { text: "Social", icon: <PeopleIcon />, link: "/dashboard/social" },
-    { text: "Apps", icon: <ViewModuleIcon />, link: "/dashboard/apps" },
+    { text: "Add Ons", icon: <ViewModuleIcon />, link: "/dashboard/addOns" },
   ];
 
   // Find the current selected index based on the current path
@@ -220,7 +221,18 @@ export default function DashboardSidebar({ sidebarOpen }) {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Home
           </Typography>
-
+          <Button
+            variant="contained"
+            size="small"
+            className="px-4 py-2 me-2 fw-semibold"
+            style={{
+              backgroundColor: "#FF007A",
+              border: "none",
+              borderRadius: "30px",
+            }}
+          >
+            Upgrade to Pro
+          </Button>
           <NavDropdown
             id="nav-avatar-dropdown"
             title={<Avatar className="custom-size-icon" />}
@@ -299,6 +311,33 @@ export default function DashboardSidebar({ sidebarOpen }) {
             </ListItem>
           ))}
         </List>
+        <div className="d-flex justify-content-end align-items-center flex-column gap-3 h-100 mb-3 px-2">
+          <Button
+            variant="contained"
+            className="px-3 py-2 fw-semibold w-100"
+            style={{
+              backgroundColor: "rgb(15 52 96)",
+              border: "none",
+              borderRadius: "30px",
+            }}
+            size="small"
+          >
+            Add New Signature
+          </Button>
+          <Button
+            variant="outlined"
+            className="px-3 py-2 fw-semibold w-100"
+            style={{
+              borderColor: "rgb(15 52 96)",
+              borderRadius: "30px",
+              color: "#000",
+            }}
+            size="small"
+          >
+            <SettingsIcon className="me-2" />
+            Settings
+          </Button>
+        </div>
       </Drawer>
 
       <Box

@@ -23,14 +23,14 @@ const MainLayout = () => {
       <DashboardSidebar sidebarOpen={sidebarOpen} />
       <Box className={`${sidebarOpen ? "content-open" : "content-closed"}`}>
         <div className="row">
-          <div className="col-lg-6 pe-lg-0">
+          <div className="col-lg-5 pe-lg-0">
             <Box sx={{ marginTop: 6.9 }}>
               <Card className="p-3 shadow-sm rounded-0">
                 <Outlet />
               </Card>
             </Box>
           </div>
-          <div className="col-lg-6 ps-lg-0">
+          <div className="col-lg-7 ps-lg-0">
             <Box sx={{ marginTop: 7 }}>
               <TemplateRender />
             </Box>
