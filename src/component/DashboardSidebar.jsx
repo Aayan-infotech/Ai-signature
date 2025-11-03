@@ -29,7 +29,7 @@ import { PlusCircleIcon } from "lucide-react";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { Avatar } from "@mui/material";
+import { Avatar, TextField } from "@mui/material";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -38,9 +38,32 @@ import ImageIcon from "@mui/icons-material/Image";
 import { LayoutTemplate } from "lucide-react";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
-import { useNavigate, useLocation } from "react-router-dom"; // Add these imports
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import CloseIcon from "@mui/icons-material/Close";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+
 const drawerWidth = 200;
+
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    padding: theme.spacing(2),
+  },
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(1),
+  },
+}));
+
+const DeleteConfirmationDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialog-paper": {
+    borderRadius: "12px",
+    padding: theme.spacing(1),
+  },
+}));
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -178,11 +201,62 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   padding: "16px 16px 8px 16px",
 }));
 
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+  },
+}));
+
+const SectionHeader = styled(Typography)(({ theme }) => ({
+  fontWeight: "600",
+  fontSize: "1rem",
+  marginBottom: theme.spacing(2),
+  color: "#333",
+}));
+
+const PasswordSection = styled(Box)(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: "8px",
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  position: "relative",
+}));
+
+const EditIconButton = styled(IconButton)(({ theme }) => ({
+  position: "absolute",
+  right: 8,
+  top: 8,
+  color: theme.palette.grey[600],
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.04)",
+  },
+}));
+
+const DeleteAccountSection = styled(Box)(({ theme }) => ({
+  border: `1px solid ${theme.palette.error.light}`,
+  borderRadius: "8px",
+  padding: theme.spacing(2),
+  marginTop: theme.spacing(3),
+  backgroundColor: "rgba(211, 47, 47, 0.04)",
+}));
+
 export default function DashboardSidebar({ sidebarOpen }) {
   const theme = useTheme();
   const navigate = useNavigate();
-  const location = useLocation(); // Get current location
+  const location = useLocation();
   const [open, setOpen] = React.useState(sidebarOpen);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = React.useState(false);
+  const [isEditingPassword, setIsEditingPassword] = React.useState(false);
+  const [userData, setUserData] = React.useState({
+    name: "Daksh Kumar",
+    email: "daksh.kumar@sayaninfotech.com",
+    password: "••••••••",
+    newPassword: "",
+    confirmPassword: "",
+    connectedPlatform: "Google",
+  });
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -190,6 +264,70 @@ export default function DashboardSidebar({ sidebarOpen }) {
 
   const handleNavigation = (link) => {
     navigate(link);
+  };
+
+  const handleSettingsOpen = () => {
+    setSettingsOpen(true);
+  };
+
+  const handleSettingsClose = () => {
+    setSettingsOpen(false);
+    setIsEditingPassword(false);
+    setUserData({
+      ...userData,
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
+
+  const handleInputChange = (field) => (event) => {
+    setUserData({
+      ...userData,
+      [field]: event.target.value,
+    });
+  };
+
+  const handleSaveChanges = () => {
+    // Here you would typically save the changes to your backend
+    console.log("Saving user data:", userData);
+
+    // If password was changed, update the displayed password
+    if (isEditingPassword && userData.newPassword) {
+      setUserData({
+        ...userData,
+        password: "••••••••", // Reset to masked password
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setIsEditingPassword(false);
+    }
+
+    handleSettingsClose();
+  };
+
+  const handlePasswordEdit = () => {
+    setIsEditingPassword(true);
+    setUserData({
+      ...userData,
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
+
+  const handleDeleteAccount = () => {
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    // Handle account deletion logic here
+    console.log("Deleting account...");
+    setDeleteConfirmOpen(false);
+    handleSettingsClose();
+    // Add your account deletion API call here
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmOpen(false);
   };
 
   const mainMenuItems = [
@@ -200,7 +338,6 @@ export default function DashboardSidebar({ sidebarOpen }) {
     { text: "Add Ons", icon: <ViewModuleIcon />, link: "/dashboard/addOns" },
   ];
 
-  // Find the current selected index based on the current path
   const getSelectedIndex = () => {
     return mainMenuItems.findIndex((item) => item.link === location.pathname);
   };
@@ -333,6 +470,7 @@ export default function DashboardSidebar({ sidebarOpen }) {
               color: "#000",
             }}
             size="small"
+            onClick={handleSettingsOpen}
           >
             <SettingsIcon className="me-2" />
             Settings
@@ -347,6 +485,213 @@ export default function DashboardSidebar({ sidebarOpen }) {
         <Toolbar />
         {/* Your page content will be rendered here by React Router */}
       </Box>
+
+      {/* Settings Modal */}
+      <BootstrapDialog
+        onClose={handleSettingsClose}
+        aria-labelledby="customized-dialog-title"
+        open={settingsOpen}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+          Account Settings
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleSettingsClose}
+          sx={(theme) => ({
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: theme.palette.grey[500],
+          })}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent dividers>
+          {/* User Details Section */}
+          <SectionHeader>User details</SectionHeader>
+
+          <StyledTextField
+            fullWidth
+            label="Name"
+            value={userData.name}
+            onChange={handleInputChange("name")}
+            variant="outlined"
+          />
+
+          <StyledTextField
+            fullWidth
+            label="Email"
+            value={userData.email}
+            onChange={handleInputChange("email")}
+            variant="outlined"
+          />
+
+          {/* Password Section */}
+          <SectionHeader sx={{ mt: 3 }}>Password</SectionHeader>
+          <PasswordSection>
+            <EditIconButton
+              size="small"
+              onClick={handlePasswordEdit}
+              disabled={isEditingPassword}
+            >
+              <EditOutlinedIcon fontSize="small" />
+            </EditIconButton>
+
+            {!isEditingPassword ? (
+              <StyledTextField
+                fullWidth
+                type="password"
+                label="Password"
+                value={userData.password}
+                variant="outlined"
+                disabled
+                placeholder="••••••••"
+              />
+            ) : (
+              <>
+                <StyledTextField
+                  fullWidth
+                  type="password"
+                  label="New Password"
+                  value={userData.newPassword}
+                  onChange={handleInputChange("newPassword")}
+                  variant="outlined"
+                  placeholder="Enter new password"
+                />
+                <StyledTextField
+                  fullWidth
+                  type="password"
+                  label="Confirm Password"
+                  value={userData.confirmPassword}
+                  onChange={handleInputChange("confirmPassword")}
+                  variant="outlined"
+                  placeholder="Confirm new password"
+                />
+              </>
+            )}
+          </PasswordSection>
+
+          {/* Account Settings Section */}
+          <SectionHeader sx={{ mt: 3 }}>Account settings</SectionHeader>
+
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Connected social platforms
+            </Typography>
+            <Typography variant="body1">
+              {userData.connectedPlatform}
+            </Typography>
+          </Box>
+
+          {/* Delete Account Section */}
+          <DeleteAccountSection>
+            <Typography
+              variant="body1"
+              color="error"
+              sx={{ fontWeight: "600", mb: 1 }}
+            >
+              Delete account
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
+            </Typography>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleDeleteAccount}
+              sx={{
+                borderColor: "error.main",
+                "&:hover": {
+                  borderColor: "error.dark",
+                  backgroundColor: "rgba(211, 47, 47, 0.04)",
+                },
+              }}
+            >
+              Delete Account
+            </Button>
+          </DeleteAccountSection>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleSettingsClose}
+            sx={{ color: "text.secondary" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveChanges}
+            variant="contained"
+            sx={{
+              backgroundColor: "#0f3460",
+              "&:hover": {
+                backgroundColor: "#0a2a4d",
+              },
+            }}
+          >
+            Save changes
+          </Button>
+        </DialogActions>
+      </BootstrapDialog>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationDialog
+        open={deleteConfirmOpen}
+        onClose={handleCancelDelete}
+        aria-labelledby="delete-confirmation-dialog"
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ m: 0, p: 3, pb: 2 }} id="delete-confirmation-dialog">
+          <Typography variant="h6" component="div" fontWeight="600">
+            Delete Account
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, pt: 0 }}>
+          <Typography variant="body1" color="text.primary" sx={{ mb: 2 }}>
+            Are you sure you want to delete your account? This action cannot be
+            undone and all your data will be permanently lost.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            To confirm, please type "DELETE" in the box below.
+          </Typography>
+          <StyledTextField
+            fullWidth
+            placeholder="DELETE"
+            variant="outlined"
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 0 }}>
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
+              color: "text.secondary",
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+            sx={{
+              backgroundColor: "#d32f2f",
+              "&:hover": {
+                backgroundColor: "#c62828",
+              },
+            }}
+          >
+            Delete Account
+          </Button>
+        </DialogActions>
+      </DeleteConfirmationDialog>
     </Box>
   );
 }
