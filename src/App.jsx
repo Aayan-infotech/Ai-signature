@@ -17,6 +17,8 @@ import ForgotPassword from "./Pages/Auth/ForgotPassword";
 import ResetPassword from "./Pages/Auth/resetPassword";
 import VerifyOtp from "./Pages/Auth/verifyOtp";
 import Dashboard from "./Pages/Dashboard";
+import Template from "./Pages/Dashboard/template";
+import Design from "./Pages/Dashboard/design";
 
 function App() {
   const ProtectedRoute = ({ children }) => {
@@ -62,7 +64,11 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             {/* Remove the nested Route with path="/" */}
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard">
+              <Route path="detail" element={<Dashboard />} />
+              <Route path="template" element={<Template />} />
+              <Route path="design" element={<Design />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

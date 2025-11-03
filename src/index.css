@@ -12,3 +12,55 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+#nav-avatar-dropdown {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+.nav-profile .dropdown-menu {
+  padding: 10px 20px 10px 20px !important;
+}
+.nav-profile .dropdown-menu a {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 10px;
+}
+.nav-profile .dropdown-menu a .custom-size-icon {
+  width: 20px;
+  height: 20px;
+}
+.closed-sideText span {
+  font-size: 11px !important;
+}
+
+.content-open {
+  width: calc(100% - 245px) !important;
+  border-left: 1px solid #edeeef;
+}
+.content-closed {
+  border-left: 1px solid #edeeef;
+}
+.position-fixed-design-card {
+  position: fixed;
+  min-height: calc(100vh - 20px);
+  width: -webkit-fill-available;
+  background-color: #e3dbdb;
+  margin: auto;
+  display: flex;
+}
+.button-tab-detail button {
+  font-size: 12px;
+  min-height: 40px !important;
+}
+.button-tab-detail button.Mui-selected {
+  background-color: #1976d2 !important;
+  color: #fff !important;
+}
+@media screen and (min-width: 768px) {
+  .min-height-custom .MuiToolbar-root {
+    min-height: 55px !important;
+  }
+}

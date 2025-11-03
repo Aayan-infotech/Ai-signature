@@ -16,6 +16,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import PeopleIcon from "@mui/icons-material/People";
@@ -24,8 +25,21 @@ import EmailIcon from "@mui/icons-material/Email";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ReportIcon from "@mui/icons-material/Report";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import { Avatar } from "@mui/material";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
+import LogoutIcon from "@mui/icons-material/Logout";
+import EditIcon from "@mui/icons-material/Edit";
+import ImageIcon from "@mui/icons-material/Image";
+import { LayoutTemplate } from "lucide-react";
+import DesignServicesIcon from "@mui/icons-material/DesignServices";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import { useNavigate, useLocation } from "react-router-dom"; // Add these imports
 
-const drawerWidth = 260;
+const drawerWidth = 200;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -34,7 +48,7 @@ const openedMixin = (theme) => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: "hidden",
-  backgroundColor: "#1a1a2e",
+  backgroundColor: "#fff",
 });
 
 const closedMixin = (theme) => ({
@@ -44,9 +58,9 @@ const closedMixin = (theme) => ({
   }),
   overflowX: "hidden",
   width: `calc(${theme.spacing(8)} + 1px)`,
-  backgroundColor: "#1a1a2e",
+  backgroundColor: "#fff",
   [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(9)} + 1px)`,
+    width: `calc(${theme.spacing(9)} + 20px)`,
   },
 });
 
@@ -56,35 +70,36 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "space-between",
   padding: theme.spacing(0, 2),
   minHeight: "64px",
-  backgroundColor: "#16213e",
-  ...theme.mixins.toolbar,
+  backgroundColor: "#fff",
 }));
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
+  backgroundColor: "#0f3460",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: "#0f3460",
-  boxShadow: "none",
-  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-  marginLeft: `calc(${theme.spacing(8)} + 1px)`,
-  width: `calc(100% - calc(${theme.spacing(8)} + 1px))`,
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: `calc(${theme.spacing(9)} + 1px)`,
-    width: `calc(100% - calc(${theme.spacing(9)} + 1px))`,
-  },
-  ...(open && {
-    marginLeft: "auto",
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
+  ...(open
+    ? {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(["width", "margin"], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+      }
+    : {
+        width: `calc(100% - 93px)`,
+        marginLeft: "auto",
+        transition: theme.transitions.create(["width", "margin"], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+      }),
 }));
 
 const Drawer = styled(MuiDrawer, {
@@ -94,6 +109,7 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
+  backgroundColor: "#fff",
   "& .MuiDrawer-paper": {
     border: "none",
   },
@@ -133,6 +149,7 @@ const MenuButton = styled(IconButton)(({ theme }) => ({
 
 const HeaderMenuButton = styled(IconButton)(({ theme }) => ({
   color: "#ffffff",
+  marginRight: theme.spacing(2),
   "&:hover": {
     backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
@@ -140,16 +157,14 @@ const HeaderMenuButton = styled(IconButton)(({ theme }) => ({
 
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
   margin: "4px 8px",
-  borderRadius: "8px",
-  color: "rgba(255, 255, 255, 0.7)",
+  color: "#000000d3",
   "&:hover": {
-    backgroundColor: "rgba(233, 69, 96, 0.1)",
-    color: "#e94560",
+    backgroundColor: "#000",
+    color: "#fff",
   },
   "&.Mui-selected": {
-    backgroundColor: "rgba(233, 69, 96, 0.2)",
-    color: "#e94560",
-    borderRight: "3px solid #e94560",
+    backgroundColor: "#0f3460",
+    color: "#fff",
   },
 }));
 
@@ -162,94 +177,109 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   padding: "16px 16px 8px 16px",
 }));
 
-export default function DashboardSidebar() {
+export default function DashboardSidebar({ sidebarOpen }) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const navigate = useNavigate();
+  const location = useLocation(); // Get current location
+  const [open, setOpen] = React.useState(sidebarOpen);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  const handleDrawerToggle = () => {
+    setOpen(!open);
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const handleNavigation = (link) => {
+    navigate(link);
   };
 
-  const handleListItemClick = (index) => {
-    setSelectedIndex(index);
-  };
-  console.log(drawerWidth);
   const mainMenuItems = [
-    { text: "Dashboard", icon: <DashboardIcon /> },
-    { text: "Analytics", icon: <AnalyticsIcon /> },
-    { text: "Users", icon: <PeopleIcon /> },
-    { text: "Messages", icon: <EmailIcon /> },
+    { text: "Detail", icon: <EditIcon />, link: "/dashboard/detail" },
+    { text: "Template", icon: <LayoutTemplate />, link: "/dashboard/template" },
+    { text: "Design", icon: <DesignServicesIcon />, link: "/dashboard/design" },
+    { text: "Social", icon: <PeopleIcon />, link: "/dashboard/social" },
+    { text: "Apps", icon: <ViewModuleIcon />, link: "/dashboard/apps" },
   ];
 
-  const secondaryMenuItems = [
-    { text: "Documents", icon: <FileCopyIcon /> },
-    { text: "Archive", icon: <ArchiveIcon /> },
-    { text: "Reports", icon: <ReportIcon /> },
-    { text: "Settings", icon: <SettingsIcon /> },
-  ];
+  // Find the current selected index based on the current path
+  const getSelectedIndex = () => {
+    return mainMenuItems.findIndex((item) => item.link === location.pathname);
+  };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={open} className="min-height-custom">
         <Toolbar>
           <HeaderMenuButton
             color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            aria-label="toggle drawer"
+            onClick={handleDrawerToggle}
             edge="start"
-            sx={{
-              marginRight: 2,
-              ...(open && { display: "none" }),
-            }}
           >
             <MenuIcon />
           </HeaderMenuButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Company Dashboard
+            Home
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.8 }}>
-            Welcome back, Admin!
-          </Typography>
+
+          <NavDropdown
+            id="nav-avatar-dropdown"
+            title={<Avatar className="custom-size-icon" />}
+            menuVariant="light"
+            className="nav-profile"
+          >
+            <NavDropdown.Item href="#action/3.1">
+              <PermIdentityIcon className="custom-size-icon" />
+              Profile
+            </NavDropdown.Item>
+            <NavDropdown.Item href="#action/3.2">
+              <CreditCardIcon className="custom-size-icon" />
+              Plan & Billing
+            </NavDropdown.Item>
+            <NavDropdown.Divider />
+            <NavDropdown.Item href="#action/3.3">
+              <AlternateEmailIcon className="custom-size-icon" />
+              Add to your email
+            </NavDropdown.Item>
+
+            <NavDropdown.Item href="#action/3.4">
+              <SettingsIcon className="custom-size-icon" />
+              Signature Setting
+            </NavDropdown.Item>
+            <NavDropdown.Divider />
+            <NavDropdown.Item href="#action/3.5">
+              {" "}
+              <LogoutIcon className="custom-size-icon" /> Logout
+            </NavDropdown.Item>
+          </NavDropdown>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
           <LogoText variant="h6">{open ? "DASHBOARD" : "DB"}</LogoText>
-          <MenuButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </MenuButton>
         </DrawerHeader>
 
         <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.1)" }} />
 
         {/* Main Navigation */}
         <List sx={{ mt: 2 }}>
-          <SectionTitle>{open ? "Main Menu" : "•"}</SectionTitle>
           {mainMenuItems.map((item, index) => (
             <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
               <StyledListItemButton
-                selected={selectedIndex === index}
-                onClick={() => handleListItemClick(index)}
+                selected={getSelectedIndex() === index}
+                onClick={() => handleNavigation(item.link)}
                 sx={{
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
+                  m: 0,
+                  display: "flex",
+                  flexDirection: open ? "row" : "column",
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    mr: open ? 2 : "0",
                     justifyContent: "center",
                     color: "inherit",
                   }}
@@ -258,55 +288,10 @@ export default function DashboardSidebar() {
                 </ListItemIcon>
                 <ListItemText
                   primary={item.text}
+                  className={!open && "closed-sideText"}
                   sx={{
-                    opacity: open ? 1 : 0,
                     "& .MuiTypography-root": {
-                      fontWeight: selectedIndex === index ? "600" : "400",
-                    },
-                  }}
-                />
-              </StyledListItemButton>
-            </ListItem>
-          ))}
-        </List>
-
-        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.1)", my: 1 }} />
-
-        {/* Secondary Navigation */}
-        <List>
-          <SectionTitle>{open ? "Management" : "•"}</SectionTitle>
-          {secondaryMenuItems.map((item, index) => (
-            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
-              <StyledListItemButton
-                selected={selectedIndex === index + mainMenuItems.length}
-                onClick={() =>
-                  handleListItemClick(index + mainMenuItems.length)
-                }
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                    color: "inherit",
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  sx={{
-                    opacity: open ? 1 : 0,
-                    "& .MuiTypography-root": {
-                      fontWeight:
-                        selectedIndex === index + mainMenuItems.length
-                          ? "600"
-                          : "400",
+                      fontWeight: getSelectedIndex() === index ? "600" : "400",
                     },
                   }}
                 />
@@ -320,61 +305,8 @@ export default function DashboardSidebar() {
         component="main"
         sx={{ flexGrow: 1, p: 3, backgroundColor: "#f8f9fa" }}
       >
-        <DrawerHeader />
-        <Box
-          sx={{
-            backgroundColor: "white",
-            borderRadius: 2,
-            p: 3,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          <Typography variant="h5" sx={{ marginBottom: 3, color: "#0f3460" }}>
-            Welcome to Your Dashboard
-          </Typography>
-          <Typography sx={{ marginBottom: 2, color: "#666", lineHeight: 1.6 }}>
-            This is your personalized dashboard where you can manage all aspects
-            of your application. Use the sidebar navigation to access different
-            sections and features.
-          </Typography>
-          <Typography sx={{ marginBottom: 2, color: "#666", lineHeight: 1.6 }}>
-            The layout features a modern dark sidebar with intuitive navigation
-            and a clean, professional header. You can collapse the sidebar to
-            maximize your workspace while maintaining easy access to all menu
-            items.
-          </Typography>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                sm: "1fr 1fr",
-                md: "1fr 1fr 1fr",
-              },
-              gap: 2,
-              mt: 4,
-            }}
-          >
-            {[1, 2, 3].map((item) => (
-              <Box
-                key={item}
-                sx={{
-                  backgroundColor: "#f0f2f5",
-                  borderRadius: 2,
-                  p: 3,
-                  textAlign: "center",
-                }}
-              >
-                <Typography variant="h6" sx={{ color: "#0f3460" }}>
-                  Card {item}
-                </Typography>
-                <Typography variant="body2" sx={{ color: "#666", mt: 1 }}>
-                  Sample content for dashboard card
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
+        <Toolbar />
+        {/* Your page content will be rendered here by React Router */}
       </Box>
     </Box>
   );
