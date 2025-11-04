@@ -49,7 +49,7 @@ export default function Template() {
                 cursor: "pointer",
                 border:
                   selectedTemplate === template.id
-                    ? "3px solid #0f3460"
+                    ? "3px solid #2a8e8a"
                     : "1px solid #ddd",
                 transition: "all 0.3s",
                 "&:hover": { transform: "scale(1.02)" },
@@ -85,7 +85,7 @@ export default function Template() {
                 cursor: "pointer",
                 border:
                   selectedTemplate === template.id
-                    ? "3px solid #0f3460"
+                    ? "3px solid #2a8e8a"
                     : "1px solid #ddd",
                 transition: "all 0.3s",
                 "&:hover": { transform: "scale(1.02)" },

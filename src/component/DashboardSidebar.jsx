@@ -49,6 +49,8 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import CallToActionIcon from "@mui/icons-material/CallToAction";
 import { SquareChevronRight, SquareChevronLeft } from "lucide-react";
+import Ai from "../assets/ai.png";
+import Logo from "../assets/aayan.png";
 const drawerWidth = 200;
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -103,7 +105,7 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  backgroundColor: "#0f3460",
+  backgroundColor: "#2a8e8a",
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
@@ -183,14 +185,14 @@ const HeaderMenuButton = styled(IconButton)(({ theme }) => ({
 
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
   margin: "4px 8px",
-  color: "#000000d3",
+  color: "#6dc36d000d3",
   borderRadius: "8px",
   "&:hover": {
-    backgroundColor: "#000",
+    backgroundColor: "#6dc36d",
     color: "#fff",
   },
   "&.Mui-selected": {
-    backgroundColor: "#0f3460",
+    backgroundColor: "#2a8e8a",
     color: "#fff",
   },
 }));
@@ -367,15 +369,17 @@ export default function DashboardSidebar({ sidebarOpen }) {
           >
             {!open ? <SquareChevronRight /> : <SquareChevronLeft />}
           </HeaderMenuButton>
-          <Box sx={{display:"flex" , justifyContent:"end" , width:"100%"}}>
+          <Box sx={{ display: "flex", justifyContent: "end", width: "100%" }}>
             <Button
               variant="contained"
               size="small"
               className="px-4 py-2 me-2 fw-semibold"
               style={{
-                backgroundColor: "#FF007A",
+                backgroundColor: "#fff",
                 border: "none",
                 borderRadius: "30px",
+                color: "#2a8e8a",
+                lineHeight: "25px",
               }}
             >
               Upgrade to Pro
@@ -415,7 +419,7 @@ export default function DashboardSidebar({ sidebarOpen }) {
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
-          <LogoText variant="h6">{open ? "DASHBOARD" : "DB"}</LogoText>
+          <LogoText variant="h6">{open ?<img src={Logo} className="w-100 img-fluid h-100" /> : <img className="w-100 img-fluid h-100" src={Ai} />}</LogoText>
         </DrawerHeader>
 
         <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.1)" }} />
@@ -464,7 +468,7 @@ export default function DashboardSidebar({ sidebarOpen }) {
             variant="contained"
             className="px-3 py-2 fw-semibold w-100"
             style={{
-              backgroundColor: "rgb(15 52 96)",
+              backgroundColor: "#2a8e8a",
               border: "none",
               borderRadius: "30px",
             }}
@@ -477,9 +481,9 @@ export default function DashboardSidebar({ sidebarOpen }) {
             variant="outlined"
             className="px-3 py-2 fw-semibold w-100"
             style={{
-              borderColor: "rgb(15 52 96)",
+              borderColor: "#2a8e8a",
               borderRadius: "30px",
-              color: "#000",
+              color: "#6dc36d",
             }}
             size="small"
             onClick={handleSettingsOpen}
@@ -638,7 +642,7 @@ export default function DashboardSidebar({ sidebarOpen }) {
             onClick={handleSaveChanges}
             variant="contained"
             sx={{
-              backgroundColor: "#0f3460",
+              backgroundColor: "#2a8e8a",
               "&:hover": {
                 backgroundColor: "#0a2a4d",
               },
