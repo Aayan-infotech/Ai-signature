@@ -48,6 +48,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import CallToActionIcon from "@mui/icons-material/CallToAction";
+import { SquareChevronRight, SquareChevronLeft } from "lucide-react";
 const drawerWidth = 200;
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -364,53 +365,52 @@ export default function DashboardSidebar({ sidebarOpen }) {
             onClick={handleDrawerToggle}
             edge="start"
           >
-            <MenuIcon />
+            {!open ? <SquareChevronRight /> : <SquareChevronLeft />}
           </HeaderMenuButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Home
-          </Typography>
-          <Button
-            variant="contained"
-            size="small"
-            className="px-4 py-2 me-2 fw-semibold"
-            style={{
-              backgroundColor: "#FF007A",
-              border: "none",
-              borderRadius: "30px",
-            }}
-          >
-            Upgrade to Pro
-          </Button>
-          <NavDropdown
-            id="nav-avatar-dropdown"
-            title={<Avatar className="custom-size-icon" />}
-            menuVariant="light"
-            className="nav-profile"
-          >
-            <NavDropdown.Item href="#action/3.1">
-              <PermIdentityIcon className="custom-size-icon" />
-              Profile
-            </NavDropdown.Item>
-            <NavDropdown.Item href="#action/3.2">
-              <CreditCardIcon className="custom-size-icon" />
-              Plan & Billing
-            </NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item href="#action/3.3">
-              <AlternateEmailIcon className="custom-size-icon" />
-              Add to your email
-            </NavDropdown.Item>
+          <Box sx={{display:"flex" , justifyContent:"end" , width:"100%"}}>
+            <Button
+              variant="contained"
+              size="small"
+              className="px-4 py-2 me-2 fw-semibold"
+              style={{
+                backgroundColor: "#FF007A",
+                border: "none",
+                borderRadius: "30px",
+              }}
+            >
+              Upgrade to Pro
+            </Button>
+            <NavDropdown
+              id="nav-avatar-dropdown"
+              title={<Avatar className="custom-size-icon" />}
+              menuVariant="light"
+              className="nav-profile"
+            >
+              <NavDropdown.Item href="#action/3.1">
+                <PermIdentityIcon className="custom-size-icon" />
+                Profile
+              </NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.2">
+                <CreditCardIcon className="custom-size-icon" />
+                Plan & Billing
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="#action/3.3">
+                <AlternateEmailIcon className="custom-size-icon" />
+                Add to your email
+              </NavDropdown.Item>
 
-            <NavDropdown.Item href="#action/3.4">
-              <SettingsIcon className="custom-size-icon" />
-              Signature Setting
-            </NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item href="#action/3.5">
-              {" "}
-              <LogoutIcon className="custom-size-icon" /> Logout
-            </NavDropdown.Item>
-          </NavDropdown>
+              <NavDropdown.Item href="#action/3.4">
+                <SettingsIcon className="custom-size-icon" />
+                Signature Setting
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="#action/3.5">
+                {" "}
+                <LogoutIcon className="custom-size-icon" /> Logout
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Box>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
