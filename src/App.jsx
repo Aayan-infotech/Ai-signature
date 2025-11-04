@@ -21,6 +21,7 @@ import Template from "./Pages/Dashboard/template";
 import Design from "./Pages/Dashboard/design";
 import Social from "./Pages/Dashboard/social";
 import AddOn from "./Pages/Dashboard/addOns";
+import CTA from "./Pages/Dashboard/cta";
 
 function App() {
   const ProtectedRoute = ({ children }) => {
@@ -71,7 +72,8 @@ function App() {
               <Route path="template" element={<Template />} />
               <Route path="design" element={<Design />} />
               <Route path="social" element={<Social />} />
-              <Route path="addOns" element={<AddOn />} />
+              <Route path="enhancement" element={<AddOn />} />
+               <Route path="cta" element={<CTA />} />
             </Route>
           </Route>
         </Route>

@@ -46,7 +46,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import CloseIcon from "@mui/icons-material/Close";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-
+import AddIcon from "@mui/icons-material/Add";
+import CallToActionIcon from "@mui/icons-material/CallToAction";
 const drawerWidth = 200;
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -182,6 +183,7 @@ const HeaderMenuButton = styled(IconButton)(({ theme }) => ({
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
   margin: "4px 8px",
   color: "#000000d3",
+  borderRadius: "8px",
   "&:hover": {
     backgroundColor: "#000",
     color: "#fff",
@@ -335,7 +337,16 @@ export default function DashboardSidebar({ sidebarOpen }) {
     { text: "Template", icon: <LayoutTemplate />, link: "/dashboard/template" },
     { text: "Design", icon: <DesignServicesIcon />, link: "/dashboard/design" },
     { text: "Social", icon: <PeopleIcon />, link: "/dashboard/social" },
-    { text: "Add Ons", icon: <ViewModuleIcon />, link: "/dashboard/addOns" },
+    {
+      text: "Enhancement",
+      icon: <ViewModuleIcon />,
+      link: "/dashboard/enhancement",
+    },
+    {
+      text: "Call To Action",
+      icon: <CallToActionIcon />,
+      link: "/dashboard/cta",
+    },
   ];
 
   const getSelectedIndex = () => {
@@ -410,7 +421,7 @@ export default function DashboardSidebar({ sidebarOpen }) {
         <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.1)" }} />
 
         {/* Main Navigation */}
-        <List sx={{ mt: 2 }}>
+        <List sx={{ mt: 2, px: 1 }}>
           {mainMenuItems.map((item, index) => (
             <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
               <StyledListItemButton
@@ -459,7 +470,8 @@ export default function DashboardSidebar({ sidebarOpen }) {
             }}
             size="small"
           >
-            Add New Signature
+            <AddIcon />
+            {open && "Add New Signature"}
           </Button>
           <Button
             variant="outlined"
@@ -472,8 +484,8 @@ export default function DashboardSidebar({ sidebarOpen }) {
             size="small"
             onClick={handleSettingsOpen}
           >
-            <SettingsIcon className="me-2" />
-            Settings
+            <SettingsIcon />
+            {open && "Settings"}
           </Button>
         </div>
       </Drawer>
