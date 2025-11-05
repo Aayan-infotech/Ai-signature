@@ -44,6 +44,22 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
+                    echo "🧱 Preparing environment for build..."
+
+                    # Ensure placeholder asset exists (temporary DevOps fix)
+                    mkdir -p src/assets
+                    if [ ! -f src/assets/ai.png ]; then
+                      echo "⚠️ Missing src/assets/ai.png — creating placeholder..."
+                      echo 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=' | base64 -d > src/assets/ai.png || true
+                      echo "✅ Created placeholder src/assets/ai.png"
+                    else
+                      echo "✅ src/assets/ai.png already exists"
+                    fi
+
+                    echo "📂 Listing src/assets directory:"
+                    ls -la src/assets || true
+
+                    echo "🏗️ Building Docker image..."
                     docker build -t $IMAGE_NAME:$IMAGE_TAG .
                 '''
             }
@@ -94,7 +110,15 @@ pipeline {
                 emailext (
                     to: 'kartikey.tiwari@aayaninfotech.com',
                     subject: "Deployment Pipeline - ${currentBuild.fullDisplayName}",
-                    body: "Job '${env.JOB_NAME} [#${env.BUILD_NUMBER}]' completed with status: ${currentBuild.currentResult}"
+                    body: """
+                    Job '${env.JOB_NAME} [#${env.BUILD_NUMBER}]' completed with status: ${currentBuild.currentResult}
+
+                    Docker Image: $IMAGE_NAME:$IMAGE_TAG
+                    Container Name: $CONTAINER_NAME
+                    Port Mapping: $HOST_PORT -> $CONTAINER_PORT
+
+                    Build logs are available in Jenkins console.
+                    """
                 )
             }
         }
