@@ -15,6 +15,12 @@ import {
 } from "@mui/icons-material";
 import { SquareScissors, Upload, MessageSquare } from "lucide-react";
 import OnlineMeetingScheduler from "../../component/Dialog/OnlineScheduler";
+import SocialButtonsModal from "../../component/Dialog/SocialButton";
+import PredesignedBanners from "../../component/Dialog/PreDessignedBanner";
+import CustomButtonModal from "../../component/Dialog/CustomButtonDialog";
+import UploadMyBannerModal from "../../component/Dialog/UploadBanner";
+import GiveUsFeedbackModal from "../../component/Dialog/FeedbackDialog";
+import VideoConferenceModal from "../../component/Dialog/VideoConference";
 
 const CTACard = ({ title, icon: Icon, onClick, isPro }) => (
   <Box
@@ -72,17 +78,64 @@ const CTACard = ({ title, icon: Icon, onClick, isPro }) => (
 const CTA = () => {
   const [open, setOpen] = useState(false);
   const [openScheduler, setOpenScheduler] = useState(false);
+  const [openSocial, setOpenSocial] = useState(false);
+  const [openPreBanner, setOpenPreBanner] = useState(false);
+  const [openCustomButton, setOpenCustomButton] = useState(false);
+  const [uploadBanner, setUploadBanner] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState(false);
+  const [openVideo, setOpenVideo] = useState(false);
 
   const handleOpen = (type) => {
     if (type === "scheduler") {
       setOpenScheduler(true);
     }
-    
+
+    if (type === "social") {
+      setOpenSocial(true);
+    }
+
+    if (type === "Prebanner") {
+      setOpenPreBanner(true);
+    }
+
+    if (type === "custom") {
+      setOpenCustomButton(true);
+    }
+    if (type === "banner") {
+      setUploadBanner(true);
+    }
+    if (type === "feedback") {
+      setFeedbackModal(true);
+    }
+    if (type === "video") {
+      setOpenVideo(true);
+    }
   };
 
   const handleClose = (type) => {
     if (type === "scheduler") {
       setOpenScheduler(false);
+    }
+
+    if (type === "social") {
+      setOpenSocial(false);
+    }
+
+    if (type === "Prebanner") {
+      setOpenPreBanner(false);
+    }
+
+    if (type === "custom") {
+      setOpenCustomButton(false);
+    }
+    if (type === "banner") {
+      setUploadBanner(false);
+    }
+    if (type === "feedback") {
+      setFeedbackModal(false);
+    }
+    if (type === "video") {
+      setOpenVideo(false);
     }
   };
 
@@ -132,6 +185,42 @@ const CTA = () => {
       <OnlineMeetingScheduler
         open={openScheduler}
         onClose={() => handleClose("scheduler")}
+        onSave={handleSave}
+      />
+
+      <SocialButtonsModal
+        open={openSocial}
+        onClose={() => handleClose("social")}
+        onSave={handleSave}
+      />
+
+      <PredesignedBanners
+        open={openPreBanner}
+        onClose={() => handleClose("Prebanner")}
+        onSave={handleSave}
+      />
+
+      <CustomButtonModal
+        open={openCustomButton}
+        onClose={() => handleClose("custom")}
+        onSave={handleSave}
+      />
+
+      <UploadMyBannerModal
+        open={uploadBanner}
+        onClose={() => handleClose("banner")}
+        onSave={handleSave}
+      />
+
+      <GiveUsFeedbackModal
+        open={feedbackModal}
+        onClose={() => handleClose("feedback")}
+        onSave={handleSave}
+      />
+
+      <VideoConferenceModal
+        open={openVideo}
+        onClose={() => handleClose("video")}
         onSave={handleSave}
       />
     </>
