@@ -21,6 +21,11 @@ import CustomButtonModal from "../../component/Dialog/CustomButtonDialog";
 import UploadMyBannerModal from "../../component/Dialog/UploadBanner";
 import GiveUsFeedbackModal from "../../component/Dialog/FeedbackDialog";
 import VideoConferenceModal from "../../component/Dialog/VideoConference";
+import JoinOurWebinarModal from "../../component/Dialog/WebinarModal";
+import AppDownloadModal from "../../component/Dialog/DownloadApp";
+import PostJobOfferModal from "../../component/Dialog/jobOffer";
+import JoinNewsletterModal from "../../component/Dialog/NewsLetter";
+import CustomHtmlModal from "../../component/Dialog/HTMLModal";
 
 const CTACard = ({ title, icon: Icon, onClick, isPro }) => (
   <Box
@@ -84,6 +89,11 @@ const CTA = () => {
   const [uploadBanner, setUploadBanner] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState(false);
   const [openVideo, setOpenVideo] = useState(false);
+  const [openWebinar, setOpenWebinar] = useState(false);
+  const [openAppDownload, setOpenAppDownload] = useState(false);
+  const [jobModal, setJobModal] = useState(false);
+  const [newsletterModal, setNewsletterModal] = useState(false);
+  const [openHtml, setOpenHtml] = useState(false);
 
   const handleOpen = (type) => {
     if (type === "scheduler") {
@@ -110,6 +120,22 @@ const CTA = () => {
     if (type === "video") {
       setOpenVideo(true);
     }
+    if (type === "webinar") {
+      setOpenWebinar(true);
+    }
+    if (type === "appDownload") {
+      setOpenAppDownload(true);
+    }
+    if (type === "job") {
+      setJobModal(true);
+    }
+    if (type === "newsletter") {
+      setNewsletterModal(true);
+    }
+    if (type === "html") {
+      setOpenHtml(true);
+    }
+
   };
 
   const handleClose = (type) => {
@@ -137,6 +163,21 @@ const CTA = () => {
     if (type === "video") {
       setOpenVideo(false);
     }
+    if (type === "webinar") {
+      setOpenWebinar(false);
+    }
+    if (type === "appDownload") {
+      setOpenAppDownload(false);
+    }
+    if (type === "job") {
+      setJobModal(false);
+    }
+    if (type === "newsletter") {
+      setNewsletterModal(false);
+    }
+    if (type === "html") {
+      setOpenHtml(false);
+    }
   };
 
   const handleSave = (formData) => {
@@ -159,7 +200,7 @@ const CTA = () => {
     { title: "Give Feedback", icon: MessageSquare, type: "feedback" },
     { title: "Video conference", icon: PhoneInTalk, type: "video" },
     { title: "Join a webinar", icon: Groups, type: "webinar" },
-    { title: "Download app", icon: CloudDownload, type: "app" },
+    { title: "Download app", icon: CloudDownload, type: "appDownload" },
     { title: "Post a job offer", icon: Work, type: "job", isPro: true },
     { title: "Join newsletter", icon: Mail, type: "newsletter" },
     { title: "HTML", icon: Code, type: "html", isPro: true },
@@ -221,6 +262,35 @@ const CTA = () => {
       <VideoConferenceModal
         open={openVideo}
         onClose={() => handleClose("video")}
+        onSave={handleSave}
+      />
+
+      <JoinOurWebinarModal
+        open={openWebinar}
+        onClose={() => handleClose("webinar")}
+        onSave={handleSave}
+      />
+
+      <AppDownloadModal
+        open={openAppDownload}
+        onClose={() => handleClose("appDownload")}
+        onSave={handleSave}
+      />
+
+      <PostJobOfferModal
+        open={jobModal}
+        onClose={() => handleClose("job")}
+        onSave={handleSave}
+      />
+
+      <JoinNewsletterModal
+        open={newsletterModal}
+        onClose={() => handleClose("newsletter")}
+        onSave={handleSave}
+      />
+      <CustomHtmlModal
+        open={openHtml}
+        onClose={() => handleClose("html")}
         onSave={handleSave}
       />
     </>
