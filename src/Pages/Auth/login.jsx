@@ -53,19 +53,20 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateForm();
+    // const validationErrors = validateForm();
 
-    if (Object.keys(validationErrors).length === 0) {
-      setIsSubmitting(true);
-      // Simulate API call
-      setTimeout(() => {
-        console.log("Login data:", formData);
-        setIsSubmitting(false);
-        alert("Login successful!");
-      }, 2000);
-    } else {
-      setErrors(validationErrors);
-    }
+    // if (Object.keys(validationErrors).length === 0) {
+    //   setIsSubmitting(true);
+    //   // Simulate API call
+    //   setTimeout(() => {
+    //     console.log("Login data:", formData);
+    //     setIsSubmitting(false);
+    //     alert("Login successful!");
+    //   }, 2000);
+    // } else {
+    //   setErrors(validationErrors);
+    // }
+    navigate("/dashboard/detail");
   };
 
   const validateForm = () => {
