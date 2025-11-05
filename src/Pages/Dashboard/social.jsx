@@ -17,7 +17,6 @@ import {
   IconButton,
   TextField,
 } from "@mui/material";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 const Social = () => {
   const [socialProfiles, setSocialProfiles] = useState([

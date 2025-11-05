@@ -14,6 +14,7 @@ import {
   Work,
 } from "@mui/icons-material";
 import { SquareScissors, Upload, MessageSquare } from "lucide-react";
+import OnlineMeetingScheduler from "../../component/Dialog/OnlineScheduler";
 
 const CTACard = ({ title, icon: Icon, onClick, isPro }) => (
   <Box
@@ -70,35 +71,43 @@ const CTACard = ({ title, icon: Icon, onClick, isPro }) => (
 
 const CTA = () => {
   const [open, setOpen] = useState(false);
-  const [modalType, setModalType] = useState(null);
+  const [openScheduler, setOpenScheduler] = useState(false);
 
   const handleOpen = (type) => {
-    setModalType(type);
-    setOpen(true);
+    if (type === "scheduler") {
+      setOpenScheduler(true);
+    }
+    
   };
 
-  const handleClose = () => {
-    setOpen(false);
-    setModalType(null);
+  const handleClose = (type) => {
+    if (type === "scheduler") {
+      setOpenScheduler(false);
+    }
   };
 
   const handleSave = (formData) => {
-    console.log("Saving CTA data:", { type: modalType, data: formData });
+    console.log("Saving CTA data:", { data: formData });
     handleClose();
   };
 
   const ctaOptions = [
     { title: "Online scheduler", icon: EventAvailable, type: "scheduler" },
-    { title: "Online payments", icon: Payment, type: "payments" , isPro: true},
+    // { title: "Online payments", icon: Payment, type: "payments", isPro: true },
     { title: "Social buttons", icon: Share, type: "social" },
-    { title: "Pre designed Banner", icon: Flag, type: "Prebanner" , isPro: true},
+    {
+      title: "Pre designed Banner",
+      icon: Flag,
+      type: "Prebanner",
+      isPro: true,
+    },
     { title: "Custom button", icon: SquareScissors, type: "custom" },
     { title: "Upload Banner", icon: Upload, type: "banner" },
     { title: "Give Feedback", icon: MessageSquare, type: "feedback" },
     { title: "Video conference", icon: PhoneInTalk, type: "video" },
     { title: "Join a webinar", icon: Groups, type: "webinar" },
     { title: "Download app", icon: CloudDownload, type: "app" },
-    { title: "Post a job offer", icon: Work, type: "job" , isPro: true},
+    { title: "Post a job offer", icon: Work, type: "job", isPro: true },
     { title: "Join newsletter", icon: Mail, type: "newsletter" },
     { title: "HTML", icon: Code, type: "html", isPro: true },
   ];
@@ -120,10 +129,9 @@ const CTA = () => {
         ))}
       </Box>
 
-      <CustomDialog
-        open={open}
-        onClose={handleClose}
-        type={modalType}
+      <OnlineMeetingScheduler
+        open={openScheduler}
+        onClose={() => handleClose("scheduler")}
         onSave={handleSave}
       />
     </>

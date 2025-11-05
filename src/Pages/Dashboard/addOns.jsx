@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Typography, Grid, Box } from "@mui/material";
-import AddOnDialog from "../../component/Dialog/AddOnDialog";
 import {
   Description,
   FormatQuote,
@@ -10,24 +9,14 @@ import {
 import CollectionsIcon from "@mui/icons-material/Collections";
 import SpaIcon from "@mui/icons-material/Spa";
 import { Signature } from "lucide-react";
+import StyledSigned from "../../component/Dialog/StyledSigned";
+import DisclaimerDialog from "../../component/Dialog/DisclaimerDialog";
+import AddQuoteDialog from "../../component/Dialog/QuoteDialog";
+import YouTubeVideoDialog from "../../component/Dialog/VideoDialog";
+import GreenFooterDialog from "../../component/Dialog/GreenFooter";
+import ImageGalleryDialog from "../../component/Dialog/ImageGallery";
 const AddOnCard = ({ title, icon: Icon, onClick, isPro }) => (
   <>
-    {/* <Card
-      sx={{
-        cursor: "pointer",
-        height: "100%",
-        transition: "transform 0.2s",
-        "&:hover": {
-          transform: "scale(1.02)",
-        },
-      }}
-      onClick={onClick}
-    >
-      <CardContent sx={{ textAlign: "center", p: 3 }}>
-        <Icon sx={{ fontSize: 40, mb: 2, color: "primary.main" }} />
-        <Typography variant="h6">{title}</Typography>
-      </CardContent>
-    </Card> */}
     <Box
       className="d-flex align-items-center justify-content-between p-3"
       sx={{
@@ -82,21 +71,68 @@ const AddOnCard = ({ title, icon: Icon, onClick, isPro }) => (
 );
 
 const AddOn = () => {
-  const [open, setOpen] = useState(false);
-  const [modalType, setModalType] = useState(null);
+  const [openSignOff, setOpenSignOff] = useState(false);
+  const [openDisclaimer, setOpenDisclaimer] = useState(false);
+  const [openQuote, setOpenQuote] = useState(false);
+  const [openVideo, setOpenVideo] = useState(false);
+  const [openGreenFooter, setOpenGreenFooter] = useState(false);
+  const [openImageGallery, setOpenImageGallery] = useState(false);
 
   const handleOpen = (type) => {
-    setModalType(type);
-    setOpen(true);
+    if (type === "signature") {
+      setOpenSignOff(true);
+    }
+
+    if (type === "disclaimer") {
+      setOpenDisclaimer(true);
+    }
+
+    if (type === "quote") {
+      setOpenQuote(true);
+    }
+
+    if (type === "video") {
+      setOpenVideo(true);
+    }
+
+    if (type === "greenFooter") {
+      setOpenGreenFooter(true);
+    }
+
+    if (type === "imageGallery") {
+      setOpenImageGallery(true);
+    }
+
+    // Add other modal handlers here for future implementations
   };
 
-  const handleClose = () => {
-    setOpen(false);
-    setModalType(null);
+  const handleClose = (type) => {
+    if (type === "signature") {
+      setOpenSignOff(false);
+    }
+
+    if (type === "disclaimer") {
+      setOpenDisclaimer(false);
+    }
+    if (type === "quote") {
+      setOpenQuote(false);
+    }
+
+    if (type === "video") {
+      setOpenVideo(false);
+    }
+
+    if (type === "greenFooter") {
+      setOpenGreenFooter(false);
+    }
+
+    if (type === "imageGallery") {
+      setOpenImageGallery(false);
+    }
   };
 
   const handleSave = (formData) => {
-    console.log("Saving data:", { type: modalType, data: formData });
+    console.log("Saving sign off data:", formData);
     // Here you can implement the save functionality
     // For example, dispatch to redux store or make an API call
     handleClose();
@@ -135,11 +171,40 @@ const AddOn = () => {
         ))}
       </Box>
 
-      <AddOnDialog
-        open={open}
-        onClose={handleClose}
-        type={modalType}
+      <StyledSigned
+        open={openSignOff}
+        onClose={() => handleClose("signature")}
         onSave={handleSave}
+      />
+
+      <DisclaimerDialog
+        open={openDisclaimer}
+        onClose={() => handleClose("disclaimer")}
+        onSave={handleSave}
+      />
+
+      <AddQuoteDialog
+        open={openQuote}
+        onClose={() => handleClose("quote")}
+        onSave={handleSave}
+      />
+
+      <YouTubeVideoDialog
+        open={openVideo}
+        onClose={() => handleClose("video")}
+        onSave={handleSave}
+      />
+
+      <GreenFooterDialog
+        open={openGreenFooter}
+        onClose={() => handleClose("greenFooter")}
+        onSave={handleSave}
+      />
+
+      <ImageGalleryDialog
+        open={openImageGallery}
+        onClose={() => handleClose("imageGallery")}
+        onAdd={handleSave}
       />
     </>
   );
