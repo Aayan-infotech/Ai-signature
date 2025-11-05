@@ -4,6 +4,7 @@ const SignatureContext = createContext();
 
 export const SignatureProvider = ({ children }) => {
   const [formData, setFormData] = useState({
+    fontFamily: "Arial",
     name: "Jason Erickson",
     title: "Online marketer",
     company: "JE marketing",

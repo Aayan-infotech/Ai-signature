@@ -49,7 +49,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import CallToActionIcon from "@mui/icons-material/CallToAction";
 import { SquareChevronRight, SquareChevronLeft } from "lucide-react";
-import Ai from "../assets/ai.png";
+import Ai from "../assets/Ai.png";
 import Logo from "../assets/aayan.png";
 const drawerWidth = 200;
 
