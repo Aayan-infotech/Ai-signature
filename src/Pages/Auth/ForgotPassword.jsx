@@ -27,7 +27,7 @@ const ForgotPassword = () => {
       maxWidth={false}
       className="min-vh-100 d-flex align-items-center justify-content-center"
       style={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(169deg,rgba(42, 142, 138, 1) 28%, rgba(109, 195, 109, 1) 78%)",
         padding: "20px",
       }}
     >
@@ -46,7 +46,7 @@ const ForgotPassword = () => {
             variant="h4"
             className="fw-bold"
             style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "#198754",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -79,7 +79,7 @@ const ForgotPassword = () => {
             variant="contained"
             className="py-2 rounded-pill mt-3"
             style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "#198754",
               border: "none",
             }}
           >

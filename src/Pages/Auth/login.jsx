@@ -97,7 +97,7 @@ const Login = () => {
       maxWidth="false"
       className="min-vh-100 d-flex align-items-center justify-content-center"
       style={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(169deg,rgba(42, 142, 138, 1) 28%, rgba(109, 195, 109, 1) 78%)",
         padding: "20px",
       }}
     >
@@ -143,11 +143,12 @@ const Login = () => {
                 variant="h4"
                 className="fw-bold gradient-text"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
+                  // background:
+                  //   "linear-gradient(169deg,rgba(42, 142, 138, 1) 28%, rgba(109, 195, 109, 1) 78%)",
+                  // WebkitBackgroundClip: "text",
+                  // WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
+                  color:"rgba(42, 142, 138, 1)"
                 }}
               >
                 Sign In
@@ -246,7 +247,7 @@ const Login = () => {
                 className="py-3 rounded-pill shadow"
                 style={{
                   background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    "linear-gradient(169deg,rgba(42, 142, 138, 1) 28%, rgba(109, 195, 109, 1) 78%)",
                   border: "none",
                 }}
               >

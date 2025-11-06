@@ -58,7 +58,7 @@ const Signup = () => {
       maxWidth={false}
       className="min-vh-100 d-flex align-items-center justify-content-center"
       style={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(169deg,rgba(42, 142, 138, 1) 28%, rgba(109, 195, 109, 1) 78%)",
         padding: "20px",
       }}
     >
@@ -105,7 +105,7 @@ const Signup = () => {
                 className="fw-bold gradient-text"
                 style={{
                   background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    "#198754",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -241,7 +241,7 @@ const Signup = () => {
                 className="py-2 rounded-pill shadow mt-2"
                 style={{
                   background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    "#198754",
                   border: "none",
                 }}
               >

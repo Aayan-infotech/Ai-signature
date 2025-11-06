@@ -47,6 +47,8 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Footer from "../../component/Footer";
+import { useNavigate } from "react-router-dom";
 
 // Animated wrapper component for fade-in effects
 const FadeInSection = ({ children, delay = 0 }) => {
@@ -70,6 +72,7 @@ const FadeInSection = ({ children, delay = 0 }) => {
 };
 
 export default function Home() {
+  const navigate = useNavigate()
   const testimonials = [
     {
       id: 1,
@@ -232,6 +235,7 @@ export default function Home() {
             <Col lg={3}>
               <animated.div style={buttonAnimation}>
                 <Button
+                onClick={() => navigate("/auth/signup")}
                   size="lg"
                   className="px-5 py-3 fw-semibold"
                   style={{
@@ -765,6 +769,7 @@ export default function Home() {
       <TemplateSelectionSection />
       <CTASection />
       <BenefitsSection />
+      <Footer/>
     </>
   );
 }

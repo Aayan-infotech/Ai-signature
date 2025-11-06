@@ -26,7 +26,7 @@ const VerifyOtp = () => {
       maxWidth={false}
       className="min-vh-100 d-flex align-items-center justify-content-center"
       style={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(169deg,rgba(42, 142, 138, 1) 28%, rgba(109, 195, 109, 1) 78%)",
         padding: "20px",
       }}
     >
@@ -44,7 +44,7 @@ const VerifyOtp = () => {
           variant="h4"
           className="fw-bold mb-2"
           style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "#198754",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
@@ -88,7 +88,7 @@ const VerifyOtp = () => {
             variant="contained"
             className="py-2 rounded-pill"
             style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "#198754",
               border: "none",
             }}
           >
