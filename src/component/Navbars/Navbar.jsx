@@ -14,7 +14,14 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   return (
-    <Navbar expand="lg" className="py-3" style={{ backgroundColor: "#2D1B69" }}>
+    <Navbar
+      expand="lg"
+      className="py-3"
+      style={{
+        background:
+          "rgba(42, 142, 138, 1)",
+      }}
+    >
       <Container>
         <Link to="/" className="text-decoration-none">
           <Navbar.Brand className="text-white fw-bold fs-4">
