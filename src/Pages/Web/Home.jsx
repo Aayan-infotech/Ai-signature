@@ -8,6 +8,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { useSpring, animated, useInView } from "@react-spring/web";
 
 import {
   Container,
@@ -46,6 +47,27 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+
+// Animated wrapper component for fade-in effects
+const FadeInSection = ({ children, delay = 0 }) => {
+  const [ref, inView] = useInView({
+    once: true,
+    rootMargin: "-100px 0px",
+  });
+
+  const animation = useSpring({
+    opacity: inView ? 1 : 0,
+    transform: inView ? "translateY(0px)" : "translateY(30px)",
+    config: { tension: 280, friction: 60 },
+    delay,
+  });
+
+  return (
+    <animated.div ref={ref} style={animation}>
+      {children}
+    </animated.div>
+  );
+};
 
 export default function Home() {
   const testimonials = [
@@ -159,6 +181,26 @@ export default function Home() {
   };
 
   function HeroSection() {
+    const heroAnimation = useSpring({
+      from: { opacity: 0, transform: "translateY(50px)" },
+      to: { opacity: 1, transform: "translateY(0px)" },
+      config: { tension: 280, friction: 60 },
+    });
+
+    const buttonAnimation = useSpring({
+      from: { opacity: 0, transform: "translateY(50px)" },
+      to: { opacity: 1, transform: "translateY(0px)" },
+      config: { tension: 280, friction: 60 },
+      delay: 200,
+    });
+
+    const carouselAnimation = useSpring({
+      from: { opacity: 0, transform: "translateY(50px)" },
+      to: { opacity: 1, transform: "translateY(0px)" },
+      config: { tension: 280, friction: 60 },
+      delay: 400,
+    });
+
     return (
       <div
         style={{
@@ -174,71 +216,77 @@ export default function Home() {
         <Container>
           <Row className="align-items-center gy-3">
             <Col lg={9}>
-              <h1 className="fs-1 fw-bold mb-4">
-                Free Email Signature Generator
-                <br />
-                to Boost Your Personal Brand
-              </h1>
-              <p className="fs-5 mb-4">
-                Create professional email signatures for your entire team.
-                Centrally manage, deploy, and track email signatures across your
-                organization.
-              </p>
+              <animated.div style={heroAnimation}>
+                <h1 className="fs-1 fw-bold mb-4">
+                  Free Email Signature Generator
+                  <br />
+                  to Boost Your Personal Brand
+                </h1>
+                <p className="fs-5 mb-4">
+                  Create professional email signatures for your entire team.
+                  Centrally manage, deploy, and track email signatures across
+                  your organization.
+                </p>
+              </animated.div>
             </Col>
             <Col lg={3}>
-              <Button
-                size="lg"
-                className="px-5 py-3 fw-semibold"
-                style={{
-                  backgroundColor: "#fff",
-                  border: "none",
-                  color: "#2A8E8A",
-                  borderRadius: "30px",
-                }}
-              >
-                Get started
-              </Button>
-              <p className="mt-3 small">
-                No credit card required • 14-day free trial
-              </p>
+              <animated.div style={buttonAnimation}>
+                <Button
+                  size="lg"
+                  className="px-5 py-3 fw-semibold"
+                  style={{
+                    backgroundColor: "#fff",
+                    border: "none",
+                    color: "#2A8E8A",
+                    borderRadius: "30px",
+                  }}
+                >
+                  Get started
+                </Button>
+                <p className="mt-3 small">
+                  No credit card required • 14-day free trial
+                </p>
+              </animated.div>
             </Col>
             <Col lg={12} className="mt-5 mt-lg-3">
-              <Swiper
-                // install Swiper modules
-                modules={[Autoplay, Pagination, Scrollbar, A11y]}
-                spaceBetween={50}
-                slidesPerView={1}
-                pagination={{ clickable: true }}
-                scrollbar={{ draggable: true }}
-                autoplay={{
-                  delay: 3000,
-                  disableOnInteraction: false,
-                }}
-              >
-                <SwiperSlide>
-                  <img
-                    src={Banner1}
-                    alt=""
-                    className="w-100 object-fit-contain"
-                  />
-                </SwiperSlide>
-                <SwiperSlide>
-                  {" "}
-                  <img
-                    src={Banner2}
-                    alt=""
-                    className="w-100 object-fit-contain"
-                  />
-                </SwiperSlide>
-                <SwiperSlide>
-                  {" "}
-                  <img
-                    src={Banner3}
-                    alt=""
-                    className="w-100 object-fit-contain"
-                  />
-                </SwiperSlide>
-              </Swiper>
+              <animated.div style={carouselAnimation}>
+                <Swiper
+                  // install Swiper modules
+                  modules={[Autoplay, Pagination, Scrollbar, A11y]}
+                  spaceBetween={50}
+                  slidesPerView={1}
+                  pagination={{ clickable: true }}
+                  scrollbar={{ draggable: true }}
+                  autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                  }}
+                >
+                  <SwiperSlide>
+                    <img
+                      src={Banner1}
+                      alt=""
+                      className="w-100 object-fit-contain"
+                    />
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    {" "}
+                    <img
+                      src={Banner2}
+                      alt=""
+                      className="w-100 object-fit-contain"
+                    />
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    {" "}
+                    <img
+                      src={Banner3}
+                      alt=""
+                      className="w-100 object-fit-contain"
+                    />
+                  </SwiperSlide>
+                </Swiper>
+              </animated.div>
             </Col>
           </Row>
         </Container>
@@ -251,125 +299,135 @@ export default function Home() {
       <div>
         <Container fluid className="px-0 mx-0 overflow-hidden">
           {/* --- Block 1: Keep as is (Text then Image) --- */}
-          <div className="row align-items-center gy-4">
-            <div className="col-lg-6 px-0">
-              <h2 className="text-center mb-4 fw-bold">
-                Create professional email signatures for your entire team to
-                standout.
-              </h2>
-              <div className="text-center">
-                <Button variant="dark" size="lg" className="mt-3">
-                  View Setup Guide
-                </Button>
+          <FadeInSection>
+            <div className="row align-items-center gy-4">
+              <div className="col-lg-6 px-0">
+                <h2 className="text-center mb-4 fw-bold">
+                  Create professional email signatures for your entire team to
+                  standout.
+                </h2>
+                <div className="text-center">
+                  <Button variant="dark" size="lg" className="mt-3">
+                    View Setup Guide
+                  </Button>
+                </div>
+              </div>
+              <div className="col-lg-6 px-0">
+                <img
+                  src={Banner4}
+                  alt="Team signature management illustration"
+                  className="w-100 object-fit-contain"
+                />
               </div>
             </div>
-            <div className="col-lg-6 px-0">
-              <img
-                src={Banner4}
-                alt="Team signature management illustration"
-                className="w-100 object-fit-contain"
-              />
-            </div>
-          </div>
+          </FadeInSection>
 
           {/* --- Block 2: Keep as is (Image then Text) --- */}
-          <div className="row align-items-center gy-4">
-            <div className="col-lg-6 px-0">
-              <img
-                src={Banner5}
-                alt="Signature design preview"
-                className="w-100 object-fit-contain"
-              />
-            </div>
-            <div className="col-lg-6 px-0">
-              <h2 className="text-center mb-4 fw-bold">
-                Create professional email signatures to make a Branding
-              </h2>
-              <div className="text-center">
-                <Button variant="dark" size="lg" className="mt-3">
-                  View Setup Guide
-                </Button>
+          <FadeInSection delay={100}>
+            <div className="row align-items-center gy-4">
+              <div className="col-lg-6 px-0">
+                <img
+                  src={Banner5}
+                  alt="Signature design preview"
+                  className="w-100 object-fit-contain"
+                />
+              </div>
+              <div className="col-lg-6 px-0">
+                <h2 className="text-center mb-4 fw-bold">
+                  Create professional email signatures to make a Branding
+                </h2>
+                <div className="text-center">
+                  <Button variant="dark" size="lg" className="mt-3">
+                    View Setup Guide
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          </FadeInSection>
 
           {/* --- Block 3: ADDED attractive marketing line and button (Text then Image) --- */}
-          <div className="row align-items-center gy-4">
-            <div className="col-lg-6 px-0">
-              <h2 className="text-center mb-4 fw-bold">
-                💰 <span className="text-primary">Drive Sales</span> with Every
-                Email. Turn your signatures into a marketing channel!
-              </h2>
-              <p className="text-center mb-4">
-                Add dynamic banners, special promotions, and social links to
-                every outgoing message effortlessly.
-              </p>
-              <div className="text-center">
-                <Button variant="dark" size="lg" className="mt-3">
-                  Create Signature Now
-                </Button>
+          <FadeInSection delay={100}>
+            <div className="row align-items-center gy-4">
+              <div className="col-lg-6 px-0">
+                <h2 className="text-center mb-4 fw-bold">
+                  💰 <span className="text-primary">Drive Sales</span> with
+                  Every Email. Turn your signatures into a marketing channel!
+                </h2>
+                <p className="text-center mb-4">
+                  Add dynamic banners, special promotions, and social links to
+                  every outgoing message effortlessly.
+                </p>
+                <div className="text-center">
+                  <Button variant="dark" size="lg" className="mt-3">
+                    Create Signature Now
+                  </Button>
+                </div>
+              </div>
+              <div className="col-lg-6 px-0">
+                <img
+                  src={Banner6}
+                  alt="Marketing banner in email signature"
+                  className="w-100 object-fit-contain"
+                />
               </div>
             </div>
-            <div className="col-lg-6 px-0">
-              <img
-                src={Banner6}
-                alt="Marketing banner in email signature"
-                className="w-100 object-fit-contain"
-              />
-            </div>
-          </div>
+          </FadeInSection>
 
           {/* --- Block 4: ADDED attractive marketing line and button (Image then Text) --- */}
-          <div className="row align-items-center gy-4">
-            <div className="col-lg-6 px-0">
-              <img
-                src={Banner7}
-                alt="Centralized management dashboard"
-                className="w-100 object-fit-contain"
-              />
-            </div>
-            <div className="col-lg-6 px-0">
-              <h2 className="text-center mb-4 fw-bold">
-                ✨ <span className="text-success">Perfect Consistency</span>{" "}
-                Across the Board. Manage everyone from one central dashboard.
-              </h2>
-              <p className="text-center mb-4">
-                Eliminate branding errors and ensure every employee's signature
-                is compliant and pixel-perfect, automatically.
-              </p>
-              <div className="text-center">
-                <Button variant="dark" size="lg" className="mt-3">
-                  Start Free Trial
-                </Button>
+          <FadeInSection delay={100}>
+            <div className="row align-items-center gy-4">
+              <div className="col-lg-6 px-0">
+                <img
+                  src={Banner7}
+                  alt="Centralized management dashboard"
+                  className="w-100 object-fit-contain"
+                />
+              </div>
+              <div className="col-lg-6 px-0">
+                <h2 className="text-center mb-4 fw-bold">
+                  ✨ <span className="text-success">Perfect Consistency</span>{" "}
+                  Across the Board. Manage everyone from one central dashboard.
+                </h2>
+                <p className="text-center mb-4">
+                  Eliminate branding errors and ensure every employee's
+                  signature is compliant and pixel-perfect, automatically.
+                </p>
+                <div className="text-center">
+                  <Button variant="dark" size="lg" className="mt-3">
+                    Start Free Trial
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          </FadeInSection>
 
           {/* --- Block 5: ADDED attractive marketing line and button (Text then Image) --- */}
-          <div className="row align-items-center gy-4">
-            <div className="col-lg-6 px-0">
-              <h2 className="text-center mb-4 fw-bold">
-                ⏰ <span className="text-warning">Setup in Minutes</span>, Save
-                Hours. Simple installation for all major email clients.
-              </h2>
-              <p className="text-center mb-4">
-                Our intuitive platform means your team can be up and running
-                with beautiful, professional signatures instantly.
-              </p>
-              <div className="text-center">
-                <Button variant="dark" size="lg" className="mt-3">
-                  View Setup Guide
-                </Button>
+          <FadeInSection delay={100}>
+            <div className="row align-items-center gy-4">
+              <div className="col-lg-6 px-0">
+                <h2 className="text-center mb-4 fw-bold">
+                  ⏰ <span className="text-warning">Setup in Minutes</span>,
+                  Save Hours. Simple installation for all major email clients.
+                </h2>
+                <p className="text-center mb-4">
+                  Our intuitive platform means your team can be up and running
+                  with beautiful, professional signatures instantly.
+                </p>
+                <div className="text-center">
+                  <Button variant="dark" size="lg" className="mt-3">
+                    View Setup Guide
+                  </Button>
+                </div>
+              </div>
+              <div className="col-lg-6 px-0">
+                <img
+                  src={Banner8}
+                  alt="Quick setup process illustration"
+                  className="w-100 object-fit-contain"
+                />
               </div>
             </div>
-            <div className="col-lg-6 px-0">
-              <img
-                src={Banner8}
-                alt="Quick setup process illustration"
-                className="w-100 object-fit-contain"
-              />
-            </div>
-          </div>
+          </FadeInSection>
         </Container>
       </div>
     );
@@ -377,58 +435,63 @@ export default function Home() {
 
   const TestimonialSlider = () => {
     return (
-      <Box sx={{ py: 8, bgcolor: "background.paper" }}>
-        <Container fluid>
-          {" "}
-          {/* Bootstrap container for centered and responsive content */}
-          <Box
-            className="d-flex justify-content-between align-items-center mb-4"
-            sx={{ maxWidth: "100%", mx: "auto" }} // Adjust max-width as needed
-          >
-            <Typography variant="h5" component="h5" fontWeight="light">
-              Professionals choose the **MySignature** free email signature
-              generator to get the most out of their emails
-            </Typography>
-            <Box className="d-none d-md-flex">
-              {" "}
-              {/* Navigation visible on medium/large screens */}
-              <IconButton className="swiper-button-prev-custom" sx={{ mr: 1 }}>
-                <ArrowBackIcon />
-              </IconButton>
-              <IconButton className="swiper-button-next-custom">
-                <ArrowForwardIcon />
-              </IconButton>
+      <FadeInSection>
+        <Box sx={{ py: 8, bgcolor: "background.paper" }}>
+          <Container fluid>
+            {" "}
+            {/* Bootstrap container for centered and responsive content */}
+            <Box
+              className="d-flex justify-content-between align-items-center mb-4"
+              sx={{ maxWidth: "100%", mx: "auto" }} // Adjust max-width as needed
+            >
+              <Typography variant="h5" component="h5" fontWeight="light">
+                Professionals choose the **MySignature** free email signature
+                generator to get the most out of their emails
+              </Typography>
+              <Box className="d-none d-md-flex">
+                {" "}
+                {/* Navigation visible on medium/large screens */}
+                <IconButton
+                  className="swiper-button-prev-custom"
+                  sx={{ mr: 1 }}
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+                <IconButton className="swiper-button-next-custom">
+                  <ArrowForwardIcon />
+                </IconButton>
+              </Box>
             </Box>
-          </Box>
-          <hr /> {/* Horizontal rule from the image */}
-          {/* Swiper Slider setup */}
-          <Swiper
-            modules={[Navigation]}
-            spaceBetween={30}
-            slidesPerView={1}
-            navigation={{
-              prevEl: ".swiper-button-prev-custom",
-              nextEl: ".swiper-button-next-custom",
-            }}
-            breakpoints={{
-              768: {
-                // Show 2 slides on screens >= 768px (like in the image)
-                slidesPerView: 2,
-                spaceBetween: 50,
-              },
-            }}
-            style={{ padding: "20px 0" }} // Add some vertical padding
-          >
-            {testimonials.map((testimonial) => (
-              <SwiperSlide key={testimonial.id}>
-                {/* Ensure slides are vertically aligned nicely */}
-                <TestimonialCard {...testimonial} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-          <hr /> {/* Second horizontal rule */}
-        </Container>
-      </Box>
+            <hr /> {/* Horizontal rule from the image */}
+            {/* Swiper Slider setup */}
+            <Swiper
+              modules={[Navigation]}
+              spaceBetween={30}
+              slidesPerView={1}
+              navigation={{
+                prevEl: ".swiper-button-prev-custom",
+                nextEl: ".swiper-button-next-custom",
+              }}
+              breakpoints={{
+                768: {
+                  // Show 2 slides on screens >= 768px (like in the image)
+                  slidesPerView: 2,
+                  spaceBetween: 50,
+                },
+              }}
+              style={{ padding: "20px 0" }} // Add some vertical padding
+            >
+              {testimonials.map((testimonial) => (
+                <SwiperSlide key={testimonial.id}>
+                  {/* Ensure slides are vertically aligned nicely */}
+                  <TestimonialCard {...testimonial} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            <hr /> {/* Second horizontal rule */}
+          </Container>
+        </Box>
+      </FadeInSection>
     );
   };
 
@@ -446,36 +509,38 @@ export default function Home() {
           {" "}
           {/* Bootstrap container for centered, responsive content */}
           {/* --- Header Section --- */}
-          <Box sx={{ mb: 6, maxWidth: "800px" }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{ fontWeight: 400, mb: 2 }}
-            >
-              Let's get started! **Choose your email signature template**
-            </Typography>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 300, color: "text.secondary", mb: 4 }}
-            >
-              Explore hundreds of professionally designed templates tailored for
-              every profession and industry.
-            </Typography>
+          <FadeInSection>
+            <Box sx={{ mb: 6, maxWidth: "800px" }}>
+              <Typography
+                variant="h3"
+                component="h1"
+                sx={{ fontWeight: 400, mb: 2 }}
+              >
+                Let's get started! **Choose your email signature template**
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 300, color: "text.secondary", mb: 4 }}
+              >
+                Explore hundreds of professionally designed templates tailored
+                for every profession and industry.
+              </Typography>
 
-            {/* MUI Button styled to look like the dark, prominent CTA */}
-            <Button
-              style={{
-                backgroundColor: "#1a2333", // Custom dark color
-                border: 0,
-                textTransform: "none",
-                fontSize: "1rem",
-                padding: "1rem 1.5rem",
-              }}
-              onClick={() => console.log("View All Templates clicked")}
-            >
-              View All Templates
-            </Button>
-          </Box>
+              {/* MUI Button styled to look like the dark, prominent CTA */}
+              <Button
+                style={{
+                  backgroundColor: "#1a2333", // Custom dark color
+                  border: 0,
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  padding: "1rem 1.5rem",
+                }}
+                onClick={() => console.log("View All Templates clicked")}
+              >
+                View All Templates
+              </Button>
+            </Box>
+          </FadeInSection>
           {/* --- Template Cards Grid --- */}
           {/* Bootstrap Row for the horizontal layout */}
         </Container>
@@ -502,13 +567,15 @@ export default function Home() {
           style={{ padding: "20px 0" }} // Add some vertical padding
         >
           {" "}
-          {templatesData.map((template) => (
+          {templatesData.map((template, idx) => (
             // Bootstrap Col for responsive columns
             <SwiperSlide key={template.id}>
-              {/* 4 columns on large screens (3 per row)
-                  6 columns on medium screens (2 per row)
-                  12 columns on small screens (1 per row) */}
-              <TemplateCard templateName={template.name} />
+              <FadeInSection delay={idx * 100}>
+                {/* 4 columns on large screens (3 per row)
+                    6 columns on medium screens (2 per row)
+                    12 columns on small screens (1 per row) */}
+                <TemplateCard templateName={template.name} />
+              </FadeInSection>
             </SwiperSlide>
           ))}
         </Swiper>
@@ -540,31 +607,35 @@ export default function Home() {
 
     return (
       <Container className="py-5 my-5">
-        <h2
-          className="text-center mb-5 fw-bold"
-          style={{ color: "rgba(42, 142, 138, 1)", fontSize: "2.5rem" }}
-        >
-          Centralized email signature management at scale.
-        </h2>
+        <FadeInSection>
+          <h2
+            className="text-center mb-5 fw-bold"
+            style={{ color: "rgba(42, 142, 138, 1)", fontSize: "2.5rem" }}
+          >
+            Centralized email signature management at scale.
+          </h2>
+        </FadeInSection>
         <Row>
           {features.map((feature, idx) => (
             <Col md={4} key={idx} className="mb-4">
-              <Card
-                className="h-100 border-0 shadow-sm"
-                style={{ borderRadius: "15px" }}
-              >
-                <Card.Body className="p-4">
-                  <div className="mb-3" style={{ color: "#6dc36d" }}>
-                    {feature.icon}
-                  </div>
-                  <Card.Title className="fw-bold mb-3">
-                    {feature.title}
-                  </Card.Title>
-                  <Card.Text className="text-muted">
-                    {feature.description}
-                  </Card.Text>
-                </Card.Body>
-              </Card>
+              <FadeInSection delay={idx * 100}>
+                <Card
+                  className="h-100 border-0 shadow-sm"
+                  style={{ borderRadius: "15px" }}
+                >
+                  <Card.Body className="p-4">
+                    <div className="mb-3" style={{ color: "#6dc36d" }}>
+                      {feature.icon}
+                    </div>
+                    <Card.Title className="fw-bold mb-3">
+                      {feature.title}
+                    </Card.Title>
+                    <Card.Text className="text-muted">
+                      {feature.description}
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </FadeInSection>
             </Col>
           ))}
         </Row>
@@ -584,46 +655,50 @@ export default function Home() {
         <Container>
           <Row className="align-items-center">
             <Col lg={6}>
-              <h2 className="display-5 fw-bold mb-4">
-                One setup. Total autonomy.
-              </h2>
-              <p className="fs-5 mb-4">
-                Set up once and let your team create their own professional
-                email signatures. Maintain brand consistency while giving
-                employees creative freedom.
-              </p>
-              <Button
-                size="lg"
-                className="px-5 py-3 fw-semibold"
-                style={{
-                  backgroundColor: "#6dc36d",
-                  border: "none",
-                  borderRadius: "30px",
-                }}
-              >
-                Try it free
-              </Button>
+              <FadeInSection>
+                <h2 className="display-5 fw-bold mb-4">
+                  One setup. Total autonomy.
+                </h2>
+                <p className="fs-5 mb-4">
+                  Set up once and let your team create their own professional
+                  email signatures. Maintain brand consistency while giving
+                  employees creative freedom.
+                </p>
+                <Button
+                  size="lg"
+                  className="px-5 py-3 fw-semibold"
+                  style={{
+                    backgroundColor: "#6dc36d",
+                    border: "none",
+                    borderRadius: "30px",
+                  }}
+                >
+                  Try it free
+                </Button>
+              </FadeInSection>
             </Col>
             <Col lg={6} className="mt-5 mt-lg-0">
-              <div
-                style={{
-                  backgroundColor: "#f8f9fa",
-                  borderRadius: "15px",
-                  padding: "40px",
-                  boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
-                }}
-              >
-                <div className="text-center" style={{ color: "#333" }}>
-                  <Mail
-                    size={60}
-                    style={{ color: "#6dc36d", marginBottom: "20px" }}
-                  />
-                  <h4 className="fw-bold mb-3">Central Management</h4>
-                  <p className="text-muted">
-                    Control all signatures from one dashboard
-                  </p>
+              <FadeInSection delay={200}>
+                <div
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "15px",
+                    padding: "40px",
+                    boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+                  }}
+                >
+                  <div className="text-center" style={{ color: "#333" }}>
+                    <Mail
+                      size={60}
+                      style={{ color: "#6dc36d", marginBottom: "20px" }}
+                    />
+                    <h4 className="fw-bold mb-3">Central Management</h4>
+                    <p className="text-muted">
+                      Control all signatures from one dashboard
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </FadeInSection>
             </Col>
           </Row>
         </Container>
@@ -657,19 +732,23 @@ export default function Home() {
 
     return (
       <Container className="py-5 my-5">
-        <h2
-          className="text-center mb-5 fw-bold"
-          style={{ color: "#2a8e8a", fontSize: "2.5rem" }}
-        >
-          Built on trust. Experts you can count on.
-        </h2>
+        <FadeInSection>
+          <h2
+            className="text-center mb-5 fw-bold"
+            style={{ color: "#2a8e8a", fontSize: "2.5rem" }}
+          >
+            Built on trust. Experts you can count on.
+          </h2>
+        </FadeInSection>
         <Row className="justify-content-center">
           {benefits.map((benefit, idx) => (
             <Col md={3} sm={6} key={idx} className="text-center mb-4">
-              <div style={{ color: "#6dc36d" }} className="mb-3">
-                {benefit.icon}
-              </div>
-              <h5 className="fw-bold">{benefit.text}</h5>
+              <FadeInSection delay={idx * 100}>
+                <div style={{ color: "#6dc36d" }} className="mb-3">
+                  {benefit.icon}
+                </div>
+                <h5 className="fw-bold">{benefit.text}</h5>
+              </FadeInSection>
             </Col>
           ))}
         </Row>
