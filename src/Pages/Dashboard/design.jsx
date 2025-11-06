@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import {
   Typography,
   Box,
@@ -9,384 +9,304 @@ import {
   InputLabel,
   TextField,
   Slider,
-  Button,
-  ButtonGroup,
   Tabs,
   Tab,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   ToggleButtonGroup,
   ToggleButton,
 } from "@mui/material";
-import CropSquareIcon from "@mui/icons-material/CropSquare";
-import CropDinIcon from "@mui/icons-material/CropDin";
-import PanoramaFishEyeIcon from "@mui/icons-material/PanoramaFishEye";
-import AlignHorizontalLeftIcon from "@mui/icons-material/AlignHorizontalLeft";
-import AlignHorizontalRightIcon from "@mui/icons-material/AlignHorizontalRight";
-import AlignVerticalTopIcon from "@mui/icons-material/AlignVerticalTop";
-import AlignVerticalBottomIcon from "@mui/icons-material/AlignVerticalBottom";
-import CallIcon from "@mui/icons-material/Call";
-import { HorizontalRule } from "@mui/icons-material";
-import CircleIcon from "@mui/icons-material/Circle";
-import SquareIcon from "@mui/icons-material/Square";
-import FacebookIcon from "@mui/icons-material/Facebook";
+import {
+  CropSquare as CropSquareIcon,
+  CropDin as CropDinIcon,
+  PanoramaFishEye as PanoramaFishEyeIcon,
+  AlignHorizontalLeft as AlignHorizontalLeftIcon,
+  AlignHorizontalRight as AlignHorizontalRightIcon,
+  AlignVerticalTop as AlignVerticalTopIcon,
+  AlignVerticalBottom as AlignVerticalBottomIcon,
+  Call as CallIcon,
+  HorizontalRule,
+  Circle as CircleIcon,
+  Square as SquareIcon,
+  Facebook as FacebookIcon,
+} from "@mui/icons-material";
 import { Facebook } from "lucide-react";
+import { useSignature } from "../../hooks/useSignature";
+
+// Font options constant
+const FONT_OPTIONS = [
+  "Roboto",
+  "Open Sans",
+  "Georgia",
+  "Palatino",
+  "Lucida Sans",
+  "Times New Roman",
+  "Courier New",
+];
+
+// Section Header Component
+const SectionHeader = ({ title, showBadge = true }) => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    }}
+  >
+    <Typography variant="h6" gutterBottom>
+      {title}
+    </Typography>
+    {showBadge && (
+      <Badge
+        badgeContent="Pro"
+        color="primary"
+        overlap="circular"
+        sx={{ mr: 2 }}
+      />
+    )}
+  </Box>
+);
+
+// Reusable Row Component
+const SettingRow = ({ label, children }) => (
+  <Box
+    sx={{
+      mt: 3,
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    }}
+  >
+    <Typography variant="body2" color="text.secondary" gutterBottom>
+      {label}
+    </Typography>
+    {children}
+  </Box>
+);
+
+// Color Picker Component
+const ColorPicker = ({ value, onChange }) => (
+  <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    <input
+      type="color"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      style={{ cursor: "pointer" }}
+    />
+    <TextField
+      size="small"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      sx={{ width: 100 }}
+    />
+  </Box>
+);
+
+// Slider with Input Component
+const SliderWithInput = ({
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  width = 200,
+}) => (
+  <Box sx={{ display: "flex", alignItems: "center", gap: 2, width }}>
+    <Slider
+      value={value}
+      onChange={(e, newValue) => onChange(newValue)}
+      min={min}
+      max={max}
+      step={step}
+      sx={{ flex: 1 }}
+    />
+    <TextField
+      size="small"
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      inputProps={{
+        min,
+        max,
+        type: "number",
+        step,
+      }}
+      sx={{ width: 60 }}
+    />
+  </Box>
+);
+
+// Tab Content Component for individual customization
+const CustomizationTab = ({
+  fontField,
+  colorField,
+  fontSizeField,
+  formValue,
+  onUpdate,
+}) => (
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "10px",
+      flexDirection: "column",
+      width: "100%",
+      px: 2,
+    }}
+  >
+    {/* Font Selection */}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "space-between",
+      }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        Font
+      </Typography>
+      <FormControl size="small" sx={{ minWidth: 120 }}>
+        <Select
+          value={formValue[fontField] || ""}
+          onChange={(e) => onUpdate(fontField, e.target.value)}
+        >
+          {FONT_OPTIONS.map((font) => (
+            <MenuItem key={font} value={font}>
+              {font}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
+
+    {/* Color Selection */}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "space-between",
+      }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        Color
+      </Typography>
+      <ColorPicker
+        value={formValue[colorField]}
+        onChange={(value) => onUpdate(colorField, value)}
+      />
+    </Box>
+
+    {/* Font Scale */}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "space-between",
+      }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        Font scale
+      </Typography>
+      <SliderWithInput
+        value={formValue[fontSizeField]}
+        onChange={(value) => onUpdate(fontSizeField, value)}
+        min={8}
+        max={24}
+      />
+    </Box>
+  </Box>
+);
 
 export default function Design() {
-  const [formValue, setFormValue] = React.useState({
-    font: "Arial",
-    color: "#45668E",
-    fontSize: 13,
-    lineSpacing: 1,
-    nameFont: "Arial",
-    nameColor: "#45668E",
-    nameFontSize: 13,
-    titleFont: "Arial",
-    titleColor: "#646464",
-    titleFontSize: 13,
-    companyFont: "Arial",
-    companyColor: "#45668E",
-    companyFontSize: 13,
-    detailsFont: "Arial",
-    detailsColor: "#45668E",
-    detailsSize: 13,
-    shape: "left",
-    size: "center",
-    position: "left",
-    label: "left",
-    direction: "left",
-    separator: "left",
-    socialFill: "left",
-    socialSize: 16,
-    socialSpace: 8,
-    socialColorMode: "web",
-    socialCustomColor: "#1877F2",
-  });
+  const { formData, updateFormData, updateDesignFormData } = useSignature();
+  const [tabValue, setTabValue] = useState(0);
+  const [showCustomization, setShowCustomization] = useState(false);
 
-  const [tabValue, setTabValue] = React.useState(0);
-  const [show, setShow] = React.useState(false);
+  // Get design values
+  const designValues = useMemo(() => formData.design || {}, [formData.design]);
+  console.log(designValues);
+
+  // Update global font
+  const handleGlobalFontChange = (font) => {
+    updateFormData({ fontFamily: font });
+    updateDesignFormData({ font });
+  };
+
+  // Update design field
+  const updateDesignField = (field, value) => {
+    updateDesignFormData({ [field]: value });
+  };
+
+  // Handlers
+  const handleToggleChange = (name) => (event, newValue) => {
+    if (newValue !== null) {
+      updateDesignField(name, newValue);
+    }
+  };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
-  const handleChange = (event) => {
-    setFormValue({
-      ...formValue,
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  const handleToggleChange = (name) => (event, newValue) => {
-    if (newValue !== null) {
-      setFormValue({
-        ...formValue,
-        [name]: newValue,
-      });
-    }
-  };
-
-  const handleSliderChange = (name) => (event, newValue) => {
-    setFormValue({
-      ...formValue,
-      [name]: newValue,
-    });
-  };
-
-  const handleNumberChange = (name) => (event) => {
-    setFormValue({
-      ...formValue,
-      [name]: Number(event.target.value),
-    });
-  };
-
-  const handleBooleanChange = (name) => (event) => {
-    setFormValue({
-      ...formValue,
-      [name]: event.target.checked,
-    });
-  };
-
-  // Common Tab Content Component
-  const TabContent = ({ fontField, colorField, fontSizeField }) => (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "flex-start",
-        gap: "10px",
-        flexDirection: "column",
-        width: "100%",
-        px: 2,
-      }}
-    >
-      {/* Font Selection */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          flexDirection: "row",
-          width: "100%",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          Font
-        </Typography>
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <Select
-            value={formValue[fontField]}
-            name={fontField}
-            onChange={handleChange}
-          >
-            <MenuItem value={"Arial"}>Arial</MenuItem>
-            <MenuItem value={"Verdana"}>Verdana</MenuItem>
-            <MenuItem value={"Georgia"}>Georgia</MenuItem>
-            <MenuItem value={"Palatino"}>Palatino</MenuItem>
-            <MenuItem value={"Lucida Sans"}>Lucida Sans</MenuItem>
-            <MenuItem value={"Times New Roman"}>Times New Roman</MenuItem>
-            <MenuItem value={"Courier New"}>Courier New</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-
-      {/* Color Selection */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          flexDirection: "row",
-          width: "100%",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          Color
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <input
-            type="color"
-            value={formValue[colorField]}
-            onChange={(e) =>
-              setFormValue({ ...formValue, [colorField]: e.target.value })
-            }
-          />
-          <TextField
-            size="small"
-            value={formValue[colorField]}
-            onChange={(e) =>
-              setFormValue({ ...formValue, [colorField]: e.target.value })
-            }
-            sx={{ width: 100 }}
-          />
-        </Box>
-      </Box>
-
-      {/* Font Scale */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          flexDirection: "row",
-          width: "100%",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          Font scale
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: 200 }}>
-          <Slider
-            value={formValue[fontSizeField]}
-            onChange={handleSliderChange(fontSizeField)}
-            min={8}
-            max={24}
-            step={1}
-            sx={{ flex: 1 }}
-          />
-          <TextField
-            size="small"
-            value={formValue[fontSizeField]}
-            onChange={handleNumberChange(fontSizeField)}
-            inputProps={{
-              min: 8,
-              max: 24,
-              type: "number",
-            }}
-            sx={{ width: 60 }}
-          />
-        </Box>
-      </Box>
-    </Box>
-  );
+  const customizationTabs = [
+    {
+      label: "Name",
+      fontField: "nameFont",
+      colorField: "nameColor",
+      fontSizeField: "nameFontSize",
+    },
+    {
+      label: "Title",
+      fontField: "titleFont",
+      colorField: "titleColor",
+      fontSizeField: "titleFontSize",
+    },
+    {
+      label: "Company",
+      fontField: "companyFont",
+      colorField: "companyColor",
+      fontSizeField: "companyFontSize",
+    },
+    {
+      label: "Details",
+      fontField: "detailsFont",
+      colorField: "detailsColor",
+      fontSizeField: "detailsSize",
+    },
+  ];
 
   return (
     <Box>
       {/* Style Section */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h6" gutterBottom>
-          Style
-        </Typography>
-        <Badge
-          badgeContent="Pro"
-          color="primary"
-          overlap="circular"
-          sx={{ mr: 2 }}
-        />
-      </Box>
-
+      <SectionHeader title="Style" />
       <Box sx={{ mt: 1 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mt: 3,
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Font
-          </Typography>
-          <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-            <InputLabel id="font-select-label">Font</InputLabel>
-            <Select
-              labelId="font-select-label"
-              value={formValue.font}
-              label="Font"
-              name="font"
-              onChange={handleChange}
-            >
-              <MenuItem value={"Arial"}>Arial</MenuItem>
-              <MenuItem value={"Verdana"}>Verdana</MenuItem>
-              <MenuItem value={"Georgia"}>Georgia</MenuItem>
-              <MenuItem value={"Palatino"}>Palatino</MenuItem>
-              <MenuItem value={"Lucida Sans"}>Lucida Sans</MenuItem>
-              <MenuItem value={"Times New Roman"}>Times New Roman</MenuItem>
-              <MenuItem value={"Courier New"}>Courier New</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mt: 3,
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Template Color
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <input
-              type="color"
-              value={formValue.color}
-              onChange={(e) =>
-                setFormValue({ ...formValue, color: e.target.value })
-              }
-            />
-            <TextField
-              size="small"
-              value={formValue.color}
-              onChange={(e) =>
-                setFormValue({ ...formValue, color: e.target.value })
-              }
-              sx={{ width: 100 }}
-            />
-          </Box>
-        </Box>
-
-        {/* Font Scale */}
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Font scale
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Slider
-              value={formValue.fontSize}
-              onChange={handleSliderChange("fontSize")}
-              min={8}
-              max={24}
-              step={1}
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              size="small"
-              value={formValue.fontSize}
-              onChange={handleNumberChange("fontSize")}
-              inputProps={{
-                min: 8,
-                max: 24,
-                type: "number",
-              }}
-              sx={{ width: 80 }}
-            />
-          </Box>
-        </Box>
-
-        {/* Line Spacing */}
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Line spacing
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Slider
-              value={formValue.lineSpacing}
-              onChange={handleSliderChange("lineSpacing")}
-              min={0.8}
-              max={3}
-              step={0.1}
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              size="small"
-              value={formValue.lineSpacing}
-              onChange={handleNumberChange("lineSpacing")}
-              inputProps={{
-                min: 0.8,
-                max: 3,
-                type: "number",
-                step: 0.1,
-              }}
-              sx={{ width: 80 }}
-            />
-          </Box>
-        </Box>
-
-        {/* Hide section */}
+        {/* Customization Toggle */}
         <Box sx={{ my: 3, display: "flex", justifyContent: "space-between" }}>
           <Typography variant="body1" color="text.secondary" gutterBottom>
             Customize each detail individually
           </Typography>
           <Typography
             variant="body2"
-            color="text.secondary"
+            color="primary"
             gutterBottom
-            sx={{ textAlign: "end", cursor: "pointer" }}
-            onClick={() => setShow(!show)}
+            sx={{ textAlign: "end", cursor: "pointer", fontWeight: 500 }}
+            onClick={() => setShowCustomization(!showCustomization)}
           >
-            {show ? "Hide" : "Show"}
+            {showCustomization ? "Hide" : "Show"}
           </Typography>
         </Box>
 
-        {show && (
+        {/* Customization Tabs */}
+        {showCustomization && (
           <Box
-            sx={{
-              mb: 2,
-              display: "flex",
-              flexDirection: "row",
-              gap: "10px",
-            }}
+            sx={{ mb: 2, display: "flex", flexDirection: "row", gap: "10px" }}
           >
             <Tabs
               value={tabValue}
@@ -395,206 +315,103 @@ export default function Design() {
               variant="scrollable"
               sx={{ borderRight: 1, borderColor: "divider", minWidth: "100px" }}
             >
-              <Tab label="Name" />
-              <Tab label="Title" />
-              <Tab label="Company" />
-              <Tab label="Details" />
+              {customizationTabs.map((tab) => (
+                <Tab key={tab.label} label={tab.label} />
+              ))}
             </Tabs>
 
-            {/* Tab Content - Now using the common component */}
-            {tabValue === 0 && (
-              <TabContent
-                fontField="nameFont"
-                colorField="nameColor"
-                fontSizeField="nameFontSize"
-              />
-            )}
-
-            {tabValue === 1 && (
-              <TabContent
-                fontField="titleFont"
-                colorField="titleColor"
-                fontSizeField="titleFontSize"
-              />
-            )}
-
-            {tabValue === 2 && (
-              <TabContent
-                fontField="companyFont"
-                colorField="companyColor"
-                fontSizeField="companyFontSize"
-              />
-            )}
-
-            {tabValue === 3 && (
-              <TabContent
-                fontField="detailsFont"
-                colorField="detailsColor"
-                fontSizeField="detailsSize"
-              />
+            {customizationTabs.map(
+              (tab, index) =>
+                tabValue === index && (
+                  <CustomizationTab
+                    key={tab.label}
+                    fontField={tab.fontField}
+                    colorField={tab.colorField}
+                    fontSizeField={tab.fontSizeField}
+                    formValue={designValues}
+                    onUpdate={updateDesignField}
+                  />
+                )
             )}
           </Box>
         )}
       </Box>
-
       <hr />
-
       {/* Images Section */}
       <Box sx={{ mt: 3 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Images
-          </Typography>
-          <Badge
-            badgeContent="Pro"
-            color="primary"
-            overlap="circular"
-            sx={{ mr: 2 }}
-          />
-        </Box>
+        <SectionHeader title="Images" />
 
         {/* Shape */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Shape
-          </Typography>
-          <FormControl component="fieldset">
-            <ToggleButtonGroup
-              value={formValue.shape}
-              exclusive
-              onChange={handleToggleChange("shape")}
-              aria-label="shape"
-            >
-              <ToggleButton value="left" aria-label="square">
-                <CropSquareIcon />
-              </ToggleButton>
-              <ToggleButton value="center" aria-label="rounded">
-                <CropDinIcon />
-              </ToggleButton>
-              <ToggleButton value="right" aria-label="circle">
-                <PanoramaFishEyeIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </FormControl>
-        </Box>
+        <SettingRow label="Shape">
+          <ToggleButtonGroup
+            value={designValues.imageShape || "rounded-2"} // Changed from "shape" to "imageShape"
+            exclusive
+            onChange={handleToggleChange("imageShape")} // Changed from "shape" to "imageShape"
+            aria-label="shape"
+          >
+            <ToggleButton value="rounded-2" aria-label="square">
+              <CropSquareIcon />
+            </ToggleButton>
+            <ToggleButton value="rounded-4" aria-label="rounded">
+              <CropDinIcon />
+            </ToggleButton>
+            <ToggleButton value="rounded-circle" aria-label="circle">
+              {" "}
+              {/* Fixed circle value */}
+              <PanoramaFishEyeIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </SettingRow>
 
         {/* Size */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Size
-          </Typography>
+        <SettingRow label="Size">
           <ToggleButtonGroup
-            value={formValue.size}
+            value={designValues.imageSize || "100px"} // Changed from "size" to "imageSize"
             exclusive
-            onChange={handleToggleChange("size")}
+            onChange={handleToggleChange("imageSize")} // Changed from "size" to "imageSize"
             aria-label="size"
           >
-            <ToggleButton value="left" aria-label="small">
+            <ToggleButton value="80px" aria-label="small">
               <Typography sx={{ fontSize: "12px", mb: 0 }}>s</Typography>
             </ToggleButton>
-            <ToggleButton value="center" aria-label="medium">
+            <ToggleButton value="100px" aria-label="medium">
               <Typography sx={{ fontSize: "16px", mb: 0 }}>S</Typography>
             </ToggleButton>
-            <ToggleButton value="right" aria-label="large">
+            <ToggleButton value="120px" aria-label="large">
               <Typography sx={{ fontSize: "20px", mb: 0 }}>S</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </SettingRow>
 
         {/* Position */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Position
-          </Typography>
+        <SettingRow label="Position">
           <ToggleButtonGroup
-            value={formValue.position}
+            value={designValues.imagePosition || "start"} // Changed from "position" to "imagePosition"
             exclusive
-            onChange={handleToggleChange("position")}
+            onChange={handleToggleChange("imagePosition")} // Changed from "position" to "imagePosition"
             aria-label="position"
           >
-            <ToggleButton value="left" aria-label="left">
+            <ToggleButton value="start" aria-label="left">
               <AlignHorizontalLeftIcon />
             </ToggleButton>
-            <ToggleButton value="center" aria-label="right">
+            <ToggleButton value="center" aria-label="center">
               <AlignHorizontalRightIcon />
             </ToggleButton>
-            <ToggleButton value="right" aria-label="top">
+            <ToggleButton value="end" aria-label="top">
               <AlignVerticalTopIcon />
             </ToggleButton>
-            <ToggleButton value="bottom" aria-label="bottom">
-              <AlignVerticalBottomIcon />
-            </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </SettingRow>
       </Box>
-
       <hr />
-
       {/* Details Section */}
-      <Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Details
-          </Typography>
-          <Badge
-            badgeContent="Pro"
-            color="primary"
-            overlap="circular"
-            sx={{ mr: 2 }}
-          />
-        </Box>
+      <Box sx={{ mt: 3 }}>
+        <SectionHeader title="Details" />
 
         {/* Label */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Label
-          </Typography>
+        <SettingRow label="Label">
           <ToggleButtonGroup
-            value={formValue.label}
+            value={designValues.label || "left"}
             exclusive
             onChange={handleToggleChange("label")}
             aria-label="label"
@@ -614,23 +431,12 @@ export default function Design() {
               <Typography sx={{ mb: 0 }}>None</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </SettingRow>
 
         {/* Direction */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Direction
-          </Typography>
+        <SettingRow label="Direction">
           <ToggleButtonGroup
-            value={formValue.direction}
+            value={designValues.direction || "left"}
             exclusive
             onChange={handleToggleChange("direction")}
             aria-label="direction"
@@ -644,23 +450,12 @@ export default function Design() {
               />
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </SettingRow>
 
         {/* Separator */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Separator
-          </Typography>
+        <SettingRow label="Separator">
           <ToggleButtonGroup
-            value={formValue.separator}
+            value={designValues.separator || "left"}
             exclusive
             onChange={handleToggleChange("separator")}
             aria-label="separator"
@@ -680,45 +475,17 @@ export default function Design() {
               <Typography sx={{ mb: 0 }}>None</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </SettingRow>
       </Box>
       <hr />
-
       {/* Social Icons Section */}
-      <Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Social Icons
-          </Typography>
-          <Badge
-            badgeContent="Pro"
-            color="primary"
-            overlap="circular"
-            sx={{ mr: 2 }}
-          />
-        </Box>
+      <Box sx={{ mt: 3 }}>
+        <SectionHeader title="Social Icons" />
 
         {/* Fill */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Fill
-          </Typography>
+        <SettingRow label="Fill">
           <ToggleButtonGroup
-            value={formValue.socialFill}
+            value={designValues.socialFill || "left"}
             exclusive
             onChange={handleToggleChange("socialFill")}
             aria-label="social fill"
@@ -733,100 +500,39 @@ export default function Design() {
               <Facebook />
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </SettingRow>
 
         {/* Size */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <Box sx={{ mt: 3 }}>
           <Typography variant="body2" color="text.secondary" gutterBottom>
             Size
           </Typography>
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 2, width: 200 }}
-          >
-            <Slider
-              value={formValue.socialSize}
-              onChange={handleSliderChange("socialSize")}
-              min={8}
-              max={48}
-              step={1}
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              size="small"
-              value={formValue.socialSize}
-              onChange={handleNumberChange("socialSize")}
-              inputProps={{
-                min: 8,
-                max: 48,
-                type: "number",
-              }}
-              sx={{ width: 60 }}
-            />
-          </Box>
+          <SliderWithInput
+            value={designValues.socialSize || 16}
+            onChange={(value) => updateDesignField("socialSize", value)}
+            min={8}
+            max={48}
+          />
         </Box>
 
         {/* Space Between */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <Box sx={{ mt: 3 }}>
           <Typography variant="body2" color="text.secondary" gutterBottom>
             Space Between
           </Typography>
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 2, width: 200 }}
-          >
-            <Slider
-              value={formValue.socialSpace}
-              onChange={handleSliderChange("socialSpace")}
-              min={0}
-              max={32}
-              step={1}
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              size="small"
-              value={formValue.socialSpace}
-              onChange={handleNumberChange("socialSpace")}
-              inputProps={{
-                min: 0,
-                max: 32,
-                type: "number",
-              }}
-              sx={{ width: 60 }}
-            />
-          </Box>
+          <SliderWithInput
+            value={designValues.socialSpace || 8}
+            onChange={(value) => updateDesignField("socialSpace", value)}
+            min={0}
+            max={32}
+          />
         </Box>
 
-        {/* Color */}
-        <Box
-          sx={{
-            mt: 3,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Color
-          </Typography>
+        {/* Color Mode */}
+        <SettingRow label="Color">
           <ToggleButtonGroup
             color="primary"
-            value={formValue.socialColorMode}
+            value={designValues.socialColorMode || "web"}
             exclusive
             onChange={handleToggleChange("socialColorMode")}
             aria-label="color mode"
@@ -834,46 +540,18 @@ export default function Design() {
             <ToggleButton value="web">Original</ToggleButton>
             <ToggleButton value="android">Custom</ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </SettingRow>
 
-        {/* Custom Color Picker - Only show when Custom is selected */}
-        {formValue.socialColorMode === "android" && (
-          <Box
-            sx={{
-              mt: 3,
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Custom Color
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <input
-                type="color"
-                value={formValue.socialCustomColor}
-                onChange={(e) =>
-                  setFormValue({
-                    ...formValue,
-                    socialCustomColor: e.target.value,
-                  })
-                }
-              />
-              <TextField
-                size="small"
-                value={formValue.socialCustomColor}
-                onChange={(e) =>
-                  setFormValue({
-                    ...formValue,
-                    socialCustomColor: e.target.value,
-                  })
-                }
-                sx={{ width: 100 }}
-              />
-            </Box>
-          </Box>
+        {/* Custom Color Picker */}
+        {designValues.socialColorMode === "android" && (
+          <SettingRow label="Custom Color">
+            <ColorPicker
+              value={designValues.socialCustomColor || "#1877F2"}
+              onChange={(value) =>
+                updateDesignField("socialCustomColor", value)
+              }
+            />
+          </SettingRow>
         )}
       </Box>
     </Box>
