@@ -53,7 +53,7 @@
 .position-fixed-design-card {
   position: fixed;
   min-height: calc(100vh - 20px);
-  width: -webkit-fill-available;
+  width: calc(100vw - 49vw);
   background-color: #e3dbdb;
   margin: auto;
   display: flex;
