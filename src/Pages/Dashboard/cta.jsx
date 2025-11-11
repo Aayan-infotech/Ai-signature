@@ -27,6 +27,7 @@ import PostJobOfferModal from "../../component/Dialog/jobOffer";
 import JoinNewsletterModal from "../../component/Dialog/NewsLetter";
 import CustomHtmlModal from "../../component/Dialog/HTMLModal";
 
+
 const CTACard = ({ title, icon: Icon, onClick, isPro }) => (
   <Box
     className="d-flex align-items-center justify-content-between p-3"
@@ -94,6 +95,7 @@ const CTA = () => {
   const [jobModal, setJobModal] = useState(false);
   const [newsletterModal, setNewsletterModal] = useState(false);
   const [openHtml, setOpenHtml] = useState(false);
+  const { formData, updateFormData, updateDesignFormData } = useSignature();
 
   const handleOpen = (type) => {
     if (type === "scheduler") {

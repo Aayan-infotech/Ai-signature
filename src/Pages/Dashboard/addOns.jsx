@@ -15,6 +15,7 @@ import AddQuoteDialog from "../../component/Dialog/QuoteDialog";
 import YouTubeVideoDialog from "../../component/Dialog/VideoDialog";
 import GreenFooterDialog from "../../component/Dialog/GreenFooter";
 import ImageGalleryDialog from "../../component/Dialog/ImageGallery";
+import { useSignature } from "../../hooks/useSignature";
 const AddOnCard = ({ title, icon: Icon, onClick, isPro }) => (
   <>
     <Box
@@ -77,7 +78,9 @@ const AddOn = () => {
   const [openVideo, setOpenVideo] = useState(false);
   const [openGreenFooter, setOpenGreenFooter] = useState(false);
   const [openImageGallery, setOpenImageGallery] = useState(false);
+  const { formData, updateFormData, updateDesignFormData } = useSignature();
 
+  console.log("formData", formData);
   const handleOpen = (type) => {
     if (type === "signature") {
       setOpenSignOff(true);

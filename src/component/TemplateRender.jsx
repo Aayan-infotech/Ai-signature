@@ -33,6 +33,7 @@ const TemplateRender = () => {
   };
 
   const SelectedTemplate = templates[selectedTemplate] || Template1;
+  console.log(formData)
 
   return (
     <div className="position-fixed-design-card">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Facebook,
   Instagram,
@@ -17,50 +17,87 @@ import {
   IconButton,
   TextField,
 } from "@mui/material";
+import { useSignature } from "../../hooks/useSignature";
 
 const Social = () => {
-  const [socialProfiles, setSocialProfiles] = useState([
+  const { formData, updateFormData, updateDesignFormData } = useSignature();
+
+
+  // Function to get initial profiles based on current formData
+  const getInitialProfiles = () => [
     {
       platform: "Facebook",
-      url: "https://www.facebook.com",
+      url:
+        formData?.socialLinks?.facebook ||
+        formData?.facebook ||
+        "https://www.facebook.com",
       icon: Facebook,
-      username: "Facebook URL",
       isEditing: false,
-      tempValue: "https://www.facebook.com",
+      tempValue:
+        formData?.socialLinks?.facebook ||
+        formData?.facebook ||
+        "https://www.facebook.com",
     },
     {
       platform: "Instagram",
-      url: "https://www.instagram.com",
+      url:
+        formData?.socialLinks?.instagram ||
+        formData?.instagram ||
+        "https://www.instagram.com",
       icon: Instagram,
-      username: "Instagram Username",
       isEditing: false,
-      tempValue: "https://www.instagram.com",
+      tempValue:
+        formData?.socialLinks?.instagram ||
+        formData?.instagram ||
+        "https://www.instagram.com",
     },
     {
       platform: "LinkedIn",
-      url: "https://linkedin.com",
+      url:
+        formData?.socialLinks?.linkedin ||
+        formData?.linkedin ||
+        "https://linkedin.com",
       icon: Linkedin,
-      username: "LinkedIn URL",
       isEditing: false,
-      tempValue: "https://linkedin.com",
+      tempValue:
+        formData?.socialLinks?.linkedin ||
+        formData?.linkedin ||
+        "https://linkedin.com",
     },
     {
       platform: "Twitter",
-      url: "https://www.x.com",
+      url:
+        formData?.socialLinks?.twitter ||
+        formData?.twitter ||
+        "https://www.x.com",
       icon: Twitter,
-      username: "Twitter Handle",
       isEditing: false,
-      tempValue: "https://www.x.com",
+      tempValue:
+        formData?.socialLinks?.twitter ||
+        formData?.twitter ||
+        "https://www.x.com",
     },
     {
       platform: "TikTok",
-      url: "https://www.tiktok.com",
+      url:
+        formData?.socialLinks?.tiktok ||
+        formData?.tiktok ||
+        "https://www.tiktok.com",
       icon: Music,
-      username: "TikTok Username",
       isEditing: false,
-      tempValue: "https://www.tiktok.com",
+      tempValue:
+        formData?.socialLinks?.tiktok ||
+        formData?.tiktok ||
+        "https://www.tiktok.com",
     },
-  ]);
+  ];
+
+  const [socialProfiles, setSocialProfiles] = useState(getInitialProfiles());
+
+  // Sync local state with global context when formData changes
+  useEffect(() => {
+    setSocialProfiles(getInitialProfiles());
+  }, [formData]);
 
   const handleDelete = (platform, event) => {
     event.preventDefault();
@@ -92,13 +129,23 @@ const Social = () => {
           ...profile,
           isEditing: false,
           url: profile.tempValue,
-          username: profile.tempValue,
         };
       }
       return profile;
     });
 
     setSocialProfiles(updatedProfiles);
+
+    // Transform array into object expected by context: { facebook: url, instagram: url, ... }
+    const socialObj = {};
+    updatedProfiles.forEach((p) => {
+      const key = p.platform.toLowerCase().replace(/[^a-z0-9]/g, "");
+      socialObj[key] = p.url;
+    });
+
+
+    // Update the global context - this will trigger the useEffect and update the display
+    updateFormData({ socialLinks: socialObj });
   };
 
   const handleCancel = (index, event) => {
@@ -134,6 +181,9 @@ const Social = () => {
       <Box textAlign="left" mb={4}>
         <Typography variant="h6" gutterBottom>
           Social Profile
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Current URLs will be displayed below after saving
         </Typography>
       </Box>
 
@@ -201,9 +251,12 @@ const Social = () => {
                     <Typography
                       variant="body2"
                       className="text-dark fw-medium"
-                      sx={{ fontSize: "0.95rem" }}
+                      sx={{
+                        fontSize: "0.95rem",
+                        wordBreak: "break-all", // Ensure long URLs break properly
+                      }}
                     >
-                      {social.username}
+                      {social.url} {/* Display the actual URL, not tempValue */}
                     </Typography>
                   )}
                 </Box>

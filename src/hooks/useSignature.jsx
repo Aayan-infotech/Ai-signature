@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import  SignatureContext  from "../context/SignatureContext";
+import SignatureContext from "../context/SignatureContext";
 
 export const useSignature = () => {
   const context = useContext(SignatureContext);

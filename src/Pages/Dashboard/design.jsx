@@ -416,15 +416,15 @@ export default function Design() {
             onChange={handleToggleChange("label")}
             aria-label="label"
           >
-            <ToggleButton value="left" aria-label="text">
+            <ToggleButton value="fullText" aria-label="text">
               <Typography sx={{ color: "primary.main", mb: 0 }}>
                 Phone
               </Typography>
             </ToggleButton>
-            <ToggleButton value="center" aria-label="letter">
+            <ToggleButton value="text" aria-label="letter">
               <Typography sx={{ mb: 0 }}>P</Typography>
             </ToggleButton>
-            <ToggleButton value="right" aria-label="icon">
+            <ToggleButton value="icon" aria-label="icon">
               <CallIcon style={{ height: "20px" }} />
             </ToggleButton>
             <ToggleButton value="none" aria-label="none">

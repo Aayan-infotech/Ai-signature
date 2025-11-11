@@ -2,6 +2,8 @@ import React from "react";
 import { Card, Row, Col, Image } from "react-bootstrap";
 import { Box, Typography, Link as MUILink, IconButton } from "@mui/material";
 import { Facebook, Instagram, LinkedIn, MusicNote } from "@mui/icons-material";
+import XIcon from "@mui/icons-material/X";
+import Tooltip from "@mui/material/Tooltip";
 
 const Template1 = ({ data }) => {
   // Helper function to get value with fallback
@@ -9,7 +11,13 @@ const Template1 = ({ data }) => {
     return designValue || parentValue || defaultValue;
   };
 
-  const { design = {}, fontFamily, fontSize, lineSpacing } = data;
+  const {
+    design = {},
+    fontFamily,
+    fontSize,
+    lineSpacing,
+    socialLinks = {},
+  } = data;
 
   // Pre-compute style values with fallbacks
   const styles = {
@@ -45,6 +53,11 @@ const Template1 = ({ data }) => {
       size: getValue(design.imageSize, "100px"),
       position: getValue(design.imagePosition, "left"),
     },
+    extra: {
+      detailsLabel: getValue(design.detailsLabel, "Details:"),
+      detailsDirection: getValue(design.detailsValue, "Extra details"),
+      detailsSeparator: getValue(design.detailsSeparator, ":"),
+    },
   };
 
   // Social icon colors
@@ -55,13 +68,14 @@ const Template1 = ({ data }) => {
   };
 
   const socialIcons = [
-    { Icon: Instagram, color: getSocialColor("#E4405F"), label: "Instagram" },
-    { Icon: Facebook, color: getSocialColor("#1877F2"), label: "Facebook" },
-    { Icon: LinkedIn, color: getSocialColor("#0077B5"), label: "LinkedIn" },
-    { Icon: MusicNote, color: getSocialColor("#000000"), label: "TikTok" },
+    { Icon: Instagram, color: getSocialColor("#E4405F"), label: "instagram" },
+    { Icon: Facebook, color: getSocialColor("#1877F2"), label: "facebook" },
+    { Icon: LinkedIn, color: getSocialColor("#0077B5"), label: "linkedin" },
+    { Icon: XIcon, color: getSocialColor("#000000"), label: "twitter" },
   ];
 
-  console.log("styles in template ", styles);
+  // Debug: log social links to see what's available
+  console.log("Social links in template:", socialLinks);
 
   return (
     <Card
@@ -80,14 +94,11 @@ const Template1 = ({ data }) => {
       </Typography>
 
       <Row className="">
-        <Col
-          xs={3}
-         className={`d-flex align-items-${styles.image.position}`}
-        >
+        <Col xs={3} className={`d-flex align-items-${styles.image.position}`}>
           <Image
             src={data.image}
             className={styles.image.shape}
-            style={{ width: styles.image.size , height: styles.image.size }}
+            style={{ width: styles.image.size, height: styles.image.size }}
             alt="Profile"
           />
         </Col>
@@ -172,22 +183,46 @@ const Template1 = ({ data }) => {
               <Box
                 sx={{ display: "flex", gap: `${design.socialSpace || 8}px` }}
               >
-                {socialIcons.map(({ Icon, color, label }) => (
-                  <IconButton
-                    key={label}
-                    size="small"
-                    aria-label={label}
-                    sx={{
-                      color,
-                      padding: "4px",
-                      "& .MuiSvgIcon-root": {
-                        fontSize: styles.social.size,
-                      },
-                    }}
-                  >
-                    <Icon />
-                  </IconButton>
-                ))}
+                {socialIcons.map(({ Icon, color, label }) => {
+                  const socialUrl = socialLinks[label];
+                  console.log(`Social ${label}:`, socialUrl);
+
+                  return (
+                    <Tooltip
+                      key={label}
+                      title={socialUrl || `Add ${label} URL`}
+                    >
+                      <IconButton
+                        size="small"
+                        aria-label={label}
+                        onClick={() => {
+                          if (socialUrl) {
+                            window.open(
+                              socialUrl,
+                              "_blank",
+                              "noopener,noreferrer"
+                            );
+                          }
+                        }}
+                        sx={{
+                          color: socialUrl ? color : "#ccc",
+                          padding: "4px",
+                          "& .MuiSvgIcon-root": {
+                            fontSize: styles.social.size,
+                          },
+                          "&:hover": {
+                            backgroundColor: socialUrl
+                              ? "rgba(0,0,0,0.1)"
+                              : "transparent",
+                          },
+                        }}
+                        disabled={!socialUrl}
+                      >
+                        <Icon />
+                      </IconButton>
+                    </Tooltip>
+                  );
+                })}
               </Box>
             </Box>
           </Box>
