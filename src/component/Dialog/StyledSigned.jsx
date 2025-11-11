@@ -19,14 +19,59 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-const StyledSigned = ({ open, onClose, onSave }) => {
-  const [tabValue, setTabValue] = useState("signature");
-  const [signOffText, setSignOffText] = useState("Kind regards,");
-  const [signAs, setSignAs] = useState("Daksh Kumar");
-  const [fontStyle, setFontStyle] = useState("cursive");
-  const [size, setSize] = useState(50);
-  const [alignment, setAlignment] = useState("left");
-  const [color, setColor] = useState("#000000");
+const StyledSigned = ({ open, onClose, onSave, initialData }) => {
+  // Determine which tab to show based on existing data
+  const getInitialTab = () => {
+    if (initialData?.signature?.isCustom) return "custom";
+    if (initialData?.signature?.signAs) return "signature";
+    if (initialData?.signoff?.signOff) return "signoff";
+    return "signature";
+  };
+
+  const getInitialSignOffText = () => {
+    return (
+      initialData?.signature?.signOff ||
+      initialData?.signoff?.signOff ||
+      "Kind regards,"
+    );
+  };
+
+  const getInitialSignAs = () => {
+    return initialData?.signature?.signAs;
+  };
+
+  const getInitialFontStyle = () => {
+    return (
+      initialData?.signature?.fontStyle ||
+      initialData?.signoff?.fontStyle ||
+      "cursive"
+    );
+  };
+
+  const getInitialSize = () => {
+    return initialData?.signature?.size || initialData?.signoff?.size || 50;
+  };
+
+  const getInitialAlignment = () => {
+    return (
+      initialData?.signature?.alignment ||
+      initialData?.signoff?.alignment ||
+      "left"
+    );
+  };
+
+  const getInitialColor = () => {
+    return (
+      initialData?.signature?.color || initialData?.signoff?.color || "#000000"
+    );
+  };
+  const [tabValue, setTabValue] = useState(getInitialTab());
+  const [signOffText, setSignOffText] = useState(getInitialSignOffText());
+  const [signAs, setSignAs] = useState(getInitialSignAs());
+  const [fontStyle, setFontStyle] = useState(getInitialFontStyle());
+  const [size, setSize] = useState(getInitialSize());
+  const [alignment, setAlignment] = useState(getInitialAlignment());
+  const [color, setColor] = useState(getInitialColor());
   const canvasRef = useRef(null);
 
   const handleSave = async () => {
@@ -35,17 +80,68 @@ const StyledSigned = ({ open, onClose, onSave }) => {
       imageData = await canvasRef.current.exportImage("png");
     }
 
-    onSave?.({
-      tabValue,
-      signOffText,
-      signAs,
-      fontStyle,
-      size,
-      alignment,
-      imageData,
-    });
-    onClose();
+    // Structure the data based on the selected tab
+    let signatureData = {};
+
+    if (tabValue === "signature") {
+      signatureData = {
+        type: "signature",
+        signature: {
+          signOff: signOffText,
+          signAs: signAs,
+          fontStyle: fontStyle,
+          size: size,
+          alignment: alignment,
+          color: color,
+          imageData: imageData,
+          isCustom: false,
+        },
+        signoff: null,
+      };
+    } else if (tabValue === "signoff") {
+      signatureData = {
+        type: "signoff",
+        signoff: {
+          signOff: signOffText,
+          fontStyle: fontStyle,
+          size: size,
+          alignment: alignment,
+          color: color,
+        },
+        signature: null,
+      };
+    } else if (tabValue === "custom") {
+      signatureData = {
+        type: "custom",
+        signature: {
+          signOff: signOffText,
+          signAs: signAs,
+          fontStyle: "custom",
+          size: size,
+          alignment: alignment,
+          color: color,
+          imageData: imageData,
+          isCustom: true,
+        },
+        signoff: null,
+      };
+    }
+
+    onSave?.(signatureData);
   };
+
+  // Reset form when dialog opens with new initialData
+  React.useEffect(() => {
+    if (open) {
+      setTabValue(getInitialTab());
+      setSignOffText(getInitialSignOffText());
+      setSignAs(getInitialSignAs());
+      setFontStyle(getInitialFontStyle());
+      setSize(getInitialSize());
+      setAlignment(getInitialAlignment());
+      setColor(getInitialColor());
+    }
+  }, [open, initialData]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -223,31 +319,33 @@ const StyledSigned = ({ open, onClose, onSave }) => {
         )}
 
         {/* Common Controls */}
-        <Box sx={{ mt: 3, p: 2, borderTop: "1px solid #eee" }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Size
-          </Typography>
-          <Slider
-            value={size}
-            onChange={(e, val) => setSize(val)}
-            min={20}
-            max={100}
-            sx={{ mb: 2 }}
-          />
+        {tabValue !== "custom" && (
+          <Box sx={{ mt: 3, p: 2, borderTop: "1px solid #eee" }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Size
+            </Typography>
+            <Slider
+              value={size}
+              onChange={(e, val) => setSize(val)}
+              min={10}
+              max={30}
+              sx={{ mb: 2 }}
+            />
 
-          <Typography variant="subtitle1" gutterBottom>
-            Alignment
-          </Typography>
-          <ToggleButtonGroup
-            value={alignment}
-            exclusive
-            onChange={(e, val) => setAlignment(val)}
-          >
-            <ToggleButton value="left">Left</ToggleButton>
-            <ToggleButton value="center">Center</ToggleButton>
-            <ToggleButton value="right">Right</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
+            <Typography variant="subtitle1" gutterBottom>
+              Alignment
+            </Typography>
+            <ToggleButtonGroup
+              value={alignment}
+              exclusive
+              onChange={(e, val) => setAlignment(val)}
+            >
+              <ToggleButton value="left">Left</ToggleButton>
+              <ToggleButton value="center">Center</ToggleButton>
+              <ToggleButton value="right">Right</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        )}
       </DialogContent>
 
       <DialogActions>

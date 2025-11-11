@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Row, Col, Image } from "react-bootstrap";
 import { Box, Typography, Link as MUILink, IconButton } from "@mui/material";
-import { Facebook, Instagram, LinkedIn, MusicNote } from "@mui/icons-material";
+import { Facebook, Instagram, LinkedIn } from "@mui/icons-material";
 import XIcon from "@mui/icons-material/X";
 import Tooltip from "@mui/material/Tooltip";
 
@@ -17,7 +17,85 @@ const Template1 = ({ data }) => {
     fontSize,
     lineSpacing,
     socialLinks = {},
+    styledSignedOff,
+    disclaimerStyle,
+    quoteStyle,
   } = data;
+
+  console.log("Template1 styledSignedOff:", styledSignedOff);
+
+  const getDisplayData = () => {
+    // Check the type field first
+    if (!styledSignedOff || !styledSignedOff.type) {
+      // Default fallback
+      return {
+        type: "none",
+        signOff: "Kind regards,",
+        fontStyle: "cursive",
+        size: 20,
+        alignment: "left",
+        color: "#000000",
+      };
+    }
+
+    const { type } = styledSignedOff;
+
+    // Return data based on the active type
+    if (type === "signature" && styledSignedOff.signature) {
+      const sig = styledSignedOff.signature;
+      return {
+        type: sig.isCustom ? "custom" : "signature",
+        signOff: sig.signOff,
+        signAs: sig.signAs,
+        fontStyle: sig.fontStyle,
+        size: sig.size,
+        alignment: sig.alignment,
+        color: sig.color,
+        imageData: sig.imageData,
+        isCustom: sig.isCustom,
+      };
+    } else if (type === "signoff" && styledSignedOff.signoff) {
+      const soff = styledSignedOff.signoff;
+      return {
+        type: "signoff",
+        signOff: soff.signOff,
+        fontStyle: soff.fontStyle,
+        size: soff.size,
+        alignment: soff.alignment,
+        color: soff.color,
+      };
+    } else if (type === "custom" && styledSignedOff.signature) {
+      const sig = styledSignedOff.signature;
+      return {
+        type: "custom",
+        signOff: sig.signOff,
+        signAs: sig.signAs,
+        fontStyle: "custom",
+        size: sig.size,
+        alignment: sig.alignment,
+        color: sig.color,
+        imageData: sig.imageData,
+        isCustom: true,
+      };
+    }
+
+    // Fallback
+    return {
+      type: "none",
+      signOff: "Kind regards,",
+      fontStyle: "cursive",
+      size: 20,
+      alignment: "left",
+      color: "#000000",
+    };
+  };
+
+  const displayData = getDisplayData();
+
+  // Check if disclaimer should be shown
+  const shouldShowDisclaimer = disclaimerStyle && disclaimerStyle.type;
+
+  const shouldShowQuote = quoteStyle && quoteStyle.category;
 
   // Pre-compute style values with fallbacks
   const styles = {
@@ -53,11 +131,6 @@ const Template1 = ({ data }) => {
       size: getValue(design.imageSize, "100px"),
       position: getValue(design.imagePosition, "left"),
     },
-    extra: {
-      detailsLabel: getValue(design.detailsLabel, "Details:"),
-      detailsDirection: getValue(design.detailsValue, "Extra details"),
-      detailsSeparator: getValue(design.detailsSeparator, ":"),
-    },
   };
 
   // Social icon colors
@@ -74,7 +147,18 @@ const Template1 = ({ data }) => {
     { Icon: XIcon, color: getSocialColor("#000000"), label: "twitter" },
   ];
 
-  // Debug: log social links to see what's available
+  // Map font styles to actual font families
+  const getFontFamily = (fontStyle) => {
+    const fontMap = {
+      cursive: "'Dancing Script', cursive",
+      handwritten: "'Caveat', cursive",
+      formal: "'Playfair Display', serif",
+      modern: "'Raleway', sans-serif",
+      custom: "'Dancing Script', cursive", // Default for custom
+    };
+    return fontMap[fontStyle] || fontMap.cursive;
+  };
+
   console.log("Social links in template:", socialLinks);
 
   return (
@@ -82,16 +166,59 @@ const Template1 = ({ data }) => {
       className="shadow-sm border-0 p-3 d-flex m-auto w-100"
       style={{ maxWidth: "500px" }}
     >
-      <Typography
-        variant="h5"
-        sx={{
-          fontFamily: "'Pacifico', cursive",
-          mb: 1,
-          color: getValue(design.color, "#000000"),
-        }}
-      >
-        Kind regards,
-      </Typography>
+      {/* Styled Sign-off Section - Only show if type is not 'none' */}
+      {displayData.type !== "none" && (
+        <Box sx={{ mb: 2 }}>
+          {/* For custom signature with image */}
+          {displayData.type === "custom" && displayData.imageData ? (
+            <Box sx={{ textAlign: displayData.alignment }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: getFontFamily(displayData.fontStyle),
+                  fontSize: `${displayData.size}px`,
+                  color: displayData.color,
+                  mb: 1,
+                }}
+              >
+                {displayData.signOff}
+              </Typography>
+              <img
+                src={displayData.imageData}
+                alt="Custom signature"
+                style={{ maxWidth: "200px", height: "auto" }}
+              />
+            </Box>
+          ) : (
+            /* For signature and signoff types */
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: getFontFamily(displayData.fontStyle),
+                fontSize: `${displayData.size}px`,
+                mb: 1,
+                color: displayData.color,
+                textAlign: displayData.alignment,
+              }}
+            >
+              {displayData.signOff}
+              {displayData.type === "signature" && displayData.signAs && (
+                <Typography
+                  component="div"
+                  sx={{
+                    fontFamily: getFontFamily(displayData.fontStyle),
+                    fontSize: `${displayData.size}px`,
+                    color: displayData.color,
+                    mt: 0.5,
+                  }}
+                >
+                  {displayData.signAs}
+                </Typography>
+              )}
+            </Typography>
+          )}
+        </Box>
+      )}
 
       <Row className="">
         <Col xs={3} className={`d-flex align-items-${styles.image.position}`}>
@@ -185,7 +312,6 @@ const Template1 = ({ data }) => {
               >
                 {socialIcons.map(({ Icon, color, label }) => {
                   const socialUrl = socialLinks[label];
-                  console.log(`Social ${label}:`, socialUrl);
 
                   return (
                     <Tooltip
@@ -228,6 +354,57 @@ const Template1 = ({ data }) => {
           </Box>
         </Col>
       </Row>
+      {shouldShowQuote && (
+        <Box sx={{ my: 3, p: 2, backgroundColor: "#f8f9fa", borderRadius: 1 }}>
+          <Typography
+            variant="body1"
+            sx={{
+              color: quoteStyle.color || "#4a4a4a",
+              fontSize: `${quoteStyle.fontSize || 14}px`,
+              textAlign: quoteStyle.align || "left",
+              lineHeight: 1.6,
+              fontStyle: "italic",
+              fontFamily: "'Georgia', serif",
+            }}
+          >
+            {quoteStyle.text}
+          </Typography>
+        </Box>
+      )}
+      {shouldShowDisclaimer && (
+        <Box sx={{ mb: 3 }}>
+          {disclaimerStyle.decorativeLine && (
+            <Box
+              sx={{
+                height: "2px",
+                background: `linear-gradient(90deg, transparent, ${disclaimerStyle.color}, transparent)`,
+                mb: 2,
+              }}
+            />
+          )}
+          <Typography
+            variant="body2"
+            sx={{
+              color: disclaimerStyle.color || "#4a4a4a",
+              fontSize: `${disclaimerStyle.fontSize || 14}px`,
+              textAlign: disclaimerStyle.align || "left",
+              lineHeight: 1.4,
+              fontStyle: "italic",
+            }}
+          >
+            {disclaimerStyle.text}
+          </Typography>
+          {disclaimerStyle.decorativeLine && (
+            <Box
+              sx={{
+                height: "1px",
+                background: `linear-gradient(90deg, transparent, ${disclaimerStyle.color}, transparent)`,
+                mt: 2,
+              }}
+            />
+          )}
+        </Box>
+      )}
     </Card>
   );
 };

@@ -78,7 +78,13 @@ const AddOn = () => {
   const [openVideo, setOpenVideo] = useState(false);
   const [openGreenFooter, setOpenGreenFooter] = useState(false);
   const [openImageGallery, setOpenImageGallery] = useState(false);
-  const { formData, updateFormData, updateDesignFormData } = useSignature();
+  const {
+    formData,
+    updateFormData,
+    updateDesignFormData,
+    updateStyledSignedOff,
+    styledSignedOff,
+  } = useSignature();
 
   console.log("formData", formData);
   const handleOpen = (type) => {
@@ -134,11 +140,10 @@ const AddOn = () => {
     }
   };
 
-  const handleSave = (formData) => {
+  const handleSave = (formData, type) => {
     console.log("Saving sign off data:", formData);
-    // Here you can implement the save functionality
-    // For example, dispatch to redux store or make an API call
-    handleClose();
+    updateStyledSignedOff(formData); // this should save the changed data
+    handleClose(type);
   };
 
   const addOns = [
@@ -177,7 +182,8 @@ const AddOn = () => {
       <StyledSigned
         open={openSignOff}
         onClose={() => handleClose("signature")}
-        onSave={handleSave}
+        onSave={(data) => handleSave(data, "signature")}
+        initialData={styledSignedOff}
       />
 
       <DisclaimerDialog

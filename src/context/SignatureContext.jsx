@@ -5,6 +5,11 @@ import {
   INITIAL_DESIGN,
   INITIAL_SOCIAL_LINKS,
   INITIAL_STYLED_SIGNEDOFF,
+  DISCLAIMER,
+  DISCLAIMER_TEXT,
+  QUOTE,
+  QUOTE_TEXT,
+  QUOTE_CATEGORY_MAP,
 } from "../utils/constant";
 
 const SignatureContext = createContext();
@@ -17,8 +22,33 @@ export const SignatureProvider = ({ children }) => {
   const [styledSignedOff, setStyledSignedOff] = useState(
     INITIAL_STYLED_SIGNEDOFF
   );
+  const [disclamierStyle, setDisclamierStyle] = useState(DISCLAIMER);
   const [selectedTemplate, setSelectedTemplate] = useState("template1");
+  const [quoteStyle, setQuoteStyle] = useState(QUOTE);
+  const getDisclaimerText = useCallback(() => {
+    const { type, customText } = disclamierStyle;
 
+    if (type === "custom" && customText) {
+      return customText;
+    }
+
+    return DISCLAIMER_TEXT[type] || "";
+  }, [disclamierStyle]);
+
+  const getQuoteText = useCallback(() => {
+    const { category, customText } = quoteStyle;
+
+    if (category === "custom" && customText) {
+      return customText;
+    }
+
+    return QUOTE_TEXT[category] || "";
+  }, [quoteStyle]);
+
+  // Update quote style
+  const updateQuoteStyle = useCallback((data) => {
+    setQuoteStyle((prev) => ({ ...prev, ...data }));
+  }, []);
   // Combined formData for backward compatibility
   const formData = useMemo(
     () => ({
@@ -27,8 +57,26 @@ export const SignatureProvider = ({ children }) => {
       design,
       socialLinks,
       styledSignedOff,
+      disclaimerStyle: {
+        ...disclamierStyle,
+        text: getDisclaimerText(), // Include computed text in formData
+      },
+      quoteStyle: {
+        ...quoteStyle,
+        text: getQuoteText(),
+      },
     }),
-    [globalStyles, userInfo, design, socialLinks, styledSignedOff]
+    [
+      globalStyles,
+      userInfo,
+      design,
+      socialLinks,
+      styledSignedOff,
+      disclamierStyle,
+      getDisclaimerText,
+      quoteStyle,
+      getQuoteText,
+    ]
   );
 
   const updateFormData = useCallback((data) => {
@@ -63,6 +111,10 @@ export const SignatureProvider = ({ children }) => {
 
   const updateStyledSignedOff = useCallback((data) => {
     setStyledSignedOff((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  const updateDisclaimerStyle = useCallback((data) => {
+    setDisclamierStyle((prev) => ({ ...prev, ...data }));
   }, []);
 
   const getStyleValue = useCallback(
@@ -126,6 +178,13 @@ export const SignatureProvider = ({ children }) => {
       getComputedStyles,
       getStyleValue,
       styledSignedOff,
+      updateStyledSignedOff,
+      disclamierStyle,
+      updateDisclaimerStyle,
+      getDisclaimerText,
+      quoteStyle,
+      updateQuoteStyle,
+      getQuoteText,
     }),
     [
       formData,
@@ -135,6 +194,13 @@ export const SignatureProvider = ({ children }) => {
       getComputedStyles,
       getStyleValue,
       styledSignedOff,
+      updateStyledSignedOff,
+      disclamierStyle,
+      updateDisclaimerStyle,
+      getDisclaimerText,
+      quoteStyle,
+      updateQuoteStyle,
+      getQuoteText,
     ]
   );
 
