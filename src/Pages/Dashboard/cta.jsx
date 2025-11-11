@@ -26,7 +26,7 @@ import AppDownloadModal from "../../component/Dialog/DownloadApp";
 import PostJobOfferModal from "../../component/Dialog/jobOffer";
 import JoinNewsletterModal from "../../component/Dialog/NewsLetter";
 import CustomHtmlModal from "../../component/Dialog/HTMLModal";
-
+import { useSignature } from "../../hooks/useSignature";
 
 const CTACard = ({ title, icon: Icon, onClick, isPro }) => (
   <Box
@@ -137,7 +137,6 @@ const CTA = () => {
     if (type === "html") {
       setOpenHtml(true);
     }
-
   };
 
   const handleClose = (type) => {
