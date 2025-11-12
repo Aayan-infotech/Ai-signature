@@ -206,7 +206,7 @@ const Template5 = ({ data = {} }) => {
       </Box>
 
       {/* ===== Social Media Icons ===== */}
-      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 3 }}>
+      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1 }}>
         {socialIcons.map(({ Icon, color, label }) => {
           const socialUrl = socialLinks[label];
           return (
@@ -237,7 +237,7 @@ const Template5 = ({ data = {} }) => {
 
       {/* ===== Quote Section ===== */}
       {shouldShowQuote && (
-        <Box sx={{ my: 3, p: 2, backgroundColor: "#f8f9fa", borderRadius: 1 }}>
+        <Box sx={{ my: 1, p: 2, backgroundColor: "#f8f9fa", borderRadius: 1 }}>
           <Typography
             variant="body1"
             sx={{
