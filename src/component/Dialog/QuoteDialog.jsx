@@ -71,7 +71,6 @@ const AddQuoteDialog = ({ open, onClose, onSave }) => {
     { label: "William Shakespeare", value: "william_shakespeare" },
     { label: "Science", value: "science" },
     { label: "Finance", value: "finance" },
-    { label: "Random", value: "random" },
     { label: "Funny", value: "funny" },
     { label: "Positive", value: "positive" },
     { label: "Friendship", value: "friendship" },

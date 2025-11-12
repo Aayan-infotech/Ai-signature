@@ -44,19 +44,19 @@
 }
 
 .content-open {
-  width: calc(100% - 245px) !important;
+  width: calc(100% - 212px) !important;
   border-left: 1px solid #edeeef;
 }
 .content-closed {
   border-left: 1px solid #edeeef;
 }
 .position-fixed-design-card {
-  position: fixed;
-  min-height: calc(100vh - 20px);
-  width: calc(100vw - 49vw);
-  background-color: #e3dbdb;
-  margin: auto;
-  display: flex;
+    position: fixed;
+    min-height: calc(100vh - 20px);
+    width: inherit;
+    background-color: #e3dbdb;
+    margin: auto;
+    display: flex;
 }
 .button-tab-detail button {
   font-size: 12px;

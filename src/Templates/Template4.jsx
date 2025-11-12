@@ -1,11 +1,36 @@
 import React from "react";
 import { Card, Row, Col, Image } from "react-bootstrap";
-import { Box, Typography, Link as MUILink, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Link as MUILink,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { Facebook, Instagram, LinkedIn, MusicNote } from "@mui/icons-material";
+import XIcon from "@mui/icons-material/X";
+import { useSignatureData } from "../hooks/useSignatureData";
 
 const Template4 = ({ data }) => {
-  // Use provided data or default data
-  const profileData = data;
+  const {
+    styles,
+    displayData,
+    socialLinks,
+    getSocialColor,
+    getFontFamily,
+    shouldShowDisclaimer,
+    shouldShowQuote,
+    disclaimerStyle,
+    quoteStyle,
+  } = useSignatureData(data);
+
+  const socialIcons = [
+    { Icon: Instagram, color: getSocialColor("#E4405F"), label: "instagram" },
+    { Icon: Facebook, color: getSocialColor("#1877F2"), label: "facebook" },
+    { Icon: LinkedIn, color: getSocialColor("#0077B5"), label: "linkedin" },
+    { Icon: XIcon, color: getSocialColor("#000000"), label: "twitter" },
+    { Icon: MusicNote, color: getSocialColor("#000000"), label: "music" },
+  ];
 
   return (
     <Card
@@ -16,23 +41,64 @@ const Template4 = ({ data }) => {
         borderRadius: "10px",
       }}
     >
+      {/* Signature Section */}
+
+      {/* Main Layout */}
       <Row className="align-items-start">
         <Col xs={4}>
-          <Typography
-            variant="body2"
-            sx={{
-              fontFamily: "'Pacifico', cursive",
-              mt: 1,
-              mb: 2,
-              color: "#000",
-              textAlign: "start",
-              fontSize: "1rem",
-            }}
-          >
-            Kind regards,
-          </Typography>
+          {displayData.type !== "none" && (
+            <Box sx={{ mb: 2 }}>
+              {displayData.type === "custom" && displayData.imageData ? (
+                <Box sx={{ textAlign: displayData.alignment }}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontFamily: getFontFamily(displayData.fontStyle),
+                      fontSize: `${displayData.size}px`,
+                      color: displayData.color,
+                      mb: 1,
+                    }}
+                  >
+                    {displayData.signOff}
+                  </Typography>
+                  <img
+                    src={displayData.imageData}
+                    alt="Custom signature"
+                    style={{ maxWidth: "200px", height: "auto" }}
+                  />
+                </Box>
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontFamily: getFontFamily(displayData.fontStyle),
+                    fontSize: `${displayData.size}px`,
+                    mb: 2,
+                    color: displayData.color,
+                    textAlign: displayData.alignment,
+                  }}
+                >
+                  {displayData.signOff}
+                  {displayData.type === "signature" && displayData.signAs && (
+                    <Typography
+                      component="div"
+                      sx={{
+                        fontFamily: getFontFamily(displayData.fontStyle),
+                        fontSize: `${displayData.size}px`,
+                        color: displayData.color,
+                        mt: 0.5,
+                      }}
+                    >
+                      {displayData.signAs}
+                    </Typography>
+                  )}
+                </Typography>
+              )}
+            </Box>
+          )}
+
           <Image
-            src={profileData.image}
+            src={data.image}
             roundedCircle
             fluid
             alt="Profile"
@@ -43,135 +109,185 @@ const Template4 = ({ data }) => {
             }}
           />
         </Col>
+
         <Col xs={8}>
-          {/* Contact Information with Checkbox Style */}
           <Box sx={{ pl: 2 }}>
+            {/* Name, Title, Company */}
             <Box sx={{ textAlign: "left", mb: 1 }}>
               <Typography
                 variant="h6"
                 sx={{
                   fontWeight: 700,
-                  // fontSize: "1.8rem",
                   lineHeight: 1.2,
+                  ...styles.name,
                 }}
               >
-                {profileData.name}
+                {data.name}
               </Typography>
               <Typography
                 variant="body1"
                 sx={{
                   fontWeight: 400,
-                  // fontSize: "1.1rem",
                   color: "#666",
+                  ...styles.title,
                 }}
               >
-                {profileData.title}
+                {data.title}
               </Typography>
               <Typography
                 variant="body1"
                 sx={{
                   fontWeight: 600,
-                  // fontSize: "1.1rem",
                   color: "#333",
+                  ...styles.company,
                 }}
               >
-                {profileData.company}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 0.6 }}>
-              <Typography variant="body3" sx={{ fontSize: "0.9rem" }}>
-                {profileData.phone}
+                {data.company}
               </Typography>
             </Box>
 
-            {/* Mobile */}
-            {profileData.mobile && (
+            {/* Contact Info */}
+            <Box sx={{ display: "flex", alignItems: "center", mb: 0.6 }}>
+              <Typography
+                variant="body2"
+                sx={{ fontSize: "0.9rem", ...styles.details }}
+              >
+                {data.phone}
+              </Typography>
+            </Box>
+
+            {data.mobile && (
               <Box sx={{ display: "flex", alignItems: "center", mb: 0.6 }}>
-                <Typography variant="body3" sx={{ fontSize: "0.9rem" }}>
-                  {profileData.mobile}
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: "0.9rem", ...styles.details }}
+                >
+                  {data.mobile}
                 </Typography>
               </Box>
             )}
 
-            {/* Website - Checked */}
             <Box sx={{ display: "flex", alignItems: "center", mb: 0.6 }}>
               <MUILink
-                href={`https://${profileData.website.replace("/", ".")}`}
+                href={`https://${data.website?.replace("/", ".")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{
                   fontSize: "0.9rem",
                   textDecoration: "none",
                   color: "#1976d2",
-                  "&:hover": {
-                    textDecoration: "underline",
-                  },
+                  "&:hover": { textDecoration: "underline" },
+                  ...styles.details,
                 }}
               >
-                {profileData.website}
+                {data.website}
               </MUILink>
             </Box>
 
-            {/* Email */}
             <Box sx={{ display: "flex", alignItems: "center", mb: 0.6 }}>
-              <Typography variant="body3" sx={{ fontSize: "0.9rem" }}>
-                {profileData.email}
+              <Typography
+                variant="body2"
+                sx={{ fontSize: "0.9rem", ...styles.details }}
+              >
+                {data.email}
               </Typography>
             </Box>
 
-            {/* Address */}
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <Typography variant="body3" sx={{ fontSize: "0.9rem" }}>
-                {profileData.address}
+              <Typography
+                variant="body2"
+                sx={{ fontSize: "0.9rem", ...styles.details }}
+              >
+                {data.address}
               </Typography>
             </Box>
 
             {/* Social Media Icons */}
             <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
-              <IconButton
-                size="small"
-                sx={{
-                  color: "#E4405F",
-                  backgroundColor: "#f5f5f5",
-                  "&:hover": { backgroundColor: "#ffeef2" },
-                }}
-              >
-                <Instagram fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                sx={{
-                  color: "#1877F2",
-                  backgroundColor: "#f5f5f5",
-                  "&:hover": { backgroundColor: "#e7f3ff" },
-                }}
-              >
-                <Facebook fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                sx={{
-                  color: "#0077B5",
-                  backgroundColor: "#f5f5f5",
-                  "&:hover": { backgroundColor: "#e6f2ff" },
-                }}
-              >
-                <LinkedIn fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                sx={{
-                  color: "#000000",
-                  backgroundColor: "#f5f5f5",
-                  "&:hover": { backgroundColor: "#f0f0f0" },
-                }}
-              >
-                <MusicNote fontSize="small" />
-              </IconButton>
+              {socialIcons.map(({ Icon, color, label }) => {
+                const socialUrl = socialLinks[label];
+                return (
+                  <Tooltip key={label} title={socialUrl || `Add ${label} URL`}>
+                    <IconButton
+                      size="small"
+                      aria-label={label}
+                      onClick={() =>
+                        socialUrl &&
+                        window.open(socialUrl, "_blank", "noopener,noreferrer")
+                      }
+                      sx={{
+                        color: socialUrl ? color : "#ccc",
+                        backgroundColor: "#f5f5f5",
+                        "&:hover": {
+                          backgroundColor: socialUrl ? "#ffeef2" : "#f5f5f5",
+                        },
+                      }}
+                      disabled={!socialUrl}
+                    >
+                      <Icon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                );
+              })}
             </Box>
           </Box>
         </Col>
       </Row>
+
+      {/* Quote Section */}
+      {shouldShowQuote && (
+        <Box sx={{ my: 3, p: 2, backgroundColor: "#f8f9fa", borderRadius: 1 }}>
+          <Typography
+            variant="body1"
+            sx={{
+              color: quoteStyle.color || "#4a4a4a",
+              fontSize: `${quoteStyle.fontSize || 14}px`,
+              textAlign: quoteStyle.align || "left",
+              lineHeight: 1.6,
+              fontStyle: "italic",
+              fontFamily: "'Georgia', serif",
+            }}
+          >
+            {quoteStyle.text}
+          </Typography>
+        </Box>
+      )}
+
+      {/* Disclaimer Section */}
+      {shouldShowDisclaimer && (
+        <Box sx={{ mb: 3 }}>
+          {disclaimerStyle.decorativeLine && (
+            <Box
+              sx={{
+                height: "2px",
+                background: `linear-gradient(90deg, transparent, ${disclaimerStyle.color}, transparent)`,
+                mb: 2,
+              }}
+            />
+          )}
+          <Typography
+            variant="body2"
+            sx={{
+              color: disclaimerStyle.color || "#4a4a4a",
+              fontSize: `${disclaimerStyle.fontSize || 14}px`,
+              textAlign: disclaimerStyle.align || "left",
+              lineHeight: 1.4,
+              fontStyle: "italic",
+            }}
+          >
+            {disclaimerStyle.text}
+          </Typography>
+          {disclaimerStyle.decorativeLine && (
+            <Box
+              sx={{
+                height: "1px",
+                background: `linear-gradient(90deg, transparent, ${disclaimerStyle.color}, transparent)`,
+                mt: 2,
+              }}
+            />
+          )}
+        </Box>
+      )}
     </Card>
   );
 };

@@ -1,6 +1,12 @@
 import React from "react";
 import { Card, Row, Col, Image } from "react-bootstrap";
-import { Box, Typography, Link as MUILink, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Link as MUILink,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import {
   Facebook,
   Instagram,
@@ -12,21 +18,28 @@ import {
   Close, // Using Close for 'X' (Twitter/X)
   MusicNote, // For TikTok icon
 } from "@mui/icons-material";
+import { useSignatureData } from "../hooks/useSignatureData";
 
 const Template6 = ({ data }) => {
-  // Use a default data structure for safety
-  const defaultData = {
-    name: "Daksh Kumar",
-    title: "developer",
-    company: "Aayan Infotech",
-    image: "placeholder.png",
-    phone: "1234567890",
-    phone2: "1234567890",
-    website: "www.example.com",
-    email: "example@email.com",
-    address: "Location",
-    ...data,
-  };
+  const {
+    styles,
+    displayData,
+    socialLinks,
+    getSocialColor,
+    getFontFamily,
+    shouldShowDisclaimer,
+    shouldShowQuote,
+    disclaimerStyle,
+    quoteStyle,
+  } = useSignatureData(data);
+
+  const socialIcons = [
+    { Icon: Instagram, color: getSocialColor("#E4405F"), label: "instagram" },
+    { Icon: Facebook, color: getSocialColor("#1877F2"), label: "facebook" },
+    { Icon: LinkedIn, color: getSocialColor("#0077B5"), label: "linkedin" },
+    { Icon: Close, color: getSocialColor("#000000"), label: "twitter" },
+    { Icon: MusicNote, color: getSocialColor("#000000"), label: "tiktok" },
+  ];
 
   return (
     <Card
@@ -34,121 +47,277 @@ const Template6 = ({ data }) => {
       style={{ maxWidth: "500px", border: "1px solid #ddd" }}
     >
       <Box sx={{ p: 3 }}>
-        {/* 1. Kind Regards Signature */}
-        <Typography
-          variant="h5"
-          sx={{
-            fontFamily: "'Pacifico', cursive",
-            mb: 2,
-            color: "#000",
-          }}
-        >
-          Kind regards.
-        </Typography>
+        {/* Signature / Signoff */}
+        {displayData.type !== "none" && (
+          <Box sx={{ mb: 2 }}>
+            {displayData.type === "custom" && displayData.imageData ? (
+              <Box sx={{ textAlign: displayData.alignment }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontFamily: getFontFamily(displayData.fontStyle),
+                    fontSize: `${displayData.size}px`,
+                    color: displayData.color,
+                    mb: 1,
+                  }}
+                >
+                  {displayData.signOff}
+                </Typography>
+                <img
+                  src={displayData.imageData}
+                  alt="Custom signature"
+                  style={{ maxWidth: "200px", height: "auto" }}
+                />
+              </Box>
+            ) : (
+              <Typography
+                variant="h5"
+                sx={{
+                  fontFamily: getFontFamily(displayData.fontStyle),
+                  fontSize: `${displayData.size}px`,
+                  mb: 1,
+                  color: displayData.color,
+                  textAlign: displayData.alignment,
+                }}
+              >
+                {displayData.signOff}
+                {displayData.type === "signature" && displayData.signAs && (
+                  <Typography
+                    component="div"
+                    sx={{
+                      fontFamily: getFontFamily(displayData.fontStyle),
+                      fontSize: `${displayData.size}px`,
+                      color: displayData.color,
+                      mt: 0.5,
+                    }}
+                  >
+                    {displayData.signAs}
+                  </Typography>
+                )}
+              </Typography>
+            )}
+          </Box>
+        )}
+
+        {/* Default Kind Regards Signature if no custom signature */}
+        {displayData.type === "none" && (
+          <Typography
+            variant="h5"
+            sx={{
+              fontFamily: "'Pacifico', cursive",
+              mb: 2,
+              color: "#000",
+            }}
+          >
+            Kind regards.
+          </Typography>
+        )}
 
         <Row className="align-items-start">
-          {/* 2. Profile Image Column */}
+          {/* Profile Image Column */}
           <Col xs={3} style={{ flexShrink: 0 }}>
-            {/* Image is rectangular in the source image */}
             <Image
-              src={defaultData.image}
+              src={data.image}
               fluid
               alt="Profile"
               style={{
-                width: "70px",
-                height: "70px",
+                width: styles.image.size,
+                height: styles.image.size,
                 objectFit: "cover",
-                borderRadius: "3px",
+                borderRadius: styles.image.shape === "rounded" ? "50%" : "3px",
               }}
             />
           </Col>
 
-          {/* 3. Name, Title, and Contact Details Column */}
+          {/* Name, Title, and Contact Details Column */}
           <Col xs={9}>
             <Box>
               {/* Name and Title */}
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#333" }}>
-                {defaultData.name}
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, color: "#333", ...styles.name }}
+              >
+                {data.name}
               </Typography>
-              <Typography variant="body3" color="text.secondary" sx={{ mb: 2 }}>
-                {defaultData.title}, **{defaultData.company}**
+              <Typography
+                variant="body3"
+                color="text.secondary"
+                sx={{ mb: 2, ...styles.title }}
+              >
+                {data.title}
+                {data.title && data.company && ", "}
+                <span style={styles.company}>{data.company}</span>
               </Typography>
 
               {/* Contact Details with Icons */}
               <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                {/* Phone 1 (Using Phone for the handset icon) */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Phone fontSize="small" color="action" />
-                  <Typography variant="body3">{defaultData.phone}</Typography>
-                </Box>
-                {/* Phone 2 (Using Phone for the mobile icon) */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Phone fontSize="small" color="action" />
-                  <Typography variant="body3">
-                    {defaultData.phone2 || defaultData.phone}
-                  </Typography>
-                </Box>
+                {/* Phone */}
+                {data.phone && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Phone fontSize="small" color="action" />
+                    <Typography variant="body3" sx={{ ...styles.details }}>
+                      {data.phone}
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* Phone 2 */}
+                {data.phone2 && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Phone fontSize="small" color="action" />
+                    <Typography variant="body3" sx={{ ...styles.details }}>
+                      {data.phone2}
+                    </Typography>
+                  </Box>
+                )}
+
                 {/* Website */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Language fontSize="small" color="action" />
-                  <MUILink
-                    href={`https://${defaultData.website}`}
-                    variant="body3"
-                    underline="none"
-                    color="text.primary"
-                  >
-                    {defaultData.website}
-                  </MUILink>
-                </Box>
+                {data.website && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Language fontSize="small" color="action" />
+                    <MUILink
+                      href={`https://${data.website}`}
+                      variant="body3"
+                      underline="none"
+                      color="text.primary"
+                      sx={{
+                        ...styles.details,
+                        textDecoration: "none",
+                        "&:hover": { textDecoration: "underline" },
+                      }}
+                    >
+                      {data.website}
+                    </MUILink>
+                  </Box>
+                )}
+
                 {/* Email */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <MailOutline fontSize="small" color="action" />
-                  <Typography variant="body3">{defaultData.email}</Typography>
-                </Box>
+                {data.email && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <MailOutline fontSize="small" color="action" />
+                    <Typography variant="body3" sx={{ ...styles.details }}>
+                      {data.email}
+                    </Typography>
+                  </Box>
+                )}
+
                 {/* Address/Location */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <LocationOnOutlined fontSize="small" color="action" />
-                  <Typography variant="body3">{defaultData.address}</Typography>
-                </Box>
+                {data.address && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <LocationOnOutlined fontSize="small" color="action" />
+                    <Typography variant="body3" sx={{ ...styles.details }}>
+                      {data.address}
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Box>
           </Col>
         </Row>
+
+        {/* Quote */}
+        {shouldShowQuote && (
+          <Box
+            sx={{ my: 3, p: 2, backgroundColor: "#f8f9fa", borderRadius: 1 }}
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                color: quoteStyle.color || "#4a4a4a",
+                fontSize: `${quoteStyle.fontSize || 14}px`,
+                textAlign: quoteStyle.align || "left",
+                lineHeight: 1.6,
+                fontStyle: "italic",
+                fontFamily: "'Georgia', serif",
+              }}
+            >
+              {quoteStyle.text}
+            </Typography>
+          </Box>
+        )}
+
+        {/* Disclaimer */}
+        {shouldShowDisclaimer && (
+          <Box sx={{ mb: 3 }}>
+            {disclaimerStyle.decorativeLine && (
+              <Box
+                sx={{
+                  height: "2px",
+                  background: `linear-gradient(90deg, transparent, ${disclaimerStyle.color}, transparent)`,
+                  mb: 2,
+                }}
+              />
+            )}
+            <Typography
+              variant="body2"
+              sx={{
+                color: disclaimerStyle.color || "#4a4a4a",
+                fontSize: `${disclaimerStyle.fontSize || 14}px`,
+                textAlign: disclaimerStyle.align || "left",
+                lineHeight: 1.4,
+                fontStyle: "italic",
+              }}
+            >
+              {disclaimerStyle.text}
+            </Typography>
+            {disclaimerStyle.decorativeLine && (
+              <Box
+                sx={{
+                  height: "1px",
+                  background: `linear-gradient(90deg, transparent, ${disclaimerStyle.color}, transparent)`,
+                  mt: 2,
+                }}
+              />
+            )}
+          </Box>
+        )}
       </Box>
 
-      {/* 4. Social Media Footer Bar */}
+      {/* Social Media Footer Bar */}
       <Box
         sx={{
-          backgroundColor: "#546e8c", // Slate Blue/Grey color from the image
+          backgroundColor: "#546e8c",
           width: "100%",
           p: 1.5,
           display: "flex",
-          justifyContent: "flex-end", // Align icons to the right
+          justifyContent: "flex-end",
           gap: 0.5,
         }}
       >
-        {/* Social Media Icons (White Icons on Colored Background) */}
-        {[Facebook, Instagram, LinkedIn, Close, MusicNote].map(
-          (Icon, index) => (
-            <IconButton
-              key={index}
-              size="small"
-              sx={{
-                color: "#fff",
-                border: "1px solid #fff",
-                borderRadius: "50%",
-                width: 30,
-                height: 30,
-                p: 0,
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            >
-              <Icon fontSize="small" />
-            </IconButton>
-          )
-        )}
+        {/* Social Media Icons with functionality from Template1 */}
+        {socialIcons.map(({ Icon, color, label }) => {
+          const socialUrl = socialLinks[label];
+          return (
+            <Tooltip key={label} title={socialUrl || `Add ${label} URL`}>
+              <IconButton
+                size="small"
+                aria-label={label}
+                onClick={() =>
+                  socialUrl &&
+                  window.open(socialUrl, "_blank", "noopener,noreferrer")
+                }
+                sx={{
+                  color: socialUrl ? "#fff" : "rgba(255,255,255,0.5)",
+                  border: `1px solid ${
+                    socialUrl ? "#fff" : "rgba(255,255,255,0.3)"
+                  }`,
+                  borderRadius: "50%",
+                  width: 30,
+                  height: 30,
+                  p: 0,
+                  "&:hover": {
+                    backgroundColor: socialUrl
+                      ? "rgba(255, 255, 255, 0.1)"
+                      : "transparent",
+                  },
+                }}
+                disabled={!socialUrl}
+              >
+                <Icon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          );
+        })}
       </Box>
     </Card>
   );

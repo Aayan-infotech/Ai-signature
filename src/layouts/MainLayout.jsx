@@ -24,14 +24,14 @@ const MainLayout = () => {
       <Box className={`${sidebarOpen ? "content-open" : "content-closed"}`}>
         <div className="row">
           <div className="col-lg-5 pe-lg-0">
-            <Box sx={{ marginTop: 6.9 }}>
+            <Box sx={{ marginTop: 6.9, minHeight: "calc(100vh - 57px)" }}>
               <Card className="p-3 shadow-sm rounded-0">
                 <Outlet />
               </Card>
             </Box>
           </div>
-          <div className="col-lg-7 ps-lg-0">
-            <Box sx={{ marginTop: 7 }}>
+          <div className="col-lg-7 ps-lg-0 pe-lg-0">
+            <Box sx={{ marginTop: 7, display: "flex", width: "inherit" }}>
               <TemplateRender />
             </Box>
           </div>
