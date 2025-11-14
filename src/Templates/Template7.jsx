@@ -31,6 +31,15 @@ const Template7 = ({ data }) => {
     shouldShowQuote,
     disclaimerStyle,
     quoteStyle,
+    shouldShowVideo,
+    youtubeVideo,
+    getYoutubeThumbnail,
+    greenFooter,
+    getGreenFooterIcon,
+    shouldShowGreenFooter,
+    getImageBorderRadius,
+    imageGallery,
+    shouldShowImageGallery,
   } = useSignatureData(data);
 
   const socialIcons = [
@@ -48,60 +57,60 @@ const Template7 = ({ data }) => {
       style={{ maxWidth: "500px" }}
     >
       {/* Signature / Signoff */}
-      {displayData.type !== "none" && (
-        <Box sx={{ mb: 2 }}>
-          {displayData.type === "custom" && displayData.imageData ? (
-            <Box sx={{ textAlign: displayData.alignment }}>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: getFontFamily(displayData.fontStyle),
-                  fontSize: `${displayData.size}px`,
-                  color: displayData.color,
-                  mb: 1,
-                }}
-              >
-                {displayData.signOff}
-              </Typography>
-              <img
-                src={displayData.imageData}
-                alt="Custom signature"
-                style={{ maxWidth: "200px", height: "auto" }}
-              />
-            </Box>
-          ) : (
-            <Typography
-              variant="h5"
-              sx={{
-                fontFamily: getFontFamily(displayData.fontStyle),
-                fontSize: `${displayData.size}px`,
-                mb: 1,
-                color: displayData.color,
-                textAlign: displayData.alignment,
-              }}
-            >
-              {displayData.signOff}
-              {displayData.type === "signature" && displayData.signAs && (
+
+      <Row>
+        {/* Left Column: Name, Title, Contact Details, Social Media */}
+        <Col xs={7}>
+          {displayData.type !== "none" && (
+            <Box sx={{ mb: 2 }}>
+              {displayData.type === "custom" && displayData.imageData ? (
+                <Box sx={{ textAlign: displayData.alignment }}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontFamily: getFontFamily(displayData.fontStyle),
+                      fontSize: `${displayData.size}px`,
+                      color: displayData.color,
+                      mb: 1,
+                    }}
+                  >
+                    {displayData.signOff}
+                  </Typography>
+                  <img
+                    src={displayData.imageData}
+                    alt="Custom signature"
+                    style={{ maxWidth: "200px", height: "auto" }}
+                  />
+                </Box>
+              ) : (
                 <Typography
-                  component="div"
+                  variant="h5"
                   sx={{
                     fontFamily: getFontFamily(displayData.fontStyle),
                     fontSize: `${displayData.size}px`,
+                    mb: 1,
                     color: displayData.color,
-                    mt: 0.5,
+                    textAlign: displayData.alignment,
                   }}
                 >
-                  {displayData.signAs}
+                  {displayData.signOff}
+                  {displayData.type === "signature" && displayData.signAs && (
+                    <Typography
+                      component="div"
+                      sx={{
+                        fontFamily: getFontFamily(displayData.fontStyle),
+                        fontSize: `${displayData.size}px`,
+                        color: displayData.color,
+                        mt: 0.5,
+                      }}
+                    >
+                      {displayData.signAs}
+                    </Typography>
+                  )}
                 </Typography>
               )}
-            </Typography>
+            </Box>
           )}
-        </Box>
-      )}
-
-      <Row >
-        {/* Left Column: Name, Title, Contact Details, Social Media */}
-        <Col xs={8}>
           <Box>
             {/* Name and Title */}
             <Typography
@@ -186,73 +195,51 @@ const Template7 = ({ data }) => {
                 </Box>
               )}
             </Box>
-
-            {/* Quote */}
-            {shouldShowQuote && (
-              <Box
-                sx={{
-                  my: 2,
-                  p: 2,
-                  backgroundColor: "#f8f9fa",
-                  borderRadius: 1,
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: quoteStyle.color || "#4a4a4a",
-                    fontSize: `${quoteStyle.fontSize || 14}px`,
-                    textAlign: quoteStyle.align || "left",
-                    lineHeight: 1.6,
-                    fontStyle: "italic",
-                    fontFamily: "'Georgia', serif",
-                  }}
-                >
-                  {quoteStyle.text}
-                </Typography>
-              </Box>
-            )}
-
-            {/* Social Media Icons (Left-aligned, circular, with border) */}
-            <Box sx={{ display: "flex", gap: 0.5 }}>
-              {socialIcons.map(({ Icon, color, label }) => {
-                const socialUrl = socialLinks[label];
-                return (
-                  <Tooltip key={label} title={socialUrl || `Add ${label} URL`}>
-                    <IconButton
-                      size="small"
-                      aria-label={label}
-                      onClick={() =>
-                        socialUrl &&
-                        window.open(socialUrl, "_blank", "noopener,noreferrer")
-                      }
-                      sx={{
-                        color: socialUrl ? "#555" : "#ccc",
-                        border: `1px solid ${socialUrl ? "#ccc" : "#eee"}`,
-                        borderRadius: "50%",
-                        width: 30,
-                        height: 30,
-                        p: 0,
-                        "&:hover": {
-                          backgroundColor: socialUrl
-                            ? "rgba(0, 0, 0, 0.05)"
-                            : "transparent",
-                        },
-                      }}
-                      disabled={!socialUrl}
-                    >
-                      <Icon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                );
-              })}
-            </Box>
           </Box>
         </Col>
 
         {/* Right Column: Profile Image and Default Signature */}
-        <Col xs={4}>
-          <div className={`d-flex flex-column h-100 justify-content-${styles.image.position}`}>
+        <Col xs={5}>
+          {/* Social Media Icons (Left-aligned, circular, with border) */}
+          <Box sx={{ display: "flex", gap: 0.5 }}>
+            {socialIcons.map(({ Icon, color, label }) => {
+              const socialUrl = socialLinks[label];
+              return (
+                <Tooltip key={label} title={socialUrl || `Add ${label} URL`}>
+                  <IconButton
+                    size="small"
+                    aria-label={label}
+                    onClick={() =>
+                      socialUrl &&
+                      window.open(socialUrl, "_blank", "noopener,noreferrer")
+                    }
+                    sx={{
+                      color: socialUrl ? "#555" : "#ccc",
+                      border: `1px solid ${socialUrl ? "#ccc" : "#eee"}`,
+                      borderRadius: "50%",
+                      width: 30,
+                      height: 30,
+                      p: 0,
+                      "& .MuiSvgIcon-root": {
+                        fontSize: styles.social.size,
+                      },
+                      "&:hover": {
+                        backgroundColor: socialUrl
+                          ? "rgba(0, 0, 0, 0.05)"
+                          : "transparent",
+                      },
+                    }}
+                    disabled={!socialUrl}
+                  >
+                    <Icon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              );
+            })}
+          </Box>
+          <div
+            className={`d-flex flex-column h-100 justify-content-${styles.image.position}`}
+          >
             {/* Default Kind Regards Signature if no custom signature */}
             {displayData.type === "none" && (
               <Typography
@@ -282,6 +269,248 @@ const Template7 = ({ data }) => {
           </div>
         </Col>
       </Row>
+      {/* 🔹 NEW: Video and Image Gallery Section */}
+      <div className="row mt-3">
+        <div className="col-6">
+          {shouldShowVideo && (
+            <Box sx={{ my: 1 }}>
+              {youtubeVideo.styleType === "compact" ? (
+                <div
+                  className={`d-flex flex-column align-items-${youtubeVideo.align} gap-2`}
+                >
+                  <a
+                    href={youtubeVideo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      textDecoration: "none",
+                      display: "inline-block",
+                    }}
+                  >
+                    <img
+                      src={getYoutubeThumbnail(youtubeVideo.videoId)}
+                      alt="YouTube thumbnail"
+                      width={120}
+                      height={90}
+                      style={{
+                        borderRadius: "4px",
+                        border: "1px solid #ddd",
+                      }}
+                      onError={(e) => {
+                        // Fallback if thumbnail doesn't exist
+                        e.target.src = getYoutubeThumbnail(
+                          youtubeVideo.videoId,
+                          "default"
+                        );
+                      }}
+                    />
+                  </a>
+                  {youtubeVideo.title && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: youtubeVideo.color || "#4a4a4a",
+                        fontSize: `${youtubeVideo.fontSize || 14}px`,
+                        fontWeight: 500,
+                        maxWidth: "120px",
+                      }}
+                    >
+                      {youtubeVideo.title}
+                    </Typography>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className={`d-flex flex-column align-items-${youtubeVideo.align} gap-2`}
+                >
+                  <Box sx={{ border: "1px solid #e0e0e0", px: 0.8, py: 1 }}>
+                    <a
+                      href={youtubeVideo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        textDecoration: "none",
+                        display: "inline-block",
+                      }}
+                    >
+                      <img
+                        src={getYoutubeThumbnail(youtubeVideo.videoId)}
+                        alt="YouTube thumbnail"
+                        width={100}
+                        height={80}
+                        style={{
+                          borderRadius: "4px",
+                          border: "1px solid #ddd",
+                        }}
+                        onError={(e) => {
+                          // Fallback if thumbnail doesn't exist
+                          e.target.src = getYoutubeThumbnail(
+                            youtubeVideo.videoId,
+                            "default"
+                          );
+                        }}
+                      />
+                    </a>
+                    {youtubeVideo.title && (
+                      <Typography
+                        className="ms-2"
+                        variant="caption"
+                        sx={{
+                          color: youtubeVideo.color || "#4a4a4a",
+                          fontSize: `${youtubeVideo.fontSize || 14}px`,
+                          fontWeight: 500,
+                          maxWidth: "120px",
+                        }}
+                      >
+                        {youtubeVideo.title}
+                      </Typography>
+                    )}
+                  </Box>
+                </div>
+              )}
+            </Box>
+          )}
+        </div>
+        <div className="col-lg-6">
+          {/* 🔹 NEW: Image Gallery */}
+          {shouldShowImageGallery && (
+            <Box sx={{ my: 1 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: `${imageGallery.spaceBetween || 20}px`,
+                  justifyContent: "flex-start",
+                }}
+              >
+                {imageGallery.images.map((img, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      width: imageGallery.imageSize || 50,
+                      height: imageGallery.imageSize || 50,
+                      overflow: "hidden",
+                      border: "1px solid #e0e0e0",
+                      borderRadius: getImageBorderRadius(imageGallery.shape),
+                      cursor:
+                        imageGallery.applyLink && imageGallery.link
+                          ? "pointer"
+                          : "default",
+                    }}
+                    onClick={() => {
+                      if (imageGallery.applyLink && imageGallery.link) {
+                        window.open(
+                          imageGallery.link,
+                          "_blank",
+                          "noopener,noreferrer"
+                        );
+                      }
+                    }}
+                  >
+                    <img
+                      src={img}
+                      alt={`Gallery image ${idx + 1}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: getImageBorderRadius(imageGallery.shape),
+                      }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+              {imageGallery.galleryTitle && (
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mt: 1,
+                    fontWeight: 600,
+                    fontSize: "12px",
+                    color: "#333",
+                  }}
+                >
+                  {imageGallery.galleryTitle}
+                </Typography>
+              )}
+            </Box>
+          )}
+        </div>
+      </div>
+
+      {/* Quote */}
+      {shouldShowQuote && (
+        <Box
+          sx={{
+            my: 2,
+            p: 2,
+            backgroundColor: "#f8f9fa",
+            borderRadius: 1,
+          }}
+        >
+          <Typography
+            variant="body1"
+            sx={{
+              color: quoteStyle.color || "#4a4a4a",
+              fontSize: `${quoteStyle.fontSize || 14}px`,
+              textAlign: quoteStyle.align || "left",
+              lineHeight: 1.6,
+              fontStyle: "italic",
+              fontFamily: "'Georgia', serif",
+            }}
+          >
+            {quoteStyle.text}
+          </Typography>
+        </Box>
+      )}
+
+      {/* 🔹 NEW: Green Footer Section */}
+      {shouldShowGreenFooter && (
+        <Box
+          sx={{
+            mt: 2,
+            pt: 2,
+            borderTop: "1px solid #e0e0e0",
+            textAlign: greenFooter.align || "left",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent:
+                greenFooter.align === "center"
+                  ? "center"
+                  : greenFooter.align === "right"
+                  ? "flex-end"
+                  : "flex-start",
+              gap: 1,
+            }}
+          >
+            {greenFooter.icon && greenFooter.icon !== "none" && (
+              <Typography
+                sx={{
+                  fontSize: `${greenFooter.fontSize || 14}px`,
+                  color: greenFooter.color || "#57c84d",
+                }}
+              >
+                {getGreenFooterIcon(greenFooter.icon)}
+              </Typography>
+            )}
+            <Typography
+              variant="body2"
+              sx={{
+                color: greenFooter.color || "#57c84d",
+                fontSize: `${greenFooter.fontSize || 14}px`,
+                fontStyle: "italic",
+                lineHeight: 1.4,
+              }}
+            >
+              {greenFooter.text}
+            </Typography>
+          </Box>
+        </Box>
+      )}
 
       {/* Disclaimer */}
       {shouldShowDisclaimer && (
@@ -318,9 +547,6 @@ const Template7 = ({ data }) => {
           )}
         </Box>
       )}
-
-      {/* Horizontal Separator Line at the bottom */}
-      <Box sx={{ borderBottom: "1px solid #eee", mt: 3, mx: -3 }} />
     </Card>
   );
 };

@@ -28,6 +28,15 @@ const Template12 = ({ data }) => {
     shouldShowQuote,
     disclaimerStyle,
     quoteStyle,
+    shouldShowVideo,
+    youtubeVideo,
+    getYoutubeThumbnail,
+    greenFooter,
+    getGreenFooterIcon,
+    shouldShowGreenFooter,
+    getImageBorderRadius,
+    imageGallery,
+    shouldShowImageGallery,
   } = useSignatureData(data);
 
   const accentColor = "#546e7a"; // Slate Blue/Grey from the image
@@ -46,113 +55,122 @@ const Template12 = ({ data }) => {
       className="shadow-sm border-0 d-flex m-auto ms-5 w-100 flex-column justify-content-start align-items-start"
       style={{ maxWidth: "600px" }}
     >
-      <div className="row">
+      <div className="row w-100">
         <div className="col-lg-12">
           <Box sx={{ p: 3, pb: 2, textAlign: "center" }}>
             {/* Signature / Signoff */}
-            {displayData.type !== "none" && (
-              <Box sx={{ mb: 2 }}>
-                {displayData.type === "custom" && displayData.imageData ? (
-                  <Box sx={{ textAlign: displayData.alignment }}>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: getFontFamily(displayData.fontStyle),
-                        fontSize: `${displayData.size}px`,
-                        color: displayData.color,
-                        mb: 1,
-                      }}
-                    >
-                      {displayData.signOff}
-                    </Typography>
-                    <img
-                      src={displayData.imageData}
-                      alt="Custom signature"
-                      style={{
-                        maxWidth: "200px",
-                        height: "auto",
-                        margin: "0 auto",
-                      }}
-                    />
-                  </Box>
-                ) : (
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontFamily: getFontFamily(displayData.fontStyle),
-                      fontSize: `${displayData.size}px`,
-                      mb: 1,
-                      color: displayData.color,
-                      textAlign: displayData.alignment,
-                    }}
-                  >
-                    {displayData.signOff}
-                    {displayData.type === "signature" && displayData.signAs && (
+            <div className="row">
+              <div className="col-7">
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 600,
+                    color: styles.name.color,
+                    mb: 0.5,
+                    fontFamily: styles.name.fontFamily,
+                    fontSize: `${styles.name.fontSize}px`,
+                    lineHeight: styles.name.lineHeight,
+                  }}
+                >
+                  {data.name}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mb: 2,
+                    color: styles.title.color,
+                    fontFamily: styles.title.fontFamily,
+                    fontSize: `${styles.title.fontSize}px`,
+                    lineHeight: styles.title.lineHeight,
+                  }}
+                >
+                  {data.title}
+                  {data.title && data.company && ", "}
+                  <span style={styles.company}>{data.company}</span>
+                </Typography>
+
+                {/* Profile Image (Centered) */}
+                <Image
+                  src={data.image}
+                  fluid
+                  alt="Profile"
+                  style={{
+                    width: styles.image.size,
+                    height: styles.image.size,
+                    objectFit: "cover",
+                    margin: "0 auto",
+                    display: "block",
+                    borderRadius:
+                      styles.image.shape === "rounded-2"
+                        ? "5px"
+                        : styles.image.shape === "rounded-circle"
+                        ? "50%"
+                        : "0px",
+                  }}
+                />
+              </div>
+              <div className="col-5">
+                {displayData.type !== "none" && (
+                  <Box sx={{ mb: 2 }}>
+                    {displayData.type === "custom" && displayData.imageData ? (
+                      <Box sx={{ textAlign: displayData.alignment }}>
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            fontFamily: getFontFamily(displayData.fontStyle),
+                            fontSize: `${displayData.size}px`,
+                            color: displayData.color,
+                            mb: 1,
+                          }}
+                        >
+                          {displayData.signOff}
+                        </Typography>
+                        <img
+                          src={displayData.imageData}
+                          alt="Custom signature"
+                          style={{
+                            maxWidth: "200px",
+                            height: "auto",
+                            margin: "0 auto",
+                          }}
+                        />
+                      </Box>
+                    ) : (
                       <Typography
-                        component="div"
+                        variant="h6"
                         sx={{
                           fontFamily: getFontFamily(displayData.fontStyle),
                           fontSize: `${displayData.size}px`,
+                          mb: 1,
                           color: displayData.color,
-                          mt: 0.5,
+                          textAlign: displayData.alignment,
                         }}
                       >
-                        {displayData.signAs}
+                        {displayData.signOff}
+                        {displayData.type === "signature" &&
+                          displayData.signAs && (
+                            <Typography
+                              component="div"
+                              sx={{
+                                fontFamily: getFontFamily(
+                                  displayData.fontStyle
+                                ),
+                                fontSize: `${displayData.size}px`,
+                                color: displayData.color,
+                                mt: 0.5,
+                              }}
+                            >
+                              {displayData.signAs}
+                            </Typography>
+                          )}
                       </Typography>
                     )}
-                  </Typography>
+                  </Box>
                 )}
-              </Box>
-            )}
+              </div>
+            </div>
 
             {/* Name and Title Block (Centered) */}
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                color: styles.name.color,
-                mb: 0.5,
-                fontFamily: styles.name.fontFamily,
-                fontSize: `${styles.name.fontSize}px`,
-                lineHeight: styles.name.lineHeight,
-              }}
-            >
-              {data.name}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                mb: 2,
-                color: styles.title.color,
-                fontFamily: styles.title.fontFamily,
-                fontSize: `${styles.title.fontSize}px`,
-                lineHeight: styles.title.lineHeight,
-              }}
-            >
-              {data.title}
-              {data.title && data.company && ", "}
-              <span style={styles.company}>{data.company}</span>
-            </Typography>
-
-            {/* Profile Image (Centered) */}
-            <Image
-              src={data.image}
-              fluid
-              alt="Profile"
-              style={{
-                width: styles.image.size,
-                height: styles.image.size,
-                objectFit: "cover",
-                margin: "0 auto",
-                display: "block",
-                borderRadius:
-                  styles.image.shape === "rounded-2"
-                    ? "5px"
-                    : styles.image.shape === "rounded-circle"
-                    ? "50%"
-                    : "0px",
-              }}
-            />
           </Box>
 
           {/* Colored Contact/Social Block */}
@@ -235,6 +253,185 @@ const Template12 = ({ data }) => {
               )}
             </Box>
 
+            {/* 🔹 NEW: Video and Image Gallery Section */}
+            <div className="row mt-3 justify-content-center">
+              <div className="col-6">
+                {shouldShowVideo && (
+                  <Box sx={{ my: 1 }}>
+                    {youtubeVideo.styleType === "compact" ? (
+                      <div
+                        className={`d-flex flex-column align-items-${youtubeVideo.align} gap-2`}
+                      >
+                        <a
+                          href={youtubeVideo.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            textDecoration: "none",
+                            display: "inline-block",
+                          }}
+                        >
+                          <img
+                            src={getYoutubeThumbnail(youtubeVideo.videoId)}
+                            alt="YouTube thumbnail"
+                            width={120}
+                            height={90}
+                            style={{
+                              borderRadius: "4px",
+                              border: "1px solid rgba(255,255,255,0.3)",
+                            }}
+                            onError={(e) => {
+                              // Fallback if thumbnail doesn't exist
+                              e.target.src = getYoutubeThumbnail(
+                                youtubeVideo.videoId,
+                                "default"
+                              );
+                            }}
+                          />
+                        </a>
+                        {youtubeVideo.title && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: "#fff",
+                              fontSize: `${youtubeVideo.fontSize || 14}px`,
+                              fontWeight: 500,
+                              maxWidth: "120px",
+                            }}
+                          >
+                            {youtubeVideo.title}
+                          </Typography>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        className={`d-flex flex-column align-items-${youtubeVideo.align} gap-2`}
+                      >
+                        <Box
+                          sx={{
+                            border: "1px solid rgba(255,255,255,0.3)",
+                            px: 0.8,
+                            py: 1,
+                          }}
+                        >
+                          <a
+                            href={youtubeVideo.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              textDecoration: "none",
+                              display: "inline-block",
+                            }}
+                          >
+                            <img
+                              src={getYoutubeThumbnail(youtubeVideo.videoId)}
+                              alt="YouTube thumbnail"
+                              width={100}
+                              height={80}
+                              style={{
+                                borderRadius: "4px",
+                                border: "1px solid rgba(255,255,255,0.3)",
+                              }}
+                              onError={(e) => {
+                                // Fallback if thumbnail doesn't exist
+                                e.target.src = getYoutubeThumbnail(
+                                  youtubeVideo.videoId,
+                                  "default"
+                                );
+                              }}
+                            />
+                          </a>
+                          {youtubeVideo.title && (
+                            <Typography
+                              className="ms-2"
+                              variant="caption"
+                              sx={{
+                                color: "#fff",
+                                fontSize: `${youtubeVideo.fontSize || 14}px`,
+                                fontWeight: 500,
+                                maxWidth: "120px",
+                              }}
+                            >
+                              {youtubeVideo.title}
+                            </Typography>
+                          )}
+                        </Box>
+                      </div>
+                    )}
+                  </Box>
+                )}
+              </div>
+              <div className="col-lg-6">
+                {/* 🔹 NEW: Image Gallery */}
+                {shouldShowImageGallery && (
+                  <Box sx={{ my: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: `${imageGallery.spaceBetween || 20}px`,
+                        justifyContent: "center",
+                      }}
+                    >
+                      {imageGallery.images.map((img, idx) => (
+                        <Box
+                          key={idx}
+                          sx={{
+                            width: imageGallery.imageSize || 50,
+                            height: imageGallery.imageSize || 50,
+                            overflow: "hidden",
+                            border: "1px solid rgba(255,255,255,0.3)",
+                            borderRadius: getImageBorderRadius(
+                              imageGallery.shape
+                            ),
+                            cursor:
+                              imageGallery.applyLink && imageGallery.link
+                                ? "pointer"
+                                : "default",
+                          }}
+                          onClick={() => {
+                            if (imageGallery.applyLink && imageGallery.link) {
+                              window.open(
+                                imageGallery.link,
+                                "_blank",
+                                "noopener,noreferrer"
+                              );
+                            }
+                          }}
+                        >
+                          <img
+                            src={img}
+                            alt={`Gallery image ${idx + 1}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: getImageBorderRadius(
+                                imageGallery.shape
+                              ),
+                            }}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                    {imageGallery.galleryTitle && (
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mt: 1,
+                          fontWeight: 600,
+                          fontSize: "12px",
+                          color: "#fff",
+                        }}
+                      >
+                        {imageGallery.galleryTitle}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+              </div>
+            </div>
+
             {/* Social Media Icons (Centered) */}
             <Box
               sx={{ display: "flex", justifyContent: "center", gap: 1, mt: 1 }}
@@ -254,6 +451,7 @@ const Template12 = ({ data }) => {
                         backgroundColor: socialUrl
                           ? "rgba(255, 255, 255, 0.1)"
                           : "rgba(255, 255, 255, 0.05)",
+                        padding: "4px",
                         "&:hover": {
                           backgroundColor: socialUrl
                             ? "rgba(255, 255, 255, 0.2)"
@@ -294,9 +492,59 @@ const Template12 = ({ data }) => {
             </Box>
           )}
 
+          {/* 🔹 NEW: Green Footer Section */}
+          {shouldShowGreenFooter && (
+            <Box
+              sx={{
+                mt: 2,
+                pt: 2,
+                borderTop: "1px solid #e0e0e0",
+                textAlign: greenFooter.align || "center",
+                p: 2,
+                width: "100%",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent:
+                    greenFooter.align === "center"
+                      ? "center"
+                      : greenFooter.align === "right"
+                      ? "flex-end"
+                      : "flex-start",
+                  gap: 1,
+                }}
+              >
+                {greenFooter.icon && greenFooter.icon !== "none" && (
+                  <Typography
+                    sx={{
+                      fontSize: `${greenFooter.fontSize || 14}px`,
+                      color: greenFooter.color || "#57c84d",
+                    }}
+                  >
+                    {getGreenFooterIcon(greenFooter.icon)}
+                  </Typography>
+                )}
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: greenFooter.color || "#57c84d",
+                    fontSize: `${greenFooter.fontSize || 14}px`,
+                    fontStyle: "italic",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {greenFooter.text}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
           {/* Disclaimer Section */}
           {shouldShowDisclaimer && (
-            <Box sx={{ mt: 1, p: 2 }}>
+            <Box sx={{ mt: 1, p: 2, width: "100%" }}>
               {disclaimerStyle.decorativeLine && (
                 <Box
                   sx={{

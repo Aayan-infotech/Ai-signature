@@ -212,7 +212,7 @@ const Template1 = ({ data }) => {
       <div className="row">
         <div className="col-6">
           {shouldShowVideo && (
-            <Box sx={{ my: 3 }}>
+            <Box sx={{ my: 1 }}>
               {youtubeVideo.styleType === "compact" ? (
                 <div
                   className={`d-flex flex-column align-items-${youtubeVideo.align} gap-2`}
@@ -313,7 +313,7 @@ const Template1 = ({ data }) => {
         <div className="col-lg-6">
           {/* Image Gallery */}
           {shouldShowImageGallery && (
-            <Box sx={{ my: 3 }}>
+            <Box sx={{ my: 1 }}>
               <Box
                 sx={{
                   display: "flex",
@@ -379,7 +379,7 @@ const Template1 = ({ data }) => {
 
       {/* Disclaimer */}
       {shouldShowDisclaimer && (
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 1 }}>
           {disclaimerStyle.decorativeLine && (
             <Box
               sx={{
@@ -416,7 +416,7 @@ const Template1 = ({ data }) => {
       {shouldShowGreenFooter && (
         <Box
           sx={{
-            mt: 3,
+            mt: 2,
             pt: 2,
             borderTop: "1px solid #e0e0e0",
             textAlign: greenFooter.align || "left",

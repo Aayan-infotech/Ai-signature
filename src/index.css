@@ -52,7 +52,7 @@
 }
 .position-fixed-design-card {
     position: fixed;
-    min-height: calc(100vh - 20px);
+    min-height: calc(100vh - 55px);
     width: inherit;
     background-color: #e3dbdb;
     margin: auto;

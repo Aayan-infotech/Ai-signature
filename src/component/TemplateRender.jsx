@@ -33,11 +33,30 @@ const TemplateRender = () => {
   };
 
   const SelectedTemplate = templates[selectedTemplate] || Template1;
-  console.log(formData)
+  console.log(formData);
 
   return (
     <div className="position-fixed-design-card">
-      <SelectedTemplate data={formData} />
+      <Box
+        sx={{
+          maxHeight: "calc(100vh - 57px)",
+          overflow: "auto",
+          width: "100%",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            overflow: "auto",
+            margin:"10px"
+          }}
+        >
+          <SelectedTemplate data={formData} />
+        </Box>
+      </Box>
     </div>
   );
 };
