@@ -84,65 +84,77 @@ const AddOn = () => {
     updateDesignFormData,
     updateStyledSignedOff,
     styledSignedOff,
+    updateYoutubeVideo,
+    youtubeVideo,
+    updateGreenFooter,
+    greenFooter,
+    imageGallery,
   } = useSignature();
 
   console.log("formData", formData);
   const handleOpen = (type) => {
-    if (type === "signature") {
-      setOpenSignOff(true);
+    switch (type) {
+      case "signature":
+        setOpenSignOff(true);
+        break;
+      case "disclaimer":
+        setOpenDisclaimer(true);
+        break;
+      case "quote":
+        setOpenQuote(true);
+        break;
+      case "video":
+        setOpenVideo(true);
+        break;
+      case "greenFooter":
+        setOpenGreenFooter(true);
+        break;
+      case "imageGallery":
+        setOpenImageGallery(true);
+        break;
+      default:
+        break;
     }
-
-    if (type === "disclaimer") {
-      setOpenDisclaimer(true);
-    }
-
-    if (type === "quote") {
-      setOpenQuote(true);
-    }
-
-    if (type === "video") {
-      setOpenVideo(true);
-    }
-
-    if (type === "greenFooter") {
-      setOpenGreenFooter(true);
-    }
-
-    if (type === "imageGallery") {
-      setOpenImageGallery(true);
-    }
-
-    // Add other modal handlers here for future implementations
   };
 
   const handleClose = (type) => {
-    if (type === "signature") {
-      setOpenSignOff(false);
-    }
-
-    if (type === "disclaimer") {
-      setOpenDisclaimer(false);
-    }
-    if (type === "quote") {
-      setOpenQuote(false);
-    }
-
-    if (type === "video") {
-      setOpenVideo(false);
-    }
-
-    if (type === "greenFooter") {
-      setOpenGreenFooter(false);
-    }
-
-    if (type === "imageGallery") {
-      setOpenImageGallery(false);
+    switch (type) {
+      case "signature":
+        setOpenSignOff(false);
+        break;
+      case "disclaimer":
+        setOpenDisclaimer(false);
+        break;
+      case "quote":
+        setOpenQuote(false);
+        break;
+      case "video":
+        setOpenVideo(false);
+        break;
+      case "greenFooter":
+        setOpenGreenFooter(false);
+        break;
+      case "imageGallery":
+        setOpenImageGallery(false);
+        break;
+      default:
+        break;
     }
   };
 
   const handleSave = (formData, type) => {
     console.log("Saving sign off data:", formData);
-    updateStyledSignedOff(formData); // this should save the changed data
+    if (type === "video") {
+      updateYoutubeVideo(formData);
+    } else if (type === "greenFooter") {
+      updateGreenFooter(formData);
+    } else if (type === "imageGallery") {
+      updateImageGallery(formData);
+    } else {
+      updateStyledSignedOff(formData);
+    }
+
+    // this should save the changed data
     handleClose(type);
   };
 
@@ -152,11 +164,10 @@ const AddOn = () => {
     { title: "Quote", icon: FormatQuote, type: "quote" },
     { title: "Video", icon: VideoLibrary, type: "video", isPro: true },
     { title: "Green Footer", icon: SpaIcon, type: "greenFooter" },
-    { title: "Image Gallery", icon: CollectionsIcon, type: "imageGallery" },
     {
-      title: "Instagram Gallery",
-      icon: Instagram,
-      type: "instagram",
+      title: "Image Gallery",
+      icon: CollectionsIcon,
+      type: "imageGallery",
       isPro: true,
     },
   ];
@@ -201,7 +212,7 @@ const AddOn = () => {
       <YouTubeVideoDialog
         open={openVideo}
         onClose={() => handleClose("video")}
-        onSave={handleSave}
+        onSave={(data) => handleSave(data, "video")}
       />
 
       <GreenFooterDialog

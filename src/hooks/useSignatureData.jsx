@@ -1,6 +1,7 @@
 // hooks/useSignatureData.js
 import { useMemo } from "react";
-
+import SpaIcon from "@mui/icons-material/Spa";
+import ForestIcon from "@mui/icons-material/Forest";
 export const useSignatureData = (data) => {
   const getValue = (designValue, parentValue, defaultValue = "") =>
     designValue || parentValue || defaultValue;
@@ -14,6 +15,9 @@ export const useSignatureData = (data) => {
     styledSignedOff,
     disclaimerStyle,
     quoteStyle,
+    youtubeVideo = {},
+    greenFooter = {},
+    imageGallery = {},
   } = data || {};
 
   // --- Display Data (Signature / Signoff / Custom)
@@ -142,6 +146,30 @@ export const useSignatureData = (data) => {
 
   const shouldShowDisclaimer = disclaimerStyle && disclaimerStyle.type;
   const shouldShowQuote = quoteStyle && quoteStyle.category;
+  const shouldShowVideo = youtubeVideo && youtubeVideo.url;
+  const shouldShowGreenFooter = greenFooter && greenFooter.category;
+  const shouldShowImageGallery =
+    imageGallery && imageGallery.images && imageGallery.images.length > 0;
+  // Get YouTube thumbnail URL
+  const getYoutubeThumbnail = (videoId, quality = "hqdefault") => {
+    if (!videoId) return "";
+    return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
+  };
+
+  const getGreenFooterIcon = (iconType) => {
+    const iconMap = {
+      tree: <ForestIcon />,
+      leaf: <SpaIcon />,
+      none: null,
+    };
+    return iconMap[iconType] || null;
+  };
+
+  const getImageBorderRadius = (shape) => {
+    if (shape === "circle") return "50%";
+    if (shape === "rounded") return "10px";
+    return "0";
+  };
 
   return {
     styles,
@@ -151,7 +179,16 @@ export const useSignatureData = (data) => {
     getFontFamily,
     shouldShowDisclaimer,
     shouldShowQuote,
+    shouldShowGreenFooter,
+    shouldShowImageGallery,
     disclaimerStyle,
     quoteStyle,
+    shouldShowVideo,
+    youtubeVideo,
+    getYoutubeThumbnail,
+    greenFooter,
+    getGreenFooterIcon,
+    imageGallery,
+    getImageBorderRadius,
   };
 };

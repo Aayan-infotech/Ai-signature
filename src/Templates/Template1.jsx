@@ -22,6 +22,15 @@ const Template1 = ({ data }) => {
     shouldShowQuote,
     disclaimerStyle,
     quoteStyle,
+    shouldShowVideo,
+    youtubeVideo,
+    getYoutubeThumbnail,
+    greenFooter,
+    getGreenFooterIcon,
+    shouldShowGreenFooter,
+    getImageBorderRadius,
+    imageGallery,
+    shouldShowImageGallery,
   } = useSignatureData(data);
 
   const socialIcons = [
@@ -31,6 +40,7 @@ const Template1 = ({ data }) => {
     { Icon: XIcon, color: getSocialColor("#000000"), label: "twitter" },
   ];
 
+  console.log("greenFooter", greenFooter);
   return (
     <Card
       className="shadow-sm border-0 p-3 d-flex m-auto ms-5 w-100"
@@ -199,6 +209,173 @@ const Template1 = ({ data }) => {
           </Typography>
         </Box>
       )}
+      <div className="row">
+        <div className="col-6">
+          {shouldShowVideo && (
+            <Box sx={{ my: 3 }}>
+              {youtubeVideo.styleType === "compact" ? (
+                <div
+                  className={`d-flex flex-column align-items-${youtubeVideo.align} gap-2`}
+                >
+                  <a
+                    href={youtubeVideo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      textDecoration: "none",
+                      display: "inline-block",
+                    }}
+                  >
+                    <img
+                      src={getYoutubeThumbnail(youtubeVideo.videoId)}
+                      alt="YouTube thumbnail"
+                      width={120}
+                      height={90}
+                      style={{
+                        borderRadius: "4px",
+                        border: "1px solid #ddd",
+                      }}
+                      onError={(e) => {
+                        // Fallback if thumbnail doesn't exist
+                        e.target.src = getYoutubeThumbnail(
+                          youtubeVideo.videoId,
+                          "default"
+                        );
+                      }}
+                    />
+                  </a>
+                  {youtubeVideo.title && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: youtubeVideo.color || "#4a4a4a",
+                        fontSize: `${youtubeVideo.fontSize || 14}px`,
+                        fontWeight: 500,
+                        maxWidth: "120px",
+                      }}
+                    >
+                      {youtubeVideo.title}
+                    </Typography>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className={`d-flex flex-column align-items-${youtubeVideo.align} gap-2`}
+                >
+                  <Box sx={{ border: "1px solid #e0e0e0", px: 0.8, py: 1 }}>
+                    <a
+                      href={youtubeVideo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        textDecoration: "none",
+                        display: "inline-block",
+                      }}
+                    >
+                      <img
+                        src={getYoutubeThumbnail(youtubeVideo.videoId)}
+                        alt="YouTube thumbnail"
+                        width={100}
+                        height={80}
+                        style={{
+                          borderRadius: "4px",
+                          border: "1px solid #ddd",
+                        }}
+                        onError={(e) => {
+                          // Fallback if thumbnail doesn't exist
+                          e.target.src = getYoutubeThumbnail(
+                            youtubeVideo.videoId,
+                            "default"
+                          );
+                        }}
+                      />
+                    </a>
+                    {youtubeVideo.title && (
+                      <Typography
+                        className="ms-2"
+                        variant="caption"
+                        sx={{
+                          color: youtubeVideo.color || "#4a4a4a",
+                          fontSize: `${youtubeVideo.fontSize || 14}px`,
+                          fontWeight: 500,
+                          maxWidth: "120px",
+                        }}
+                      >
+                        {youtubeVideo.title}
+                      </Typography>
+                    )}
+                  </Box>
+                </div>
+              )}
+            </Box>
+          )}
+        </div>
+        <div className="col-lg-6">
+          {/* Image Gallery */}
+          {shouldShowImageGallery && (
+            <Box sx={{ my: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: `${imageGallery.spaceBetween || 20}px`,
+                  justifyContent: "flex-start",
+                }}
+              >
+                {imageGallery.images.map((img, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      width: imageGallery.imageSize || 50,
+                      height: imageGallery.imageSize || 50,
+                      overflow: "hidden",
+                      border: "1px solid #e0e0e0",
+                      borderRadius: getImageBorderRadius(imageGallery.shape),
+                      cursor:
+                        imageGallery.applyLink && imageGallery.link
+                          ? "pointer"
+                          : "default",
+                    }}
+                    onClick={() => {
+                      if (imageGallery.applyLink && imageGallery.link) {
+                        window.open(
+                          imageGallery.link,
+                          "_blank",
+                          "noopener,noreferrer"
+                        );
+                      }
+                    }}
+                  >
+                    <img
+                      src={img}
+                      alt={`Gallery image ${idx + 1}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: getImageBorderRadius(imageGallery.shape),
+                      }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+              {imageGallery.galleryTitle && (
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mt: 1,
+                    fontWeight: 600,
+                    fontSize: "12px",
+                    color: "#333",
+                  }}
+                >
+                  {imageGallery.galleryTitle}
+                </Typography>
+              )}
+            </Box>
+          )}
+        </div>
+      </div>
 
       {/* Disclaimer */}
       {shouldShowDisclaimer && (
@@ -233,6 +410,53 @@ const Template1 = ({ data }) => {
               }}
             />
           )}
+        </Box>
+      )}
+
+      {shouldShowGreenFooter && (
+        <Box
+          sx={{
+            mt: 3,
+            pt: 2,
+            borderTop: "1px solid #e0e0e0",
+            textAlign: greenFooter.align || "left",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent:
+                greenFooter.align === "center"
+                  ? "center"
+                  : greenFooter.align === "right"
+                  ? "flex-end"
+                  : "flex-start",
+              gap: 1,
+            }}
+          >
+            {greenFooter.icon && greenFooter.icon !== "none" && (
+              <Typography
+                sx={{
+                  fontSize: `${greenFooter.fontSize || 14}px`,
+                  color: greenFooter.color || "#57c84d",
+                }}
+              >
+                {getGreenFooterIcon(greenFooter.icon)}
+              </Typography>
+            )}
+            <Typography
+              variant="body2"
+              sx={{
+                color: greenFooter.color || "#57c84d",
+                fontSize: `${greenFooter.fontSize || 14}px`,
+                fontStyle: "italic",
+                lineHeight: 1.4,
+              }}
+            >
+              {greenFooter.text}
+            </Typography>
+          </Box>
         </Box>
       )}
     </Card>

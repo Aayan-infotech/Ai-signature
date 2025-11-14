@@ -427,7 +427,7 @@ export default function DashboardSidebar({ sidebarOpen }) {
         {/* Main Navigation */}
         <List sx={{ mt: 2, px: 1 }}>
           {mainMenuItems.map((item, index) => (
-            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
+            <ListItem key={item.text} disablePadding sx={{ display: "block" , my:.8 }}>
               <StyledListItemButton
                 selected={getSelectedIndex() === index}
                 onClick={() => handleNavigation(item.link)}

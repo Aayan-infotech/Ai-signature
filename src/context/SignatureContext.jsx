@@ -10,6 +10,10 @@ import {
   QUOTE,
   QUOTE_TEXT,
   QUOTE_CATEGORY_MAP,
+  VIDEO,
+  GREEN_FOOTER_STYLE,
+  GREEN_FOOTER_TEXT,
+  IMAGE_GALLERY,
 } from "../utils/constant";
 
 const SignatureContext = createContext();
@@ -25,6 +29,10 @@ export const SignatureProvider = ({ children }) => {
   const [disclamierStyle, setDisclamierStyle] = useState(DISCLAIMER);
   const [selectedTemplate, setSelectedTemplate] = useState("template1");
   const [quoteStyle, setQuoteStyle] = useState(QUOTE);
+  const [youtubeVideo, setYoutubeVideo] = useState(VIDEO);
+  const [greenFooter, setGreenFooter] = useState(GREEN_FOOTER_STYLE);
+  const [imageGallery, setImageGallery] = useState(IMAGE_GALLERY);
+
   const getDisclaimerText = useCallback(() => {
     const { type, customText } = disclamierStyle;
 
@@ -45,9 +53,41 @@ export const SignatureProvider = ({ children }) => {
     return QUOTE_TEXT[category] || "";
   }, [quoteStyle]);
 
+  const getGreenFooterText = useCallback(() => {
+    const { category, customText } = greenFooter;
+    console.log("category", category);
+    console.log("121212", GREEN_FOOTER_TEXT[category]);
+    if (category === "custom" && customText) {
+      return customText;
+    }
+
+    return GREEN_FOOTER_TEXT[category] || "";
+  }, [greenFooter]);
+
   // Update quote style
   const updateQuoteStyle = useCallback((data) => {
     setQuoteStyle((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  const updateYoutubeVideo = useCallback((data) => {
+    setYoutubeVideo((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  const getYoutubeVideoId = useCallback((url) => {
+    if (!url) return null;
+
+    const regex =
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  }, []);
+
+  const updateGreenFooter = useCallback((data) => {
+    setGreenFooter((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  const updateImageGallery = useCallback((data) => {
+    setImageGallery((prev) => ({ ...prev, ...data }));
   }, []);
   // Combined formData for backward compatibility
   const formData = useMemo(
@@ -65,6 +105,15 @@ export const SignatureProvider = ({ children }) => {
         ...quoteStyle,
         text: getQuoteText(),
       },
+      youtubeVideo: {
+        ...youtubeVideo,
+        videoId: getYoutubeVideoId(youtubeVideo.url),
+      },
+      greenFooter: {
+        ...greenFooter,
+        text: getGreenFooterText(),
+      },
+      imageGallery,
     }),
     [
       globalStyles,
@@ -76,6 +125,11 @@ export const SignatureProvider = ({ children }) => {
       getDisclaimerText,
       quoteStyle,
       getQuoteText,
+      youtubeVideo,
+      getYoutubeVideoId,
+      greenFooter,
+      getGreenFooterText,
+      imageGallery,
     ]
   );
 
@@ -185,6 +239,14 @@ export const SignatureProvider = ({ children }) => {
       quoteStyle,
       updateQuoteStyle,
       getQuoteText,
+      youtubeVideo,
+      updateYoutubeVideo,
+      getYoutubeVideoId,
+      greenFooter,
+      updateGreenFooter,
+      getGreenFooterText,
+      imageGallery,
+      updateImageGallery,
     }),
     [
       formData,
@@ -201,6 +263,14 @@ export const SignatureProvider = ({ children }) => {
       quoteStyle,
       updateQuoteStyle,
       getQuoteText,
+      youtubeVideo,
+      updateYoutubeVideo,
+      getYoutubeVideoId,
+      greenFooter,
+      updateGreenFooter,
+      getGreenFooterText,
+      imageGallery,
+      updateImageGallery,
     ]
   );
 

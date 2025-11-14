@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useContext, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -18,60 +18,73 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import SignatureContext from "../../context/SignatureContext";
 
-const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
-  const [images, setImages] = useState([]);
-  const [galleryTitle, setGalleryTitle] = useState("");
-  const [imageSize, setImageSize] = useState(50);
-  const [spaceBetween, setSpaceBetween] = useState(20);
-  const [shape, setShape] = useState("square");
-  const [applyLink, setApplyLink] = useState(true);
-  const [link, setLink] = useState("");
+const ImageGalleryDialog = ({ open, onClose, onSave }) => {
+  const { imageGallery, updateImageGallery } = useContext(SignatureContext);
+
+  const [formData, setFormData] = useState({
+    images: [],
+    galleryTitle: "",
+    imageSize: 50,
+    spaceBetween: 20,
+    shape: "square",
+    applyLink: true,
+    link: "",
+  });
+
+  // Initialize form with existing data when dialog opens
+  useEffect(() => {
+    if (open && imageGallery) {
+      setFormData({
+        images: imageGallery.images || [],
+        galleryTitle: imageGallery.galleryTitle || "",
+        imageSize: imageGallery.imageSize || 50,
+        spaceBetween: imageGallery.spaceBetween || 20,
+        shape: imageGallery.shape || "square",
+        applyLink: imageGallery.applyLink !== false,
+        link: imageGallery.link || "",
+      });
+    }
+  }, [open, imageGallery]);
 
   const handleImageUpload = useCallback((e) => {
     const files = Array.from(e.target.files);
     const fileURLs = files.map((file) => URL.createObjectURL(file));
-    setImages((prev) => [...prev, ...fileURLs].slice(0, 5)); // max 5 images
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, ...fileURLs].slice(0, 5), // max 5 images
+    }));
   }, []);
 
   const resetForm = useCallback(() => {
-    setImages([]);
-    setGalleryTitle("");
-    setImageSize(50);
-    setSpaceBetween(20);
-    setShape("square");
-    setApplyLink(true);
-    setLink("");
+    setFormData({
+      images: [],
+      galleryTitle: "",
+      imageSize: 50,
+      spaceBetween: 20,
+      shape: "square",
+      applyLink: true,
+      link: "",
+    });
   }, []);
 
-  const handleAdd = useCallback(() => {
-    onAdd({
-      images,
-      galleryTitle,
-      imageSize,
-      spaceBetween,
-      shape,
-      applyLink,
-      link,
-    });
+  const handleSave = useCallback(() => {
+    // Call the context update function
+    updateImageGallery(formData);
+
+    // Also call the onSave prop for backward compatibility
+    if (onSave) {
+      onSave(formData, "imageGallery");
+    }
+
     onClose();
     resetForm();
-  }, [
-    images,
-    galleryTitle,
-    imageSize,
-    spaceBetween,
-    shape,
-    applyLink,
-    link,
-    onAdd,
-    onClose,
-    resetForm,
-  ]);
+  }, [formData, updateImageGallery, onSave, onClose, resetForm]);
 
   const handleShapeChange = useCallback((event, newShape) => {
     if (newShape !== null) {
-      setShape(newShape);
+      setFormData((prev) => ({ ...prev, shape: newShape }));
     }
   }, []);
 
@@ -81,30 +94,30 @@ const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
   }, [onClose, resetForm]);
 
   const handleImageSizeChange = useCallback((event, newValue) => {
-    setImageSize(newValue);
+    setFormData((prev) => ({ ...prev, imageSize: newValue }));
   }, []);
 
   const handleSpaceBetweenChange = useCallback((event, newValue) => {
-    setSpaceBetween(newValue);
+    setFormData((prev) => ({ ...prev, spaceBetween: newValue }));
   }, []);
 
   const handleGalleryTitleChange = useCallback((event) => {
-    setGalleryTitle(event.target.value);
+    setFormData((prev) => ({ ...prev, galleryTitle: event.target.value }));
   }, []);
 
   const handleLinkChange = useCallback((event) => {
-    setLink(event.target.value);
+    setFormData((prev) => ({ ...prev, link: event.target.value }));
   }, []);
 
   const handleApplyLinkChange = useCallback((event) => {
-    setApplyLink(event.target.checked);
+    setFormData((prev) => ({ ...prev, applyLink: event.target.checked }));
   }, []);
 
   const getBorderRadius = useCallback(() => {
-    if (shape === "circle") return "50%";
-    if (shape === "rounded") return "10px";
+    if (formData.shape === "circle") return "50%";
+    if (formData.shape === "rounded") return "10px";
     return "0";
-  }, [shape]);
+  }, [formData.shape]);
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -150,7 +163,7 @@ const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
           />
 
           {/* Preview Images */}
-          {images.map((img, idx) => (
+          {formData.images.map((img, idx) => (
             <Box
               key={idx}
               sx={{
@@ -182,7 +195,7 @@ const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
         <TextField
           fullWidth
           placeholder="Your Gallery Title"
-          value={galleryTitle}
+          value={formData.galleryTitle}
           onChange={handleGalleryTitleChange}
           variant="outlined"
           size="small"
@@ -194,7 +207,7 @@ const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
           Images size
         </Typography>
         <Slider
-          value={imageSize}
+          value={formData.imageSize}
           onChange={handleImageSizeChange}
           min={20}
           max={100}
@@ -207,7 +220,7 @@ const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
           Space between
         </Typography>
         <Slider
-          value={spaceBetween}
+          value={formData.spaceBetween}
           onChange={handleSpaceBetweenChange}
           min={0}
           max={50}
@@ -220,7 +233,7 @@ const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
           Shape
         </Typography>
         <ToggleButtonGroup
-          value={shape}
+          value={formData.shape}
           exclusive
           onChange={handleShapeChange}
           sx={{ mb: 3 }}
@@ -265,25 +278,25 @@ const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
         >
           <Typography variant="body2">Apply link to all images</Typography>
           <Switch
-            checked={applyLink}
+            checked={formData.applyLink}
             onChange={handleApplyLinkChange}
             color="primary"
           />
         </Stack>
 
         {/* Link Input */}
-        {applyLink && (
+        {formData.applyLink && (
           <Stack direction="row" alignItems="center" spacing={1}>
             <TextField
               fullWidth
               placeholder="Your Link Here"
-              value={link}
+              value={formData.link}
               onChange={handleLinkChange}
               variant="outlined"
               size="small"
             />
             <Link
-              href={link || "#"}
+              href={formData.link || "#"}
               target="_blank"
               rel="noopener"
               underline="hover"
@@ -299,10 +312,10 @@ const ImageGalleryDialog = ({ open, onClose, onAdd }) => {
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           variant="contained"
-          onClick={handleAdd}
-          disabled={images.length === 0}
+          onClick={handleSave}
+          disabled={formData.images.length === 0}
         >
-          Add
+          {imageGallery?.images?.length ? "Update" : "Add"}
         </Button>
       </DialogActions>
     </Dialog>

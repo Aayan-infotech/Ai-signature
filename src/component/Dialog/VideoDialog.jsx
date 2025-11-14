@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -18,14 +18,39 @@ import {
   Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useSignature } from "../../hooks/useSignature";
 
-const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
+const YouTubeVideoDialog = ({ open, onClose, onSave }) => {
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
   const [styleType, setStyleType] = useState("compact");
   const [fontColor, setFontColor] = useState("#4a4a4a");
   const [fontSize, setFontSize] = useState(14);
   const [alignment, setAlignment] = useState("left");
+  const { youtubeVideo, updateYoutubeVideo } = useSignature();
+
+  const [formData, setFormData] = useState({
+    url: "",
+    title: "",
+    styleType: "compact",
+    color: "#4a4a4a",
+    fontSize: 14,
+    align: "left",
+  });
+
+  // Initialize form with existing data when dialog opens
+  useEffect(() => {
+    if (open && youtubeVideo) {
+      setFormData({
+        url: youtubeVideo.url || "",
+        title: youtubeVideo.title || "",
+        styleType: youtubeVideo.styleType || "compact",
+        color: youtubeVideo.color || "#4a4a4a",
+        fontSize: youtubeVideo.fontSize || 14,
+        align: youtubeVideo.align || "left",
+      });
+    }
+  }, [open, youtubeVideo]);
 
   const colors = [
     "#4a4a4a",
@@ -37,25 +62,45 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
     "#ff4d4d",
   ];
 
-  const handleAdd = () => {
-    onAdd({
-      url,
-      title,
-      styleType,
-      fontColor,
-      fontSize,
-      alignment,
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    // Call the context update function
+    updateYoutubeVideo(formData);
+
+    // Also call the onSave prop for backward compatibility if needed
+    if (onSave) {
+      onSave(formData, "video");
+    }
+
+    onClose();
+  };
+
+  const handleClose = () => {
+    // Reset form when closing without saving
+    setFormData({
+      url: youtubeVideo?.url || "",
+      title: youtubeVideo?.title || "",
+      styleType: youtubeVideo?.styleType || "compact",
+      color: youtubeVideo?.color || "#4a4a4a",
+      fontSize: youtubeVideo?.fontSize || 14,
+      align: youtubeVideo?.align || "left",
     });
     onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 600 }}>
         YouTube video
         <IconButton
           aria-label="close"
-          onClick={onClose}
+          onClick={handleClose}
           sx={{ position: "absolute", right: 8, top: 8 }}
         >
           <CloseIcon />
@@ -73,8 +118,8 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
           label="YouTube video / playlist URL"
           placeholder="http://www.youtube.com/watch?v=123"
           variant="outlined"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          value={formData.url}
+          onChange={(e) => handleInputChange("url", e.target.value)}
           sx={{ mb: 2 }}
         />
         <TextField
@@ -82,8 +127,8 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
           label="Video / Playlist title"
           placeholder="Kitesurfing how to:"
           variant="outlined"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={formData.title}
+          onChange={(e) => handleInputChange("title", e.target.value)}
           sx={{ mb: 3 }}
         />
 
@@ -99,8 +144,8 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
           </Typography>
           <RadioGroup
             row
-            value={styleType}
-            onChange={(e) => setStyleType(e.target.value)}
+            value={formData.styleType}
+            onChange={(e) => handleInputChange("styleType", e.target.value)}
           >
             <FormControlLabel
               value="compact"
@@ -136,19 +181,21 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
           Font color
         </Typography>
         <Stack direction="row" spacing={1} mb={2} flexWrap="wrap">
-          {colors.map((c) => (
+          {colors.map((color) => (
             <Box
-              key={c}
+              key={color}
               sx={{
                 width: 26,
                 height: 26,
                 borderRadius: "50%",
-                bgcolor: c,
+                bgcolor: color,
                 cursor: "pointer",
                 border:
-                  c === fontColor ? "2px solid black" : "2px solid transparent",
+                  color === formData.color
+                    ? "2px solid black"
+                    : "2px solid transparent",
               }}
-              onClick={() => setFontColor(c)}
+              onClick={() => handleInputChange("color", color)}
             />
           ))}
           <Box>
@@ -161,8 +208,8 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
                 cursor: "pointer",
                 padding: "5px",
               }}
-              value={fontColor}
-              onChange={(e) => setFontColor(e.target.value)}
+              value={formData.color}
+              onChange={(e) => handleInputChange("color", e.target.value)}
             />
           </Box>
         </Stack>
@@ -172,8 +219,8 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
           Font size
         </Typography>
         <Slider
-          value={fontSize}
-          onChange={(e, val) => setFontSize(val)}
+          value={formData.fontSize}
+          onChange={(e, value) => handleInputChange("fontSize", value)}
           min={10}
           max={24}
           valueLabelDisplay="auto"
@@ -185,9 +232,9 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
           Alignment
         </Typography>
         <ToggleButtonGroup
-          value={alignment}
+          value={formData.align}
           exclusive
-          onChange={(e, val) => val && setAlignment(val)}
+          onChange={(e, value) => value && handleInputChange("align", value)}
         >
           <ToggleButton value="left">
             <Box textAlign="left" width="60px">
@@ -208,13 +255,13 @@ const YouTubeVideoDialog = ({ open, onClose, onAdd }) => {
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleClose}>Cancel</Button>
         <Button
           variant="contained"
-          onClick={handleAdd}
-          disabled={!url || !title}
+          onClick={handleSave}
+          disabled={!formData.url || !formData.title}
         >
-          Add
+          {youtubeVideo?.url ? "Update" : "Add"}
         </Button>
       </DialogActions>
     </Dialog>

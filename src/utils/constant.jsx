@@ -143,3 +143,49 @@ export const QUOTE_CATEGORY_MAP = {
   albert_einstein: "albert_einstein",
   my_own_quotes: "custom",
 };
+
+export const VIDEO = {
+  url: "",
+  title: "",
+  styleType: "compact",
+  color: "#4a4a4a",
+  fontSize: 14,
+  align: "left",
+  videoId: null,
+};
+
+export const GREEN_FOOTER_TEXT = {
+  Environmental_responsibility:
+    "Please consider your environmental responsibility. Before printing this e-mail message, ask yourself whether you really need a hard copy.",
+  Environmental_responsibility_short:
+    "Please consider the environment before printing this e-mail!",
+  Do_you_really_need: "Do you really need to print this email?",
+  Printing_kills_trees: "Printing emails kills trees. Print is murder!",
+  Dont_print_this: "Don't print this, Ok?",
+  Printing_emails: "Printing emails is SO 2009",
+  Save_a_tree: "Save a tree - kill a beaver",
+  Be_Carbon_free:
+    "Be like me, be Carbon free - don't print this and save a tree",
+  Save_ink_cartridges:
+    "Save ink cartridges from going extinct! Don't print this email!",
+};
+
+export const GREEN_FOOTER_STYLE = {
+  color: "#57c84d",
+  fontSize: 14,
+  align: "left",
+  customText: "",
+  category: "",
+  icon: "",
+};
+
+// Add to your constants file
+export const IMAGE_GALLERY = {
+  images: [],
+  galleryTitle: "",
+  imageSize: 50,
+  spaceBetween: 20,
+  shape: "square",
+  applyLink: true,
+  link: "",
+};

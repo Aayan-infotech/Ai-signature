@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,31 +16,56 @@ import {
   ToggleButtonGroup,
   Box,
   Stack,
+  TextField,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SpaIcon from "@mui/icons-material/Spa";
 import ForestIcon from "@mui/icons-material/Forest";
+import SignatureContext from "../../context/SignatureContext";
 
-const GreenFooterDialog = ({ open, onClose, onAdd }) => {
-  const [selectedText, setSelectedText] = useState(
-    "environmental_responsibility"
-  );
-  const [icon, setIcon] = useState("none");
-  const [fontSize, setFontSize] = useState(14);
-  const [color, setColor] = useState("#57c84d");
-  const [alignment, setAlignment] = useState("left");
+const GreenFooterDialog = ({ open, onClose, onSave }) => {
+  const { greenFooter, updateGreenFooter } = useContext(SignatureContext);
+
+  const [formData, setFormData] = useState({
+    category: "",
+    icon: "none",
+    fontSize: 14,
+    color: "#57c84d",
+    align: "left",
+    customText: "",
+  });
+
+  // Initialize form with existing data when dialog opens
+  useEffect(() => {
+    if (open && greenFooter) {
+      setFormData({
+        category: greenFooter.category || "environmental_responsibility",
+        icon: greenFooter.icon || "none",
+        fontSize: greenFooter.fontSize || 14,
+        color: greenFooter.color || "#57c84d",
+        align: greenFooter.align || "left",
+        customText: greenFooter.customText || "",
+      });
+    }
+  }, [open, greenFooter]);
 
   const footerTexts = [
-    "Environmental responsibility",
-    "Environmental responsibility short",
-    "Do you really need..?",
-    "Printing kills trees",
-    "Don't print this",
-    "Printing emails is SO 2009",
-    "Save a tree - kill a beaver",
-    "Be Carbon free",
-    "Save ink cartridges",
-    "Custom",
+    {
+      value: "Environmental_responsibility",
+      label: "Environmental responsibility",
+    },
+    {
+      value: "Environmental_responsibility_short",
+      label: "Environmental responsibility short",
+    },
+    { value: "Do_you_really_need", label: "Do you really need..?" },
+    { value: "Printing_kills_trees", label: "Printing kills trees" },
+    { value: "Dont_print_this", label: "Don't print this" },
+    { value: "Printing_emails", label: "Printing emails is SO 2009" },
+    { value: "Save_a_tree", label: "Save a tree - kill a beaver" },
+    { value: "Be_carbon_free", label: "Be Carbon free" },
+    { value: "Save_ink_cartridges", label: "Save ink cartridges" },
+    { value: "custom", label: "Custom" },
   ];
 
   const colors = [
@@ -53,24 +78,45 @@ const GreenFooterDialog = ({ open, onClose, onAdd }) => {
     "#ff4d4d",
   ];
 
-  const handleAdd = () => {
-    onAdd({
-      selectedText,
-      icon,
-      fontSize,
-      color,
-      alignment,
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    // Call the context update function
+    updateGreenFooter(formData);
+
+    // Also call the onSave prop for backward compatibility
+    if (onSave) {
+      onSave(formData, "greenFooter");
+    }
+
+    onClose();
+  };
+
+  const handleClose = () => {
+    // Reset form when closing without saving
+    setFormData({
+      category: greenFooter?.category || "environmental_responsibility",
+      icon: greenFooter?.icon || "none",
+      fontSize: greenFooter?.fontSize || 14,
+      color: greenFooter?.color || "#57c84d",
+      align: greenFooter?.align || "left",
+      customText: greenFooter?.customText || "",
     });
     onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: 600 }}>
         Add a green footer
         <IconButton
           aria-label="close"
-          onClick={onClose}
+          onClick={handleClose}
           sx={{ position: "absolute", right: 8, top: 8 }}
         >
           <CloseIcon />
@@ -84,19 +130,34 @@ const GreenFooterDialog = ({ open, onClose, onAdd }) => {
             Choose a text
           </Typography>
           <RadioGroup
-            value={selectedText}
-            onChange={(e) => setSelectedText(e.target.value)}
+            value={formData.category}
+            onChange={(e) => handleInputChange("category", e.target.value)}
           >
             {footerTexts.map((text) => (
               <FormControlLabel
-                key={text}
-                value={text.toLowerCase().replace(/\s+/g, "_")}
+                key={text.value}
+                value={text.value}
                 control={<Radio />}
-                label={text}
+                label={text.label}
               />
             ))}
           </RadioGroup>
         </FormControl>
+
+        {/* Custom Text Input */}
+        {formData.category === "custom" && (
+          <TextField
+            fullWidth
+            label="Custom Text"
+            placeholder="Enter your custom green footer text"
+            variant="outlined"
+            value={formData.customText}
+            onChange={(e) => handleInputChange("customText", e.target.value)}
+            sx={{ mb: 3 }}
+            multiline
+            rows={3}
+          />
+        )}
 
         {/* Footer Style */}
         <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
@@ -112,28 +173,28 @@ const GreenFooterDialog = ({ open, onClose, onAdd }) => {
             value="tree"
             control={
               <Radio
-                checked={icon === "tree"}
-                onChange={() => setIcon("tree")}
+                checked={formData.icon === "tree"}
+                onChange={() => handleInputChange("icon", "tree")}
               />
             }
-            label={<ForestIcon color="success"/>}
+            label={<ForestIcon color="success" />}
           />
           <FormControlLabel
             value="leaf"
             control={
               <Radio
-                checked={icon === "leaf"}
-                onChange={() => setIcon("leaf")}
+                checked={formData.icon === "leaf"}
+                onChange={() => handleInputChange("icon", "leaf")}
               />
             }
-            label={<SpaIcon color="success"/>}
+            label={<SpaIcon color="success" />}
           />
           <FormControlLabel
             value="none"
             control={
               <Radio
-                checked={icon === "none"}
-                onChange={() => setIcon("none")}
+                checked={formData.icon === "none"}
+                onChange={() => handleInputChange("icon", "none")}
               />
             }
             label="None"
@@ -145,8 +206,8 @@ const GreenFooterDialog = ({ open, onClose, onAdd }) => {
           Font size
         </Typography>
         <Slider
-          value={fontSize}
-          onChange={(e, val) => setFontSize(val)}
+          value={formData.fontSize}
+          onChange={(e, value) => handleInputChange("fontSize", value)}
           min={10}
           max={24}
           valueLabelDisplay="auto"
@@ -158,21 +219,37 @@ const GreenFooterDialog = ({ open, onClose, onAdd }) => {
           Color
         </Typography>
         <Stack direction="row" spacing={1} mb={2} flexWrap="wrap">
-          {colors.map((c) => (
+          {colors.map((color) => (
             <Box
-              key={c}
+              key={color}
               sx={{
                 width: 26,
                 height: 26,
                 borderRadius: "50%",
-                bgcolor: c,
+                bgcolor: color,
                 cursor: "pointer",
                 border:
-                  c === color ? "2px solid black" : "2px solid transparent",
+                  color === formData.color
+                    ? "2px solid black"
+                    : "2px solid transparent",
               }}
-              onClick={() => setColor(c)}
+              onClick={() => handleInputChange("color", color)}
             />
           ))}
+          <Box>
+            <input
+              type="color"
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                cursor: "pointer",
+                padding: "5px",
+              }}
+              value={formData.color}
+              onChange={(e) => handleInputChange("color", e.target.value)}
+            />
+          </Box>
         </Stack>
 
         {/* Banner Alignment */}
@@ -180,9 +257,9 @@ const GreenFooterDialog = ({ open, onClose, onAdd }) => {
           Banner alignment
         </Typography>
         <ToggleButtonGroup
-          value={alignment}
+          value={formData.align}
           exclusive
-          onChange={(e, val) => val && setAlignment(val)}
+          onChange={(e, value) => value && handleInputChange("align", value)}
         >
           <ToggleButton value="left">
             <Box textAlign="left" width="60px">
@@ -203,9 +280,9 @@ const GreenFooterDialog = ({ open, onClose, onAdd }) => {
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleAdd}>
-          Add
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button variant="contained" onClick={handleSave}>
+          {greenFooter?.category ? "Update" : "Add"}
         </Button>
       </DialogActions>
     </Dialog>
