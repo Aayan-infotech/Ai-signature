@@ -89,6 +89,7 @@ const AddOn = () => {
     updateGreenFooter,
     greenFooter,
     imageGallery,
+    updateImageGallery,
   } = useSignature();
 
   console.log("formData", formData);

@@ -10,6 +10,7 @@ import {
 import { Facebook, Instagram, LinkedIn } from "@mui/icons-material";
 import XIcon from "@mui/icons-material/X";
 import { useSignatureData } from "../hooks/useSignatureData";
+import { Button } from "@mui/material";
 
 const Template1 = ({ data }) => {
   const {
@@ -31,6 +32,13 @@ const Template1 = ({ data }) => {
     getImageBorderRadius,
     imageGallery,
     shouldShowImageGallery,
+    shouldShowOnlineMeeting,
+    getButtonStyles,
+    getButtonIcon,
+    getSchedulingProviderName,
+    onlineMeeting,
+    shouldShowSocialButtons,
+    socialButtons,
   } = useSignatureData(data);
 
   const socialIcons = [
@@ -40,7 +48,7 @@ const Template1 = ({ data }) => {
     { Icon: XIcon, color: getSocialColor("#000000"), label: "twitter" },
   ];
 
-  console.log("greenFooter", greenFooter);
+  console.log("socialButtons", socialButtons);
   return (
     <Card
       className="shadow-sm border-0 p-3 d-flex m-auto ms-5 w-100"
@@ -97,7 +105,6 @@ const Template1 = ({ data }) => {
           )}
         </Box>
       )}
-
       {/* Main Layout */}
       <Row>
         <Col xs={3} className={`d-flex align-items-${styles.image.position}`}>
@@ -190,7 +197,107 @@ const Template1 = ({ data }) => {
           </Box>
         </Col>
       </Row>
+      {shouldShowOnlineMeeting && (
+        <Box sx={{ my: 2, textAlign: onlineMeeting.align || "left" }}>
+          <a
+            href={onlineMeeting.schedulerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={getButtonStyles()}
+            onMouseEnter={(e) => {
+              if (onlineMeeting.buttonType !== "Simple") {
+                e.target.style.opacity = "0.8";
+                e.target.style.transform = "translateY(-1px)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (onlineMeeting.buttonType !== "Simple") {
+                e.target.style.opacity = "1";
+                e.target.style.transform = "translateY(0)";
+              }
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {getButtonIcon()}
+              <span>{onlineMeeting.buttonText || "Book a meeting"}</span>
+            </Box>
+          </a>
 
+          {/* Provider badge */}
+          {onlineMeeting.showProviderBadge !== false && (
+            <Typography
+              variant="caption"
+              sx={{
+                display: "block",
+                mt: 0.5,
+                color: "#666",
+                fontSize: "10px",
+              }}
+            >
+              Powered by {getSchedulingProviderName()}
+            </Typography>
+          )}
+        </Box>
+      )}
+      {/* Social Buttons Section */}
+      {shouldShowSocialButtons &&
+        socialButtons.links &&
+        socialButtons.links.length > 0 && (
+          <Box sx={{ my: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                justifyContent: socialButtons.align || "flex-start",
+              }}
+            >
+              {socialButtons.links.map((button) => (
+                <Button
+                  key={button.platform}
+                  variant="contained"
+                 
+                  href={button.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    backgroundColor: button.color,
+                    color: "white",
+                  
+                    textTransform: "none",
+                    borderRadius:
+                      socialButtons.shape === "square"
+                        ? 0
+                        : socialButtons.shape === "rounded_sm"
+                        ? "4px"
+                        : "50px",
+                    border:
+                      socialButtons.style === "Stroke"
+                        ? "2px solid white"
+                        : "none",
+                    boxShadow:
+                      socialButtons.style === "Stroke"
+                        ? `0 0 0 2px ${button.color}`
+                        : "none",
+                    minWidth: "auto",
+                    px: 2,
+                    py: 1,
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    "&:hover": {
+                      backgroundColor: button.color,
+                      opacity: 0.9,
+                      transform: "translateY(-1px)",
+                    },
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  {button.text}
+                </Button>
+              ))}
+            </Box>
+          </Box>
+        )}
       {/* Quote */}
       {shouldShowQuote && (
         <Box sx={{ my: 3, p: 2, backgroundColor: "#f8f9fa", borderRadius: 1 }}>
@@ -376,7 +483,6 @@ const Template1 = ({ data }) => {
           )}
         </div>
       </div>
-
       {/* Disclaimer */}
       {shouldShowDisclaimer && (
         <Box sx={{ mb: 1 }}>
@@ -412,7 +518,6 @@ const Template1 = ({ data }) => {
           )}
         </Box>
       )}
-
       {shouldShowGreenFooter && (
         <Box
           sx={{

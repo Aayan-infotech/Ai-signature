@@ -95,7 +95,12 @@ const CTA = () => {
   const [jobModal, setJobModal] = useState(false);
   const [newsletterModal, setNewsletterModal] = useState(false);
   const [openHtml, setOpenHtml] = useState(false);
-  const { formData, updateFormData, updateDesignFormData } = useSignature();
+  const {
+    formData,
+    updateFormData,
+    updateDesignFormData,
+    updateSocialButtons,
+  } = useSignature();
 
   const handleOpen = (type) => {
     if (type === "scheduler") {
@@ -181,9 +186,16 @@ const CTA = () => {
     }
   };
 
-  const handleSave = (formData) => {
-    console.log("Saving CTA data:", { data: formData });
-    handleClose();
+  // In CTA component - replace the handleSave function
+  const handleSave = (formData, type) => {
+    console.log("Saving CTA data:", { type, data: formData });
+
+    if (type === "social") {
+      console.log("Updating social buttons:", formData);
+      updateSocialButtons(formData);
+    }
+
+    handleClose(type);
   };
 
   const ctaOptions = [
@@ -233,7 +245,8 @@ const CTA = () => {
       <SocialButtonsModal
         open={openSocial}
         onClose={() => handleClose("social")}
-        onSave={handleSave}
+        onSave={handleSave} // Use the new handler
+        initialData={formData.socialButtons} // Pass initial data
       />
 
       <PredesignedBanners

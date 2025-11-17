@@ -14,6 +14,8 @@ import {
   GREEN_FOOTER_STYLE,
   GREEN_FOOTER_TEXT,
   IMAGE_GALLERY,
+  ONLINE_MEETING,
+  INITIAL_SOCIAL_BUTTONS,
 } from "../utils/constant";
 
 const SignatureContext = createContext();
@@ -32,6 +34,13 @@ export const SignatureProvider = ({ children }) => {
   const [youtubeVideo, setYoutubeVideo] = useState(VIDEO);
   const [greenFooter, setGreenFooter] = useState(GREEN_FOOTER_STYLE);
   const [imageGallery, setImageGallery] = useState(IMAGE_GALLERY);
+  const [onlineMeeting, setOnlineMeeting] = useState(ONLINE_MEETING);
+  const [socialButtons, setSocialButtons] = useState(INITIAL_SOCIAL_BUTTONS);
+
+  // Update online meeting settings
+  const updateOnlineMeeting = useCallback((data) => {
+    setOnlineMeeting((prev) => ({ ...prev, ...data }));
+  }, []);
 
   const getDisclaimerText = useCallback(() => {
     const { type, customText } = disclamierStyle;
@@ -71,6 +80,16 @@ export const SignatureProvider = ({ children }) => {
 
   const updateYoutubeVideo = useCallback((data) => {
     setYoutubeVideo((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  // In SignatureContext - update updateSocialButtons function
+  const updateSocialButtons = useCallback((data) => {
+    console.log("Context: Updating social buttons with:", data);
+    setSocialButtons((prev) => {
+      const updated = { ...prev, ...data };
+      console.log("Context: Social buttons updated to:", updated);
+      return updated;
+    });
   }, []);
 
   const getYoutubeVideoId = useCallback((url) => {
@@ -114,6 +133,8 @@ export const SignatureProvider = ({ children }) => {
         text: getGreenFooterText(),
       },
       imageGallery,
+      onlineMeeting,
+      socialButtons,
     }),
     [
       globalStyles,
@@ -130,6 +151,8 @@ export const SignatureProvider = ({ children }) => {
       greenFooter,
       getGreenFooterText,
       imageGallery,
+      onlineMeeting,
+      socialButtons,
     ]
   );
 
@@ -247,6 +270,10 @@ export const SignatureProvider = ({ children }) => {
       getGreenFooterText,
       imageGallery,
       updateImageGallery,
+      onlineMeeting,
+      updateOnlineMeeting,
+      socialButtons,
+      updateSocialButtons,
     }),
     [
       formData,
@@ -271,6 +298,10 @@ export const SignatureProvider = ({ children }) => {
       getGreenFooterText,
       imageGallery,
       updateImageGallery,
+      onlineMeeting,
+      updateOnlineMeeting,
+      socialButtons,
+      updateSocialButtons,
     ]
   );
 

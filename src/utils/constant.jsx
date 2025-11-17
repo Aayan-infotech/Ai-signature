@@ -189,3 +189,64 @@ export const IMAGE_GALLERY = {
   applyLink: true,
   link: "",
 };
+
+// Add to your constants file
+export const ONLINE_MEETING = {
+  enabled: false,
+  schedulingProvider: "vcita",
+  schedulerUrl: "",
+  buttonText: "Book a meeting",
+  buttonType: "Full",
+  buttonSize: "M",
+  buttonColor: "#007dff",
+  buttonIcon: "circle",
+  buttonShape: "rounded",
+};
+
+// Scheduling providers
+export const SCHEDULING_PROVIDERS = {
+  vcita: "vCita",
+  calendly: "Calendly",
+  acuity: "Acuity Scheduling",
+  custom: "Custom",
+};
+
+// Button types
+export const BUTTON_TYPES = {
+  Full: "Full",
+  Light: "Light",
+  Simple: "Simple link",
+};
+
+// Button sizes
+export const BUTTON_SIZES = {
+  S: "Small",
+  M: "Medium", 
+  L: "Large",
+};
+
+// Button shapes
+export const BUTTON_SHAPES = {
+  square: "Square",
+  rounded_sm: "Rounded Small",
+  rounded: "Rounded",
+};
+
+// Icon options
+export const ICON_OPTIONS = {
+  circle: "CheckCircle",
+  calendar_month: "CalendarMonth", 
+  calendar_today: "CalendarToday",
+  link: "Link",
+  time: "AccessTime",
+  emoticon: "InsertEmoticon",
+  none: "None",
+};
+
+export const INITIAL_SOCIAL_BUTTONS = {
+  enabled: false,
+  links: [],
+  style: "Stroke",
+  shape: "rounded_sm",
+  size:20
+};
