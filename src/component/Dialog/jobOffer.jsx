@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import CustomDialog from "./CustomDialog"; // Assuming CustomDialog is imported correctly
+import React, { useState, useEffect } from "react";
+import CustomDialog from "./CustomDialog";
 import {
   TextField,
   Typography,
@@ -14,6 +14,7 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Alert,
 } from "@mui/material";
 import {
   FormatAlignLeft,
@@ -21,24 +22,28 @@ import {
   FormatAlignRight,
 } from "@mui/icons-material";
 
-// Utility function to simulate data saving
-const handleSaveJobOfferData = (data) => {
-  console.log("Job Offer Data to be saved:", data);
-  alert("Simulated Save Job Offer! Check the console for data.");
-};
-
-// Map of predefined colors for visual display - NOW INCLUDING GREEN
+// Map of predefined colors for visual display
 const colorMap = {
   black: "#000000",
   purple: "#800080",
-  green: "#008000", // <-- ADDED GREEN
+  green: "#008000",
   blue: "#00BFFF",
   yellow: "#FFD700",
   red: "#DC143C",
-  custom: "transparent", // Placeholder for the custom color circle
 };
 
-// Helper component for the Color Radio Group (defined here for completeness)
+// Helper function to get contrast color for text (moved outside component)
+const getContrastColor = (hexcolor) => {
+  if (!hexcolor) return "#FFFFFF";
+  const hex = hexcolor.replace("#", "");
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 128 ? "#000000" : "#FFFFFF";
+};
+
+// Helper component for the Color Radio Group
 const ColorRadioGroup = ({ selectedValue, onChange, colorOptions, name }) => (
   <RadioGroup row name={name} value={selectedValue} onChange={onChange}>
     {Object.keys(colorOptions).map((colorName) => {
@@ -55,78 +60,208 @@ const ColorRadioGroup = ({ selectedValue, onChange, colorOptions, name }) => (
                 "&.Mui-checked": {
                   color: colorValue,
                 },
-                ...(colorName === "custom" && {
-                  border: "1px solid grey",
-                  borderRadius: "50%",
-                  width: "20px",
-                  height: "20px",
-                  margin: "2px",
-                }),
               }}
             />
           }
-          label={""} // No label text, just the radio button
+          label=""
         />
       );
     })}
   </RadioGroup>
 );
 
-const PostJobOfferModal = ({ open, onClose }) => {
-  // --- State for Data Fields ---
-  const [introduction, setIntroduction] = useState("We are looking for:");
-  const [positionLink, setPositionLink] = useState("https://");
-  const [buttonText, setButtonText] = useState("WE ARE HIRING");
+// Helper functions for preview styling (moved outside component)
+const getPreviewStyles = (style) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: "12px",
+  textAlign: style.alignment,
+});
 
-  // --- State for Style Fields ---
-  // Defaulting to black, as it's the first option and appears selected in the image
-  const [buttonColor, setButtonColor] = useState("black");
-  const [fontColor, setFontColor] = useState("dark");
-  // Defaulting to Medium (M), as it appears selected in the image
-  const [buttonSize, setButtonSize] = useState("M");
-  const [fontSize, setFontSize] = useState(3);
-  // Defaulting to Left, as it appears selected in the image
-  const [alignment, setAlignment] = useState("left");
+const getPreviewIntroductionStyles = (style) => {
+  const fontSizeMap = {
+    1: "12px",
+    2: "14px",
+    3: "16px",
+    4: "18px",
+    5: "20px",
+  };
+
+  const colorMap = {
+    dark: "#000000",
+    light: "#666666",
+  };
+
+  return {
+    fontSize: fontSizeMap[style.fontSize],
+    color: colorMap[style.fontColor],
+    fontWeight: 500,
+    marginBottom: "4px",
+  };
+};
+
+const getPreviewButtonStyles = (style) => {
+  const sizeStyles = {
+    S: { padding: "6px 12px", fontSize: "11px" },
+    M: { padding: "8px 16px", fontSize: "12px" },
+    L: { padding: "10px 20px", fontSize: "13px" },
+  };
+
+  const colorMap = {
+    black: "#000000",
+    purple: "#800080",
+    green: "#008000",
+    blue: "#00BFFF",
+    yellow: "#FFD700",
+    red: "#DC143C",
+  };
+
+  const backgroundColor = colorMap[style.buttonColor] || "#000000";
+  const color = getContrastColor(backgroundColor);
+
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: sizeStyles[style.buttonSize]?.padding || "8px 16px",
+    fontSize: sizeStyles[style.buttonSize]?.fontSize || "12px",
+    backgroundColor,
+    color,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    textDecoration: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    border: "none",
+  };
+};
+
+const PostJobOfferModal = ({ open, onClose, onSave, initialData }) => {
+  // Default data structure
+  const defaultData = {
+    enabled: true,
+    introduction: "We are looking for:",
+    positionLink: "https://",
+    buttonText: "WE ARE HIRING",
+    style: {
+      buttonColor: "black",
+      fontColor: "dark",
+      buttonSize: "M",
+      fontSize: 3,
+      alignment: "left",
+    },
+  };
+
+  // State for form data
+  const [formData, setFormData] = useState(defaultData);
+  const [errors, setErrors] = useState({});
+
+  // Button text options
+  const buttonTextOptions = [
+    "WE ARE HIRING",
+    "APPLY NOW",
+    "VIEW JOB",
+    "LEARN MORE",
+    "JOIN OUR TEAM",
+  ];
+
+  // Initialize with initialData when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormData(initialData || defaultData);
+      setErrors({});
+    }
+  }, [open, initialData]);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.introduction?.trim()) {
+      newErrors.introduction = "Introduction is required";
+    }
+
+    if (
+      !formData.positionLink?.trim() ||
+      formData.positionLink === "https://"
+    ) {
+      newErrors.positionLink = "Valid position link is required";
+    } else if (!formData.positionLink.startsWith("https://")) {
+      newErrors.positionLink = "Link must start with https://";
+    }
+
+    if (!formData.buttonText?.trim()) {
+      newErrors.buttonText = "Button text is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSave = () => {
-    const data = {
-      introduction,
-      positionLink,
-      buttonText,
+    if (validateForm()) {
+      onSave(formData, "job");
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+      }));
+    }
+  };
+
+  const handleStyleChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
       style: {
-        buttonColor,
-        fontColor,
-        buttonSize,
-        fontSize,
-        alignment,
+        ...prev.style,
+        [field]: value,
       },
-    };
-    handleSaveJobOfferData(data); // Call the prop function to send data
-    onClose();
+    }));
   };
 
   const handleAlignment = (event, newAlignment) => {
     if (newAlignment !== null) {
-      setAlignment(newAlignment);
+      handleStyleChange("alignment", newAlignment);
     }
   };
 
   const handleButtonSize = (event, newSize) => {
     if (newSize !== null) {
-      setButtonSize(newSize);
+      handleStyleChange("buttonSize", newSize);
     }
   };
+
+  const hasValidLink =
+    formData.positionLink && formData.positionLink !== "https://";
 
   return (
     <CustomDialog
       open={open}
       onClose={onClose}
-      title="Post a job offer"
+      title="Post a Job Offer"
       onSave={handleSave}
-      saveText="Add" // Button text as per the image
+      saveText="Add"
+      maxWidth="md"
     >
       <Box sx={{ p: 2 }}>
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+        {!hasValidLink && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            Update the position link to enable the job offer button in your
+            signature.
+          </Alert>
+        )}
+
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
           Enter job description
         </Typography>
 
@@ -135,9 +270,14 @@ const PostJobOfferModal = ({ open, onClose }) => {
           label="Introduction"
           fullWidth
           margin="normal"
-          value={introduction}
-          onChange={(e) => setIntroduction(e.target.value)}
-          sx={{ mb: 2 }}
+          value={formData.introduction}
+          onChange={(e) => handleInputChange("introduction", e.target.value)}
+          error={!!errors.introduction}
+          helperText={
+            errors.introduction ||
+            "e.g., 'We are looking for:', 'Join our team:', etc."
+          }
+          sx={{ mb: 3 }}
         />
 
         {/* Link Field */}
@@ -145,39 +285,45 @@ const PostJobOfferModal = ({ open, onClose }) => {
           label="Link To Position Page"
           fullWidth
           margin="normal"
-          value={positionLink}
-          onChange={(e) => setPositionLink(e.target.value)}
+          value={formData.positionLink}
+          onChange={(e) => handleInputChange("positionLink", e.target.value)}
+          error={!!errors.positionLink}
+          helperText={
+            errors.positionLink || "Paste the URL to your job posting"
+          }
           sx={{ mb: 3 }}
         />
 
-        {/* Button Text Dropdown (Select) */}
+        {/* Button Text Dropdown */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4 }}>
-          <Typography sx={{ minWidth: "90px" }}>Button text</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Button text</Typography>
           <Select
-            value={buttonText}
-            onChange={(e) => setButtonText(e.target.value)}
+            value={formData.buttonText}
+            onChange={(e) => handleInputChange("buttonText", e.target.value)}
             fullWidth
             size="small"
+            error={!!errors.buttonText}
           >
-            {/* Mock Menu Items */}
-            <MenuItem value={"WE ARE HIRING"}>WE ARE HIRING</MenuItem>
-            <MenuItem value={"APPLY NOW"}>APPLY NOW</MenuItem>
-            <MenuItem value={"VIEW JOB"}>VIEW JOB</MenuItem>
+            {buttonTextOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
           </Select>
         </Stack>
 
         <Divider sx={{ mb: 4 }} />
 
         <Typography variant="h6" gutterBottom>
-          Style
+          Style Settings
         </Typography>
 
         {/* Button Color Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: "90px" }}>**Button color**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Button color</Typography>
           <ColorRadioGroup
-            selectedValue={buttonColor}
-            onChange={(e) => setButtonColor(e.target.value)}
+            selectedValue={formData.style.buttonColor}
+            onChange={(e) => handleStyleChange("buttonColor", e.target.value)}
             colorOptions={colorMap}
             name="button-color"
           />
@@ -185,36 +331,31 @@ const PostJobOfferModal = ({ open, onClose }) => {
 
         {/* Font Color Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: "90px" }}>**Font color**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Font color</Typography>
           <RadioGroup
             row
-            value={fontColor}
-            onChange={(e) => setFontColor(e.target.value)}
+            value={formData.style.fontColor}
+            onChange={(e) => handleStyleChange("fontColor", e.target.value)}
             name="font-color"
           >
             <FormControlLabel
               value="dark"
-              control={<Radio sx={{ color: "black" }} size="small" />}
-              label=""
+              control={<Radio size="small" />}
+              label="Dark"
             />
             <FormControlLabel
               value="light"
-              control={<Radio sx={{ color: "lightgrey" }} size="small" />}
-              label=""
-            />
-            <FormControlLabel
-              value="custom"
               control={<Radio size="small" />}
-              label="🎨" // Custom/Other option
+              label="Light"
             />
           </RadioGroup>
         </Stack>
 
-        {/* Button Size Control (Toggle Button Group) */}
+        {/* Button Size Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: "90px" }}>**Button size**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Button size</Typography>
           <ToggleButtonGroup
-            value={buttonSize}
+            value={formData.style.buttonSize}
             exclusive
             onChange={handleButtonSize}
             aria-label="button size"
@@ -232,25 +373,35 @@ const PostJobOfferModal = ({ open, onClose }) => {
           </ToggleButtonGroup>
         </Stack>
 
-        {/* Font Size Control (Slider) */}
+        {/* Font Size Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: "90px" }}>**Font size**</Typography>
-          <Slider
-            value={fontSize}
-            onChange={(e, newValue) => setFontSize(newValue)}
-            step={1}
-            min={1}
-            max={5}
-            marks
-            sx={{ width: "auto", flexGrow: 1, m: 0 }}
-          />
+          <Typography sx={{ minWidth: "100px" }}>Font size</Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <Slider
+              value={formData.style.fontSize}
+              onChange={(e, newValue) =>
+                handleStyleChange("fontSize", newValue)
+              }
+              step={1}
+              min={1}
+              max={5}
+              marks={[
+                { value: 1, label: "S" },
+                { value: 2, label: "M" },
+                { value: 3, label: "L" },
+                { value: 4, label: "XL" },
+                { value: 5, label: "XXL" },
+              ]}
+              valueLabelDisplay="auto"
+            />
+          </Box>
         </Stack>
 
-        {/* Alignment Control (Toggle Button Group) */}
+        {/* Alignment Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: "90px" }}>**Alignment**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Alignment</Typography>
           <ToggleButtonGroup
-            value={alignment}
+            value={formData.style.alignment}
             exclusive
             onChange={handleAlignment}
             aria-label="text alignment"
@@ -267,6 +418,59 @@ const PostJobOfferModal = ({ open, onClose }) => {
             </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
+
+        {/* Preview Section */}
+        <Box
+          sx={{
+            mt: 4,
+            p: 3,
+            backgroundColor: "#f5f5f5",
+            borderRadius: 2,
+            border: "1px solid #e0e0e0",
+          }}
+        >
+          <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+            Preview:
+          </Typography>
+          <Box sx={getPreviewStyles(formData.style)}>
+            <Typography
+              variant="body1"
+              sx={getPreviewIntroductionStyles(formData.style)}
+            >
+              {formData.introduction}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent:
+                  formData.style.alignment === "center"
+                    ? "center"
+                    : formData.style.alignment === "right"
+                    ? "flex-end"
+                    : "flex-start",
+              }}
+            >
+              <Box
+                sx={getPreviewButtonStyles(formData.style)}
+                onMouseEnter={(e) => {
+                  e.target.style.opacity = "0.9";
+                  e.target.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.opacity = "1";
+                  e.target.style.transform = "translateY(0)";
+                }}
+              >
+                {formData.buttonText}
+              </Box>
+            </Box>
+          </Box>
+          {!hasValidLink && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              Position link required to activate button
+            </Alert>
+          )}
+        </Box>
       </Box>
     </CustomDialog>
   );

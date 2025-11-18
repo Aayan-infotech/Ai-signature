@@ -8,6 +8,18 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import LinkIcon from "@mui/icons-material/Link";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import StarIcon from "@mui/icons-material/Star";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import CircleIcon from "@mui/icons-material/Circle";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideoCallIcon from "@mui/icons-material/VideoCall";
+import DesktopWindowsIcon from "@mui/icons-material/DesktopWindows";
+import MonitorIcon from "@mui/icons-material/Monitor";
+import MicIcon from "@mui/icons-material/Mic";
+import TvIcon from "@mui/icons-material/Tv";
+import LaptopIcon from "@mui/icons-material/Laptop";
 
 export const useSignatureData = (data) => {
   const getValue = (designValue, parentValue, defaultValue = "") =>
@@ -30,6 +42,11 @@ export const useSignatureData = (data) => {
     banner = {},
     customButton = {},
     uploadBanner,
+    feedback = {},
+    videoConference = {},
+    webinar = {},
+    appDownload = {},
+    jobOffer = {},
   } = data || {};
 
   console.log("socialButtons", socialButtons);
@@ -172,13 +189,12 @@ export const useSignatureData = (data) => {
     customButton && customButton.enabled && customButton.buttonUrl;
   const shouldShowUploadBanner =
     uploadBanner && uploadBanner.enabled && uploadBanner.imageUrl;
-
-  // Add console log for debugging
-  console.log("Social buttons state:", {
-    enabled: socialButtons?.enabled,
-    linksCount: socialButtons?.links?.length,
-    shouldShow: shouldShowSocialButtons,
-  });
+  const shouldShowFeedback = feedback && feedback.enabled && feedback.linkUrl;
+  const shouldShowVideoConference =
+    videoConference && videoConference.enabled && videoConference.link;
+  const shouldShowWebinar = webinar && webinar.enabled && webinar.linkUrl;
+  const shouldShowAppDownload = appDownload && appDownload.enabled;
+  const shouldShowJobOffer = jobOffer && jobOffer.enabled;
 
   const getContrastColor = (hexcolor) => {
     if (!hexcolor) return "#FFFFFF";
@@ -410,13 +426,14 @@ export const useSignatureData = (data) => {
 
   const getUploadBannerStyles = () => {
     const sizeStyles = {
-      S: { height: "50px", fontSize: "12px", width: "75px" },
-      M: { height: "75px", fontSize: "14px", width: "100px" },
-      L: { height: "100px", fontSize: "16px", width: "150px" },
+      S: { height: "50px", fontSize: "12px" },
+      M: { height: "75px", fontSize: "14px" },
+      L: { height: "100px", fontSize: "16px" },
     };
 
     return {
       ...sizeStyles[uploadBanner.size || "M"],
+      width: "100%",
       objectFit: "cover",
       borderRadius: "4px",
       cursor: uploadBanner.link ? "pointer" : "default",
@@ -426,6 +443,360 @@ export const useSignatureData = (data) => {
   const handleUploadBannerClick = () => {
     if (uploadBanner.link) {
       window.open(uploadBanner.link, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const feedbackIcons = {
+    circle: CircleIcon,
+    star: StarIcon,
+    heart: FavoriteIcon,
+    comment: ChatBubbleIcon,
+    like: ThumbUpIcon,
+    none: null,
+  };
+
+  const getFeedbackIcon = () => {
+    const IconComponent = feedbackIcons[feedback.icon];
+    if (!IconComponent || feedback.icon === "none") return null;
+
+    const iconSizeMap = {
+      S: "small",
+      M: "medium",
+      L: "large",
+    };
+
+    return (
+      <IconComponent
+        fontSize={iconSizeMap[feedback.iconSize || "M"]}
+        sx={{ color: feedback.iconColor || "black" }}
+      />
+    );
+  };
+
+  // Get feedback styles
+  const getFeedbackStyles = () => {
+    const baseStyles = {
+      textDecoration: "none",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "8px",
+      fontWeight: 500,
+      transition: "all 0.3s ease",
+      cursor: "pointer",
+      fontFamily: getValue(design.detailsFont, fontFamily, "Roboto"),
+      color: feedback.fontColor || "black",
+      fontSize: `${(feedback.fontSize || 50) / 5 + 10}px`, // Scale font size appropriately
+    };
+
+    return baseStyles;
+  };
+
+  const handleFeedbackClick = () => {
+    if (feedback.linkUrl) {
+      window.open(feedback.linkUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const videoConferenceIcons = {
+    Zoom: VideocamIcon,
+    "Google Meet": VideoCallIcon,
+    "Microsoft Teams": VideocamIcon,
+  };
+
+  // Get video conference button styles
+  const getVideoConferenceStyles = () => {
+    const baseStyles = {
+      textDecoration: "none",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "8px",
+      fontWeight: 500,
+      transition: "all 0.3s ease",
+      cursor: "pointer",
+      fontFamily: getValue(design.detailsFont, fontFamily, "Roboto"),
+      backgroundColor: "#007dff",
+      color: "white",
+      border: "none",
+      textTransform: "none",
+      "&:hover": {
+        opacity: 0.9,
+        transform: "translateY(-1px)",
+      },
+    };
+
+    // Size styles based on slider value (0-100 scale)
+    const scaledSize = (videoConference.size || 60) / 100;
+    const sizeStyles = {
+      padding: `${6 + scaledSize * 6}px ${12 + scaledSize * 12}px`,
+      fontSize: `${12 + scaledSize * 4}px`,
+    };
+
+    // Shape styles
+    const shapeStyles = {
+      square: { borderRadius: "0" },
+      rounded_sm: { borderRadius: "4px" },
+      rounded: { borderRadius: "50px" },
+    };
+
+    return {
+      ...baseStyles,
+      ...sizeStyles,
+      ...shapeStyles[videoConference.shape || "square"],
+    };
+  };
+
+  // Get video conference icon
+  const getVideoConferenceIcon = () => {
+    const IconComponent = videoConferenceIcons[videoConference.provider];
+    if (!IconComponent) return null;
+
+    const scaledSize = (videoConference.size || 60) / 100;
+    const iconSize = 16 + scaledSize * 8;
+
+    return (
+      <IconComponent
+        sx={{
+          fontSize: `${iconSize}px`,
+          color: "white",
+        }}
+      />
+    );
+  };
+
+  const handleVideoConferenceClick = () => {
+    if (videoConference.link) {
+      window.open(videoConference.link, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const webinarIcons = {
+    circle: CircleIcon,
+    desktop_windows: DesktopWindowsIcon,
+    monitor_grid: MonitorIcon,
+    mic: MicIcon,
+    tv: TvIcon,
+    laptop: LaptopIcon,
+    none: null,
+  };
+
+  // Get webinar icon component
+  const getWebinarIcon = () => {
+    const IconComponent = webinarIcons[webinar.icon];
+    if (!IconComponent || webinar.icon === "none") return null;
+
+    const iconSizeMap = {
+      S: "small",
+      M: "medium",
+      L: "large",
+    };
+
+    return (
+      <IconComponent
+        fontSize={iconSizeMap[webinar.iconSize || "M"]}
+        sx={{ color: webinar.iconColor || "black" }}
+      />
+    );
+  };
+
+  // Get webinar styles
+  const getWebinarStyles = () => {
+    const baseStyles = {
+      textDecoration: "none",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "8px",
+      fontWeight: 500,
+      transition: "all 0.3s ease",
+      cursor: "pointer",
+      fontFamily: getValue(design.detailsFont, fontFamily, "Roboto"),
+      color: webinar.fontColor || "black",
+      fontSize: `${(webinar.fontSize || 50) / 5 + 10}px`, // Scale font size appropriately
+    };
+
+    return baseStyles;
+  };
+
+  const handleWebinarClick = () => {
+    if (webinar.linkUrl) {
+      window.open(webinar.linkUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const getAppDownloadStyles = () => {
+    if (!appDownload) return {};
+
+    const baseStyles = {
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px",
+      marginTop: "16px",
+      textAlign: appDownload.style?.alignment || "left",
+    };
+
+    return baseStyles;
+  };
+
+  // Get title styles for app download
+  const getAppDownloadTitleStyles = () => {
+    if (!appDownload) return {};
+
+    const fontSizeMap = {
+      1: "12px",
+      2: "14px",
+      3: "16px",
+      4: "18px",
+      5: "20px",
+    };
+
+    const colorMap = {
+      dark: "#000000",
+      light: "#FFFFFF",
+      custom: appDownload.style?.customColor || "#000000",
+    };
+
+    return {
+      fontSize: fontSizeMap[appDownload.style?.fontSize || 3],
+      color: colorMap[appDownload.style?.fontColor || "dark"],
+      fontWeight: 600,
+      marginBottom: "8px",
+    };
+  };
+
+  // Get button styles for app download
+  const getAppDownloadButtonStyles = (platform) => {
+    if (!appDownload) return {};
+
+    const baseStyles = {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "8px",
+      padding: "8px 16px",
+      borderRadius: "8px",
+      textDecoration: "none",
+      fontWeight: 500,
+      fontSize: "14px",
+      transition: "all 0.3s ease",
+      border: "1px solid #ddd",
+      backgroundColor: "#f8f9fa",
+      color: "#333",
+      "&:hover": {
+        backgroundColor: "#e9ecef",
+        transform: "translateY(-1px)",
+      },
+    };
+
+    return baseStyles;
+  };
+
+  const handleAppDownloadClick = (platform) => {
+    const link =
+      platform === "google"
+        ? appDownload?.googlePlayLink
+        : appDownload?.appStoreLink;
+
+    if (
+      link &&
+      link !== `https://play.google.com/store/apps/details?id=APP_ID` &&
+      link !== `https://itunes.apple.com/us/app/APP_NAME`
+    ) {
+      window.open(link, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const getJobOfferStyles = () => {
+    if (!jobOffer) return {};
+
+    const baseStyles = {
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
+      marginTop: "16px",
+      textAlign: jobOffer.style?.alignment || "left",
+    };
+
+    return baseStyles;
+  };
+
+  // Get introduction styles for job offer
+  const getJobOfferIntroductionStyles = () => {
+    if (!jobOffer) return {};
+
+    const fontSizeMap = {
+      1: "12px",
+      2: "14px",
+      3: "16px",
+      4: "18px",
+      5: "20px",
+    };
+
+    const colorMap = {
+      dark: "#000000",
+      light: "#666666",
+      custom: jobOffer.style?.customColor || "#000000",
+    };
+
+    return {
+      fontSize: fontSizeMap[jobOffer.style?.fontSize || 3],
+      color: colorMap[jobOffer.style?.fontColor || "dark"],
+      fontWeight: 500,
+      marginBottom: "4px",
+    };
+  };
+
+  // Get button styles for job offer
+  const getJobOfferButtonStyles = () => {
+    if (!jobOffer) return {};
+
+    const baseStyles = {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "8px",
+      textDecoration: "none",
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      transition: "all 0.3s ease",
+      cursor: "pointer",
+      fontFamily: getValue(design.detailsFont, fontFamily, "Roboto"),
+      border: "none",
+      "&:hover": {
+        opacity: 0.9,
+        transform: "translateY(-1px)",
+      },
+    };
+
+    // Size styles
+    const sizeStyles = {
+      S: { padding: "8px 16px", fontSize: "12px" },
+      M: { padding: "12px 24px", fontSize: "14px" },
+      L: { padding: "16px 32px", fontSize: "16px" },
+    };
+
+    const colorMap = {
+      dark: "#000000",
+      light: "#666666",
+      custom: jobOffer.style?.customColor || "#000000",
+    };
+
+    // Color styles
+    const colorStyles = {
+      backgroundColor: colorMap[jobOffer.style?.buttonColor] || "#000000",
+      color: getContrastColor(
+        colorMap[jobOffer.style?.buttonColor] || "#000000"
+      ),
+    };
+
+    return {
+      ...baseStyles,
+      ...sizeStyles[jobOffer.style?.buttonSize || "M"],
+      ...colorStyles,
+    };
+  };
+
+  const handleJobOfferClick = () => {
+    if (jobOffer?.positionLink && jobOffer.positionLink !== "https://") {
+      window.open(jobOffer.positionLink, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -468,5 +839,32 @@ export const useSignatureData = (data) => {
     shouldShowUploadBanner,
     getUploadBannerStyles,
     handleUploadBannerClick,
+    feedback,
+    shouldShowFeedback,
+    getFeedbackIcon,
+    getFeedbackStyles,
+    handleFeedbackClick,
+    videoConference,
+    shouldShowVideoConference,
+    getVideoConferenceStyles,
+    getVideoConferenceIcon,
+    handleVideoConferenceClick,
+    webinar,
+    shouldShowWebinar,
+    getWebinarIcon,
+    getWebinarStyles,
+    handleWebinarClick,
+    appDownload,
+    shouldShowAppDownload,
+    getAppDownloadStyles,
+    getAppDownloadTitleStyles,
+    getAppDownloadButtonStyles,
+    handleAppDownloadClick,
+    jobOffer,
+    shouldShowJobOffer,
+    getJobOfferStyles,
+    getJobOfferIntroductionStyles,
+    getJobOfferButtonStyles,
+    handleJobOfferClick,
   };
 };

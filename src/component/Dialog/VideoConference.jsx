@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// In VideoConferenceModal.jsx
+import React, { useState, useContext, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -6,10 +7,11 @@ import {
   Stack,
   Slider,
   Grid,
-  Button
+  Button,
 } from "@mui/material";
 import LinkIcon from "@mui/icons-material/Link";
-import CustomDialog from "./CustomDialog"; // Assuming CustomDialog is accessible
+import CustomDialog from "./CustomDialog";
+import { useSignature } from "../../hooks/useSignature";
 
 // --- Provider Data ---
 const VIDEO_PROVIDERS = [
@@ -22,30 +24,50 @@ const VIDEO_PROVIDERS = [
  * Renders the Video conference form content.
  */
 const VideoConferenceModal = ({ open, onClose }) => {
-  // --- State Management (Defaults set to match the image) ---
-  const [selectedProvider, setSelectedProvider] = useState("Zoom");
-  const [buttonText, setButtonText] = useState("Meet me on Zoom");
-  const [shape, setShape] = useState("square"); // Matches the selected shape
-  const [size, setSize] = useState(60); // Mid-point for the slider
-  const [link, setLink] = useState("");
+  const { videoConference, updateVideoConference } = useSignature();
 
-  // Update button text when provider changes, keeping it consistent with the image
+  // Initialize state from context
+  const [selectedProvider, setSelectedProvider] = useState(
+    videoConference.provider || "Zoom"
+  );
+  const [buttonText, setButtonText] = useState(
+    videoConference.buttonText || "Meet me on Zoom"
+  );
+  const [shape, setShape] = useState(videoConference.shape || "square");
+  const [size, setSize] = useState(videoConference.size || 60);
+  const [link, setLink] = useState(videoConference.link || "");
+
+  // Update local state when context changes
+  useEffect(() => {
+    if (videoConference) {
+      setSelectedProvider(videoConference.provider || "Zoom");
+      setButtonText(videoConference.buttonText || "Meet me on Zoom");
+      setShape(videoConference.shape || "square");
+      setSize(videoConference.size || 60);
+      setLink(videoConference.link || "");
+    }
+  }, [videoConference, open]);
+
+  // Update button text when provider changes
   const handleProviderChange = (providerName) => {
     setSelectedProvider(providerName);
-    const provider = VIDEO_PROVIDERS.find(p => p.name === providerName);
+    const provider = VIDEO_PROVIDERS.find((p) => p.name === providerName);
     setButtonText(provider ? provider.defaultText : "");
   };
 
   // --- Handlers ---
   const handleSave = () => {
-    console.log("Saving video conference button:", {
+    const videoConferenceData = {
+      enabled: true,
       provider: selectedProvider,
       buttonText,
       shape,
       size,
       link,
-    });
-    // The "Add" button is visually disabled in the image, suggesting the link is required.
+    };
+
+    console.log("Saving video conference button:", videoConferenceData);
+    updateVideoConference(videoConferenceData);
     onClose();
   };
 
@@ -54,23 +76,24 @@ const VideoConferenceModal = ({ open, onClose }) => {
   const renderProviderSelection = () => (
     <Grid container spacing={2}>
       {VIDEO_PROVIDERS.map((provider) => (
-        <Grid item xs={3} key={provider.name}>
+        <Grid item xs={4} key={provider.name}>
           <Box
             onClick={() => handleProviderChange(provider.name)}
             sx={{
               p: 1.5,
               borderRadius: 1,
               border: 1,
-              borderColor: selectedProvider === provider.name ? "primary.main" : "grey.300",
+              borderColor:
+                selectedProvider === provider.name
+                  ? "primary.main"
+                  : "grey.300",
               cursor: "pointer",
               textAlign: "center",
               transition: "border 0.2s",
+              backgroundColor:
+                selectedProvider === provider.name ? "#f0f8ff" : "white",
             }}
           >
-            {/* Placeholder for Icon - In a real app, this would be an actual image or SVG */}
-            {/* <Box sx={{ width: 40, height: 40, margin: '0 auto', mb: 0.5 }}>
-              {provider.icon}
-            </Box>  */}
             <Typography variant="body2" fontWeight="medium">
               {provider.name}
             </Typography>
@@ -113,22 +136,18 @@ const VideoConferenceModal = ({ open, onClose }) => {
               sx={{
                 width: 50,
                 height: 25,
-                border: 1,
+                border: 2,
                 borderColor: shape === s ? "primary.main" : "grey.400",
                 borderRadius: index === 0 ? 0 : index === 1 ? "4px" : "50px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                position: 'relative',
-                bgcolor: 'white',
+                position: "relative",
+                bgcolor: "white",
+                transition: "border-color 0.2s",
               }}
-            >
-                {/* Visual indicator for the selected shape - checkmark not used, 
-                    using color/border to indicate selection. 
-                    The image shows a checked box for 'square'. We use border/color.
-                */}
-            </Box>
+            />
           ))}
         </Stack>
       </Box>
@@ -141,9 +160,10 @@ const VideoConferenceModal = ({ open, onClose }) => {
         <Slider
           value={size}
           onChange={(e, newValue) => setSize(newValue)}
-          valueLabelDisplay="off"
-          min={0}
-          max={100}
+          valueLabelDisplay="auto"
+          valueLabelFormat={(value) => `${value}px`}
+          min={10}
+          max={40}
         />
       </Box>
 
@@ -156,19 +176,16 @@ const VideoConferenceModal = ({ open, onClose }) => {
           size="medium"
           variant="outlined"
           placeholder="Link"
+          error={!link}
+          helperText={!link ? "Link is required" : ""}
           InputProps={{
-            startAdornment: (
-              <LinkIcon sx={{ color: "action.active", mr: 1 }} />
-            ),
+            startAdornment: <LinkIcon sx={{ color: "action.active", mr: 1 }} />,
             sx: { paddingLeft: 0 },
           }}
         />
       </Box>
     </Box>
   );
-
-  // The 'Add' button is visually disabled (grayed out) in the image, likely because the Link field is required/empty.
-  const isAddDisabled = !link; 
 
   return (
     <CustomDialog
@@ -178,32 +195,13 @@ const VideoConferenceModal = ({ open, onClose }) => {
       onSave={handleSave}
       saveText="Add"
       cancelText="Cancel"
-      maxWidth="sm" // Wider to fit the 4-column grid
+      maxWidth="sm"
+      disableSave={!link} // Disable save if no link provided
     >
       <Stack spacing={3}>
         {renderProviderSelection()}
         {renderButtonCustomization()}
       </Stack>
-
-      {/* Override DialogActions to apply the disabled style to the 'Add' button */}
-      <Box sx={{ p: 2, pt: 1, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button 
-            variant="contained" 
-            onClick={handleSave} 
-            disabled={isAddDisabled}
-            sx={{
-                bgcolor: isAddDisabled ? '#ccc' : 'primary.main', 
-                color: isAddDisabled ? 'rgba(0, 0, 0, 0.26)' : 'white',
-                '&.Mui-disabled': {
-                    bgcolor: '#ccc', 
-                    color: 'rgba(0, 0, 0, 0.26)',
-                }
-            }}
-        >
-          Add
-        </Button>
-      </Box>
     </CustomDialog>
   );
 };

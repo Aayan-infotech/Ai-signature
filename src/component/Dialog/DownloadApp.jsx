@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import CustomDialog from "./CustomDialog"; // Assuming CustomDialog is in the same directory or properly imported
+import React, { useState, useEffect } from "react";
+import CustomDialog from "./CustomDialog";
 import {
   TextField,
   Typography,
@@ -12,61 +12,119 @@ import {
   ToggleButtonGroup,
   Stack,
   Divider,
+  Alert,
 } from "@mui/material";
-import { FormatAlignLeft, FormatAlignCenter, FormatAlignRight } from "@mui/icons-material";
+import {
+  FormatAlignLeft,
+  FormatAlignCenter,
+  FormatAlignRight,
+} from "@mui/icons-material";
 
-// Utility function to simulate data saving
-const handleSaveData = (data) => {
-  console.log("Data to be saved:", data);
-  alert("Simulated Save! Check the console for data.");
-};
+const AppDownloadModal = ({ open, onClose, onSave, initialData }) => {
+  // Default data structure
+  const defaultData = {
+    enabled: true,
+    title: "Download our app",
+    googlePlayLink: "https://play.google.com/store/apps/details?id=APP_ID",
+    appStoreLink: "https://itunes.apple.com/us/app/APP_NAME",
+    style: {
+      fontColor: "dark",
+      fontSize: 3,
+      alignment: "left",
+    },
+  };
 
-const AppDownloadModal = ({ open, onClose }) => {
   // State for form data
-  const [title, setTitle] = useState("Download our app");
-  const [googlePlayLink, setGooglePlayLink] = useState(
-    "https://play.google.com/store/apps/details?id=APP_ID"
-  );
-  const [appStoreLink, setAppStoreLink] = useState(
-    "https://itunes.apple.com/us/app/APP_NAME"
-  );
-  // State for style controls
-  const [fontColor, setFontColor] = useState("dark"); // 'dark', 'light', or 'custom'
-  const [fontSize, setFontSize] = useState(3); // Slider value 1-5
-  const [alignment, setAlignment] = useState("left"); // 'left', 'center', 'right'
+  const [formData, setFormData] = useState(defaultData);
+  const [errors, setErrors] = useState({});
+
+  // Initialize with initialData when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormData(initialData || defaultData);
+      setErrors({});
+    }
+  }, [open, initialData]);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.title?.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    if (formData.googlePlayLink === defaultData.googlePlayLink) {
+      newErrors.googlePlayLink = "Please update the Google Play Store link";
+    }
+
+    if (formData.appStoreLink === defaultData.appStoreLink) {
+      newErrors.appStoreLink = "Please update the App Store link";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSave = () => {
-    const data = {
-      title,
-      googlePlayLink,
-      appStoreLink,
+    if (validateForm()) {
+      onSave(formData, "appDownload");
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+      }));
+    }
+  };
+
+  const handleStyleChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
       style: {
-        fontColor,
-        fontSize,
-        alignment,
+        ...prev.style,
+        [field]: value,
       },
-    };
-    handleSaveData(data); // Call the prop function to send data
-    onClose();
+    }));
   };
 
   const handleAlignment = (event, newAlignment) => {
     if (newAlignment !== null) {
-      setAlignment(newAlignment);
+      handleStyleChange("alignment", newAlignment);
     }
   };
+
+  const hasValidLinks =
+    formData.googlePlayLink !== defaultData.googlePlayLink &&
+    formData.appStoreLink !== defaultData.appStoreLink;
 
   return (
     <CustomDialog
       open={open}
       onClose={onClose}
-      title="Download our app" // The title for the modal
-      onSave={handleSave} // The save handler
-      saveText="Add" // Changing the save button text to "Add" as per the image
+      title="Download App Configuration"
+      onSave={handleSave}
+      saveText="Add"
+      maxWidth="md"
     >
       <Box sx={{ p: 2 }}>
+        {!hasValidLinks && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            Update the app store links below to enable the download buttons in
+            your signature.
+          </Alert>
+        )}
+
         <Typography variant="h6" gutterBottom>
-          Add app title & links
+          App Information
         </Typography>
 
         {/* Title Field */}
@@ -74,82 +132,95 @@ const AppDownloadModal = ({ open, onClose }) => {
           label="Title"
           fullWidth
           margin="normal"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={formData.title}
+          onChange={(e) => handleInputChange("title", e.target.value)}
+          error={!!errors.title}
+          helperText={errors.title}
           sx={{ mb: 3 }}
         />
 
         {/* Google Play Field */}
         <TextField
-          label="Google Play"
+          label="Google Play Store Link"
           fullWidth
           margin="normal"
-          value={googlePlayLink}
-          onChange={(e) => setGooglePlayLink(e.target.value)}
+          value={formData.googlePlayLink}
+          onChange={(e) => handleInputChange("googlePlayLink", e.target.value)}
+          error={!!errors.googlePlayLink}
+          helperText={
+            errors.googlePlayLink || "Paste your app's Google Play Store URL"
+          }
           sx={{ mb: 2 }}
         />
 
         {/* App Store Field */}
         <TextField
-          label="App Store"
+          label="App Store Link"
           fullWidth
           margin="normal"
-          value={appStoreLink}
-          onChange={(e) => setAppStoreLink(e.target.value)}
+          value={formData.appStoreLink}
+          onChange={(e) => handleInputChange("appStoreLink", e.target.value)}
+          error={!!errors.appStoreLink}
+          helperText={errors.appStoreLink || "Paste your app's App Store URL"}
           sx={{ mb: 4 }}
         />
 
         <Divider sx={{ mb: 4 }} />
-        
+
         <Typography variant="h6" gutterBottom>
-          Style
+          Style Settings
         </Typography>
 
         {/* Font Color Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>Font color</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Font color</Typography>
           <RadioGroup
             row
-            value={fontColor}
-            onChange={(e) => setFontColor(e.target.value)}
+            value={formData.style.fontColor}
+            onChange={(e) => handleStyleChange("fontColor", e.target.value)}
           >
             <FormControlLabel
               value="dark"
-              control={<Radio sx={{ color: 'black' }} size="small" />}
-              label=""
+              control={<Radio size="small" />}
+              label="Dark"
             />
             <FormControlLabel
               value="light"
-              control={<Radio sx={{ color: 'lightgrey' }} size="small" />}
-              label=""
-            />
-            <FormControlLabel
-              value="custom"
               control={<Radio size="small" />}
-              label="🎨" // Using an emoji to represent a color picker/custom option
+              label="Light"
             />
           </RadioGroup>
         </Stack>
 
         {/* Font Size Control (Slider) */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>Font size</Typography>
-          <Slider
-            value={fontSize}
-            onChange={(e, newValue) => setFontSize(newValue)}
-            step={1}
-            min={1}
-            max={5}
-            marks
-            sx={{ width: 'auto', flexGrow: 1, m: 0 }}
-          />
+          <Typography sx={{ minWidth: "100px" }}>Font size</Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <Slider
+              value={formData.style.fontSize}
+              onChange={(e, newValue) =>
+                handleStyleChange("fontSize", newValue)
+              }
+              step={1}
+              min={1}
+              max={5}
+              marks={[
+                { value: 1, label: "S" },
+                { value: 2, label: "M" },
+                { value: 3, label: "L" },
+                { value: 4, label: "XL" },
+                { value: 5, label: "XXL" },
+              ]}
+              valueLabelDisplay="auto"
+            />
+          </Box>
         </Stack>
 
         {/* Alignment Control (Toggle Button Group) */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>Alignment</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Alignment</Typography>
           <ToggleButtonGroup
-            value={alignment}
+            value={formData.style.alignment}
             exclusive
             onChange={handleAlignment}
             aria-label="text alignment"
@@ -166,9 +237,84 @@ const AppDownloadModal = ({ open, onClose }) => {
             </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
+
+        {/* Preview Section */}
+        <Box sx={{ mt: 4, p: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            Preview:
+          </Typography>
+          <Box sx={getPreviewStyles(formData.style)}>
+            <Typography variant="h6" sx={getPreviewTitleStyles(formData.style)}>
+              {formData.title}
+            </Typography>
+            <Box sx={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+              {formData.googlePlayLink !== defaultData.googlePlayLink && (
+                <Box sx={getPreviewButtonStyles()}>
+                  <Box
+                    sx={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  >
+                    <span>📱</span>
+                    Google Play
+                  </Box>
+                </Box>
+              )}
+              {formData.appStoreLink !== defaultData.appStoreLink && (
+                <Box sx={getPreviewButtonStyles()}>
+                  <Box
+                    sx={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  >
+                    <span>📱</span>
+                    App Store
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Box>
       </Box>
     </CustomDialog>
   );
 };
+
+// Helper functions for preview styling
+const getPreviewStyles = (style) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+  textAlign: style.alignment,
+});
+
+const getPreviewTitleStyles = (style) => {
+  const fontSizeMap = {
+    1: "12px",
+    2: "14px",
+    3: "16px",
+    4: "18px",
+    5: "20px",
+  };
+
+  const colorMap = {
+    dark: "#000000",
+    light: "#666666",
+  };
+
+  return {
+    fontSize: fontSizeMap[style.fontSize],
+    color: colorMap[style.fontColor],
+    fontWeight: 600,
+    marginBottom: "8px",
+  };
+};
+
+const getPreviewButtonStyles = () => ({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "8px",
+  padding: "6px 12px",
+  borderRadius: "6px",
+  backgroundColor: "white",
+  border: "1px solid #ddd",
+  fontSize: "12px",
+});
 
 export default AppDownloadModal;

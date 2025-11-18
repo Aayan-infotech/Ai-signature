@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// In GiveUsFeedbackModal.jsx
+import React, { useState, useContext, useEffect } from "react";
 import {
   Typography,
   Radio,
@@ -18,8 +19,9 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft";
 import FormatAlignCenterIcon from "@mui/icons-material/FormatAlignCenter";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
-import CircleIcon from "@mui/icons-material/Circle"; // Using Circle to represent the 'circle' icon selection
-import CustomDialog from "./CustomDialog"; // Assuming CustomDialog is accessible
+import CircleIcon from "@mui/icons-material/Circle";
+import CustomDialog from "./CustomDialog";
+import { useSignature } from "../../hooks/useSignature";
 
 // --- Color Data ---
 const ICON_COLORS = [
@@ -51,20 +53,42 @@ const ICON_OPTIONS = [
  * Renders the Give us Feedback form content.
  */
 const GiveUsFeedbackModal = ({ open, onClose }) => {
-  // --- State Management (Defaults set to match the image) ---
-  const [title, setTitle] = useState("Rate my services:");
-  const [linkText, setLinkText] = useState("How was your overall experience with me?");
-  const [linkUrl, setLinkUrl] = useState("https://");
-  const [icon, setIcon] = useState("circle"); // Matches the selected circle icon
-  const [iconSize, setIconSize] = useState("M"); // Matches the selected size
-  const [iconColor, setIconColor] = useState("black"); // Matches the selected icon color
-  const [fontColor, setFontColor] = useState("black"); // Matches the selected font color
-  const [fontSize, setFontSize] = useState(50); // Setting a mid-point value for the slider
-  const [alignment, setAlignment] = useState("left"); // Matches the selected alignment
+  const { feedback, updateFeedback } = useSignature();
+
+  // Initialize state from context
+  const [title, setTitle] = useState(feedback.title || "Rate my services:");
+  const [linkText, setLinkText] = useState(
+    feedback.linkText || "How was your overall experience with me?"
+  );
+  const [linkUrl, setLinkUrl] = useState(feedback.linkUrl || "https://");
+  const [icon, setIcon] = useState(feedback.icon || "circle");
+  const [iconSize, setIconSize] = useState(feedback.iconSize || "M");
+  const [iconColor, setIconColor] = useState(feedback.iconColor || "black");
+  const [fontColor, setFontColor] = useState(feedback.fontColor || "black");
+  const [fontSize, setFontSize] = useState(feedback.fontSize || 50);
+  const [alignment, setAlignment] = useState(feedback.alignment || "left");
+
+  // Update local state when context changes
+  useEffect(() => {
+    if (feedback) {
+      setTitle(feedback.title || "Rate my services:");
+      setLinkText(
+        feedback.linkText || "How was your overall experience with me?"
+      );
+      setLinkUrl(feedback.linkUrl || "https://");
+      setIcon(feedback.icon || "circle");
+      setIconSize(feedback.iconSize || "M");
+      setIconColor(feedback.iconColor || "black");
+      setFontColor(feedback.fontColor || "black");
+      setFontSize(feedback.fontSize || 50);
+      setAlignment(feedback.alignment || "left");
+    }
+  }, [feedback, open]);
 
   // --- Handlers ---
   const handleSave = () => {
-    console.log("Saving feedback link settings:", {
+    const feedbackData = {
+      enabled: true,
       title,
       linkText,
       linkUrl,
@@ -74,14 +98,21 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
       fontColor,
       fontSize,
       alignment,
-    });
+    };
+
+    console.log("Saving feedback link settings:", feedbackData);
+    updateFeedback(feedbackData);
     onClose();
   };
 
   // --- Rendering Functions ---
 
   const renderColorPalette = (palette, currentColor, setColorFn) => (
-    <RadioGroup row value={currentColor} onChange={(e) => setColorFn(e.target.value)}>
+    <RadioGroup
+      row
+      value={currentColor}
+      onChange={(e) => setColorFn(e.target.value)}
+    >
       {palette.map((colorValue) => (
         <Tooltip title={colorValue} key={colorValue}>
           <FormControlLabel
@@ -96,7 +127,9 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
                   backgroundColor: colorValue,
                   border: 2,
                   borderColor:
-                    currentColor === colorValue ? "primary.main" : "transparent",
+                    currentColor === colorValue
+                      ? "primary.main"
+                      : "transparent",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -111,7 +144,8 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
                     borderRadius: "50%",
                     backgroundColor: colorValue,
                     border: 1,
-                    borderColor: colorValue === "white" ? "grey.400" : colorValue,
+                    borderColor:
+                      colorValue === "white" ? "grey.400" : colorValue,
                   }}
                 />
               </Box>
@@ -131,6 +165,7 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
       saveText="Add"
       cancelText="Cancel"
       maxWidth="sm"
+      disableSave={!linkUrl} // Disable save if no URL provided
     >
       <Stack spacing={3}>
         {/* Feedback Details */}
@@ -168,6 +203,8 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
             size="small"
             variant="standard"
             placeholder="https://"
+            error={!linkUrl}
+            helperText={!linkUrl ? "URL is required" : ""}
           />
         </Box>
 
@@ -197,12 +234,16 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
                       sx={{
                         p: 0.5,
                         border: 1,
-                        borderColor: icon === value ? "primary.main" : "transparent",
+                        borderColor:
+                          icon === value ? "primary.main" : "transparent",
                         borderRadius: "50%",
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: icon === value ? "primary.main" : "action.active",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color:
+                          icon === value ? "primary.main" : "action.active",
+                        width: 40,
+                        height: 40,
                       }}
                     >
                       {Icon ? <Icon fontSize="medium" /> : "None"}
@@ -234,7 +275,8 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
                         px: 2,
                         py: 1,
                         border: 1,
-                        borderColor: iconSize === s ? "primary.main" : "grey.300",
+                        borderColor:
+                          iconSize === s ? "primary.main" : "grey.300",
                         borderRadius: 1,
                         bgcolor: iconSize === s ? "white" : "grey.50",
                         color: "text.primary",
@@ -275,10 +317,11 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
             <Slider
               value={fontSize}
               onChange={(e, newValue) => setFontSize(newValue)}
-              valueLabelDisplay="off"
-              min={0}
-              max={100}
-              sx={{ width: '90%' }} // Adjust width to visually match the image
+              valueLabelDisplay="auto"
+              valueLabelFormat={(value) => `${value}px`}
+              min={10}
+              max={30}
+              sx={{ width: "90%" }}
             />
           </Box>
 
@@ -316,14 +359,15 @@ const GiveUsFeedbackModal = ({ open, onClose }) => {
                         textAlign: "center",
                       }}
                     >
-                      <Icon color={alignment === value ? "primary" : "action"} />
+                      <Icon
+                        color={alignment === value ? "primary" : "action"}
+                      />
                     </Box>
                   }
                 />
               ))}
             </RadioGroup>
           </Box>
-
         </Box>
       </Stack>
     </CustomDialog>

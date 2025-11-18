@@ -19,6 +19,11 @@ import {
   INITIAL_BANNER,
   INITIAL_CUSTOM_BUTTON,
   INITIAL_UPLOAD_BANNER,
+  INITIAL_FEEDBACK,
+  INITIAL_VIDEO_CONFERENCE,
+  INITIAL_WEBINAR,
+  INITIAL_APP_DOWNLOAD,
+  INITIAL_JOB_OFFER,
 } from "../utils/constant";
 
 const SignatureContext = createContext();
@@ -42,6 +47,32 @@ export const SignatureProvider = ({ children }) => {
   const [banner, setBanner] = useState(INITIAL_BANNER);
   const [customButton, setCustomButton] = useState(INITIAL_CUSTOM_BUTTON);
   const [uploadBanner, setUploadBanner] = useState(INITIAL_UPLOAD_BANNER);
+  const [feedback, setFeedback] = useState(INITIAL_FEEDBACK);
+  const [videoConference, setVideoConference] = useState(
+    INITIAL_VIDEO_CONFERENCE
+  );
+  const [webinar, setWebinar] = useState(INITIAL_WEBINAR);
+  const [appDownload, setAppDownload] = useState(INITIAL_APP_DOWNLOAD);
+  const [jobOffer, setJobOffer] = useState(INITIAL_JOB_OFFER);
+
+  const updateAppDownload = useCallback((data) => {
+    setAppDownload((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  // Update webinar settings
+  const updateWebinar = useCallback((data) => {
+    setWebinar((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  // Update video conference settings
+  const updateVideoConference = useCallback((data) => {
+    setVideoConference((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  // Update feedback settings
+  const updateFeedback = useCallback((data) => {
+    setFeedback((prev) => ({ ...prev, ...data }));
+  }, []);
 
   // Update upload banner settings
   const updateUploadBanner = useCallback((data) => {
@@ -128,6 +159,10 @@ export const SignatureProvider = ({ children }) => {
   const updateImageGallery = useCallback((data) => {
     setImageGallery((prev) => ({ ...prev, ...data }));
   }, []);
+
+  const updateJobOffer = useCallback((data) => {
+    setJobOffer((prev) => ({ ...prev, ...data }));
+  }, []);
   // Combined formData for backward compatibility
   const formData = useMemo(
     () => ({
@@ -158,6 +193,11 @@ export const SignatureProvider = ({ children }) => {
       banner,
       customButton,
       uploadBanner,
+      feedback,
+      videoConference,
+      webinar,
+      appDownload,
+      jobOffer,
     }),
     [
       globalStyles,
@@ -179,6 +219,11 @@ export const SignatureProvider = ({ children }) => {
       banner,
       customButton,
       uploadBanner,
+      feedback,
+      videoConference,
+      webinar,
+      appDownload,
+      jobOffer,
     ]
   );
 
@@ -306,6 +351,16 @@ export const SignatureProvider = ({ children }) => {
       updateCustomButton,
       uploadBanner,
       updateUploadBanner,
+      feedback,
+      updateFeedback,
+      videoConference,
+      updateVideoConference,
+      webinar,
+      updateWebinar,
+      appDownload,
+      updateAppDownload,
+      jobOffer,
+      updateJobOffer,
     }),
     [
       formData,
@@ -340,6 +395,16 @@ export const SignatureProvider = ({ children }) => {
       updateCustomButton,
       uploadBanner,
       updateUploadBanner,
+      feedback,
+      updateFeedback,
+      videoConference,
+      updateVideoConference,
+      webinar,
+      updateWebinar,
+      appDownload,
+      updateAppDownload,
+      jobOffer,
+      updateJobOffer,
     ]
   );
 

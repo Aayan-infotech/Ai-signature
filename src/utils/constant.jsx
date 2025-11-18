@@ -221,7 +221,7 @@ export const BUTTON_TYPES = {
 // Button sizes
 export const BUTTON_SIZES = {
   S: "Small",
-  M: "Medium", 
+  M: "Medium",
   L: "Large",
 };
 
@@ -235,7 +235,7 @@ export const BUTTON_SHAPES = {
 // Icon options
 export const ICON_OPTIONS = {
   circle: "CheckCircle",
-  calendar_month: "CalendarMonth", 
+  calendar_month: "CalendarMonth",
   calendar_today: "CalendarToday",
   link: "Link",
   time: "AccessTime",
@@ -248,7 +248,7 @@ export const INITIAL_SOCIAL_BUTTONS = {
   links: [],
   style: "Stroke",
   shape: "rounded_sm",
-  size:20
+  size: 20,
 };
 
 export const INITIAL_BANNER = {
@@ -287,4 +287,79 @@ export const INITIAL_UPLOAD_BANNER = {
   imageUrl: "",
   link: "",
   size: "M",
+};
+
+// In your utils/constant.js file
+export const INITIAL_FEEDBACK = {
+  enabled: false,
+  title: "Rate my services:",
+  linkText: "How was your overall experience with me?",
+  linkUrl: "https://",
+  icon: "circle",
+  iconSize: "M",
+  iconColor: "black",
+  fontColor: "black",
+  fontSize: 50,
+  alignment: "left",
+};
+
+// In your utils/constant.js file
+export const INITIAL_VIDEO_CONFERENCE = {
+  enabled: false,
+  provider: "Zoom",
+  buttonText: "Meet me on Zoom",
+  shape: "square",
+  size: 60,
+  link: "",
+};
+
+// In your utils/constant.js file
+export const INITIAL_WEBINAR = {
+  enabled: false,
+  title: "Join our webinar:",
+  linkText: "How to make an awesome website",
+  linkUrl: "https://",
+  icon: "circle",
+  iconSize: "M",
+  iconColor: "black",
+  fontColor: "black",
+  fontSize: 50,
+  alignment: "left",
+};
+
+export const INITIAL_APP_DOWNLOAD = {
+  enabled: false,
+  title: "Download our app",
+  googlePlayLink: "https://play.google.com/store/apps/details?id=APP_ID",
+  appStoreLink: "https://itunes.apple.com/us/app/APP_NAME",
+  style: {
+    fontColor: "dark",
+    fontSize: 3,
+    alignment: "left",
+  },
+};
+
+export const INITIAL_JOB_OFFER = {
+  enabled: false,
+  introduction: "We are looking for:",
+  positionLink: "https://",
+  buttonText: "WE ARE HIRING",
+  style: {
+    buttonColor: "black",
+    fontColor: "dark",
+    buttonSize: "M",
+    fontSize: 3,
+    alignment: "left",
+  },
+};
+
+// Add to your existing color map if not already present
+export const colorMap = {
+  black: "#000000",
+  purple: "#800080",
+  green: "#008000",
+  blue: "#00BFFF",
+  yellow: "#FFD700",
+  red: "#DC143C",
+  custom: "transparent",
 };

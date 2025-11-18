@@ -103,6 +103,11 @@ const CTA = () => {
     updateBanner,
     updateCustomButton,
     updateUploadBanner,
+    updateFeedback,
+    updateVideoConference,
+    updateWebinar,
+    updateAppDownload,
+    updateJobOffer,
   } = useSignature();
 
   const handleOpen = (type) => {
@@ -205,7 +210,26 @@ const CTA = () => {
       console.log("Updating upload banner:", formData);
       updateUploadBanner(formData);
     }
-
+    if (type === "feedback") {
+      console.log("Updating feedback:", formData);
+      updateFeedback(formData);
+    }
+    if (type === "video") {
+      console.log("Updating video conference:", formData);
+      updateVideoConference(formData);
+    }
+    if (type === "webinar") {
+      console.log("Updating webinar:", formData);
+      updateWebinar(formData);
+    }
+    if (type === "appDownload") {
+      console.log("Updating app download:", formData);
+      updateAppDownload(formData);
+    }
+    if (type === "job") {
+      console.log("Updating job offer:", formData);
+      updateJobOffer(formData);
+    }
     handleClose(type);
   };
 
