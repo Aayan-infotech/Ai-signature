@@ -108,6 +108,8 @@ const CTA = () => {
     updateWebinar,
     updateAppDownload,
     updateJobOffer,
+    updateNewsletter,
+    updateCustomHtml,
   } = useSignature();
 
   const handleOpen = (type) => {
@@ -230,6 +232,14 @@ const CTA = () => {
       console.log("Updating job offer:", formData);
       updateJobOffer(formData);
     }
+    if (type === "newsletter") {
+      console.log("Updating newsletter:", formData);
+      updateNewsletter(formData);
+    }
+    if (type === "html") {
+      console.log("Updating custom HTML:", formData);
+      updateCustomHtml(formData);
+    }
     handleClose(type);
   };
 
@@ -336,11 +346,13 @@ const CTA = () => {
         open={newsletterModal}
         onClose={() => handleClose("newsletter")}
         onSave={handleSave}
+        initialData={formData.newsletter}
       />
       <CustomHtmlModal
         open={openHtml}
         onClose={() => handleClose("html")}
         onSave={handleSave}
+        initialData={formData.customHtml}
       />
     </>
   );

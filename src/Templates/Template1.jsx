@@ -78,6 +78,16 @@ const Template1 = ({ data }) => {
     jobOffer,
     getJobOfferButtonStyles,
     handleJobOfferClick,
+    getNewsletterIcon,
+    handleNewsletterClick,
+    getNewsletterLinkStyles,
+    newsletter,
+    getNewsletterTextStyles,
+    getNewsletterStyles,
+    getNewsletterTitleStyles,
+    shouldShowNewsletter,
+    shouldShowCustomHtml,
+    renderCustomHtml
   } = useSignatureData(data);
 
   const socialIcons = [
@@ -468,7 +478,6 @@ const Template1 = ({ data }) => {
           )}
         </Col>
       </Row>
-
       {/* Social Buttons Section */}
       {shouldShowSocialButtons &&
         socialButtons.links &&
@@ -792,7 +801,6 @@ const Template1 = ({ data }) => {
           </Box>
         </Box>
       )}
-
       {shouldShowUploadBanner && (
         <Box sx={{ mb: 3 }}>
           <img
@@ -851,7 +859,7 @@ const Template1 = ({ data }) => {
           )}
         </Box>
       )}
-      <Box sx={{ display: "flex", flexDirection: "row" }}>
+      <Box sx={{ display: "flex", flexDirection: "row", gap: "18px" }}>
         {shouldShowAppDownload && (
           <Box sx={getAppDownloadStyles()}>
             <Typography variant="h6" sx={getAppDownloadTitleStyles()}>
@@ -971,7 +979,53 @@ const Template1 = ({ data }) => {
             </Box>
           </Box>
         )}
+        {shouldShowNewsletter && (
+          <Box sx={getNewsletterStyles()}>
+            <Typography variant="h6" sx={getNewsletterTitleStyles()}>
+              {newsletter.title}
+            </Typography>
+
+            {newsletter.text &&
+              newsletter.text !== "e.g. Get the best marketing tips" && (
+                <Typography variant="body2" sx={getNewsletterTextStyles()}>
+                  {newsletter.text}
+                </Typography>
+              )}
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent:
+                  newsletter.style?.alignment === "center"
+                    ? "center"
+                    : newsletter.style?.alignment === "right"
+                    ? "flex-end"
+                    : "flex-start",
+              }}
+            >
+              <a
+                href={newsletter.linkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={getNewsletterLinkStyles()}
+                onMouseEnter={(e) => {
+                  e.target.style.opacity = "0.8";
+                  e.target.style.textDecoration = "underline";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.opacity = "1";
+                  e.target.style.textDecoration = "none";
+                }}
+                onClick={handleNewsletterClick}
+              >
+                {getNewsletterIcon()}
+                Subscribe Now
+              </a>
+            </Box>
+          </Box>
+        )}
       </Box>
+      {shouldShowCustomHtml && renderCustomHtml()}
     </Card>
   );
 };

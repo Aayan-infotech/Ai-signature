@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import CustomDialog from "./CustomDialog"; // Assuming CustomDialog is imported correctly
+import React, { useState, useEffect } from "react";
+import CustomDialog from "./CustomDialog";
 import {
   TextField,
   Typography,
@@ -12,143 +12,175 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Alert,
 } from "@mui/material";
-import { 
-  FormatAlignLeft, 
-  FormatAlignCenter, 
+import {
+  FormatAlignLeft,
+  FormatAlignCenter,
   FormatAlignRight,
-  EmailOutlined, // Envelope icon
-  EditOutlined, // Pencil icon
-  AlternateEmail, // @ symbol icon
-  SendOutlined, // Paper plane icon
-  // Note: The empty circle/None icon can be represented by 'None' state
+  EmailOutlined,
+  EditOutlined,
+  AlternateEmail,
+  SendOutlined,
 } from "@mui/icons-material";
 
-// Utility function to simulate data saving
-const handleSaveNewsletterData = (data) => {
-  console.log("Newsletter Data to be saved:", data);
-  alert("Simulated Save Newsletter! Check the console for data.");
-};
-
-// Map of predefined colors for visual display (Icon and Font colors)
+// Map of predefined colors for visual display
 const colorMap = {
   black: "#000000",
   purple: "#800080",
-  blue: "#00BFFF", 
+  blue: "#00BFFF",
   green: "#008000",
   yellow: "#FFD700",
   red: "#DC143C",
-  custom: "transparent", // Placeholder for the custom color circle
 };
 
 // Map of available icon options
 const iconMap = {
-  envelope: EmailOutlined,
-  pencil: EditOutlined,
-  at: AlternateEmail,
-  plane: SendOutlined,
-  none: 'None', // String to represent no icon
+  envelope: { component: EmailOutlined, label: "Envelope" },
+  pencil: { component: EditOutlined, label: "Pencil" },
+  at: { component: AlternateEmail, label: "At Symbol" },
+  plane: { component: SendOutlined, label: "Paper Plane" },
+  none: { component: null, label: "None" },
 };
 
-// Helper component for the Color Radio Group (re-used from previous modal)
+// Helper component for the Color Radio Group
 const ColorRadioGroup = ({ selectedValue, onChange, colorOptions, name }) => (
-    <RadioGroup
-      row
-      name={name}
-      value={selectedValue}
-      onChange={onChange}
-    >
-      {Object.keys(colorOptions).map((colorName) => {
-        const colorValue = colorOptions[colorName];
-        return (
-          <FormControlLabel
-            key={colorName}
-            value={colorName}
-            control={
-              <Radio 
-                size="small"
-                sx={{
+  <RadioGroup row name={name} value={selectedValue} onChange={onChange}>
+    {Object.keys(colorOptions).map((colorName) => {
+      const colorValue = colorOptions[colorName];
+      return (
+        <FormControlLabel
+          key={colorName}
+          value={colorName}
+          control={
+            <Radio
+              size="small"
+              sx={{
+                color: colorValue,
+                "&.Mui-checked": {
                   color: colorValue,
-                  '&.Mui-checked': {
-                    color: colorValue,
-                  },
-                  ...(colorName === 'custom' && { 
-                    border: '1px solid grey', 
-                    borderRadius: '50%',
-                    width: '20px', 
-                    height: '20px',
-                    margin: '2px',
-                  }),
-                }} 
-              />
-            }
-            label={''}
-          />
-        );
-      })}
-    </RadioGroup>
-  );
+                },
+              }}
+            />
+          }
+          label=""
+        />
+      );
+    })}
+  </RadioGroup>
+);
 
+const JoinNewsletterModal = ({ open, onClose, onSave, initialData }) => {
+  // Default data structure
+  const defaultData = {
+    enabled: true,
+    title: "Subscribe for free:",
+    text: "e.g. Get the best marketing tips",
+    linkUrl: "https://",
+    style: {
+      icon: "envelope",
+      iconSize: "M",
+      iconColor: "black",
+      fontColor: "dark",
+      fontSize: 3,
+      alignment: "left",
+    },
+  };
 
-const JoinNewsletterModal = ({ open, onClose }) => {
-  // --- State for Data Fields ---
-  const [title, setTitle] = useState("Subscribe for free:");
-  const [text, setText] = useState("e.g. Get the best marketing tips");
-  const [linkUrl, setLinkUrl] = useState("https://");
-  
-  // --- State for Style Fields ---
-  // Icon and its style
-  const [icon, setIcon] = useState("envelope"); // Default to envelope icon
-  const [iconSize, setIconSize] = useState("M"); // Default to Medium
-  const [iconColor, setIconColor] = useState("black"); // Default to black
-  
-  // Font style
-  const [fontColor, setFontColor] = useState("dark"); // Default to dark font
-  const [fontSize, setFontSize] = useState(3); 
-  const [alignment, setAlignment] = useState("left");
+  // State for form data
+  const [formData, setFormData] = useState(defaultData);
+  const [errors, setErrors] = useState({});
+
+  // Initialize with initialData when modal opens
+  useEffect(() => {
+    if (open) {
+      setFormData(defaultData);
+      setErrors({});
+    }
+  }, [open, initialData]);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.title?.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    if (!formData.linkUrl?.trim() || formData.linkUrl === "https://") {
+      newErrors.linkUrl = "Valid newsletter link is required";
+    } else if (!formData.linkUrl.startsWith("https://")) {
+      newErrors.linkUrl = "Link must start with https://";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSave = () => {
-    const data = {
-      title,
-      text,
-      linkUrl,
+    if (validateForm()) {
+      console.log("Saving newsletter data:", formData);
+      onSave(formData, "newsletter");
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+      }));
+    }
+  };
+
+  const handleStyleChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
       style: {
-        icon,
-        iconSize,
-        iconColor,
-        fontColor,
-        fontSize,
-        alignment,
+        ...prev.style,
+        [field]: value,
       },
-    };
-    handleSaveNewsletterData(data);
-    onClose();
+    }));
   };
 
   const handleIconSize = (event, newSize) => {
     if (newSize !== null) {
-      setIconSize(newSize);
+      handleStyleChange("iconSize", newSize);
     }
   };
 
   const handleAlignment = (event, newAlignment) => {
     if (newAlignment !== null) {
-      setAlignment(newAlignment);
+      handleStyleChange("alignment", newAlignment);
     }
   };
 
+  const hasValidLink = formData.linkUrl && formData.linkUrl !== "https://";
 
   return (
     <CustomDialog
       open={open}
       onClose={onClose}
       title="Join our Newsletter"
-      onSave={handleSave} 
+      onSave={handleSave}
       saveText="Add"
+      maxWidth="md"
     >
       <Box sx={{ p: 2 }}>
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          Enter your newsletter details
+        {!hasValidLink && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            Update the newsletter link to enable the subscription in your
+            signature.
+          </Alert>
+        )}
+
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Newsletter Details
         </Typography>
 
         {/* Title Field */}
@@ -156,139 +188,182 @@ const JoinNewsletterModal = ({ open, onClose }) => {
           label="Title"
           fullWidth
           margin="normal"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          sx={{ mb: 2 }}
+          value={formData.title}
+          onChange={(e) => handleInputChange("title", e.target.value)}
+          error={!!errors.title}
+          helperText={errors.title || "Main heading for your newsletter"}
+          sx={{ mb: 3 }}
         />
 
         {/* Text Field */}
         <TextField
-          label="Text"
+          label="Description"
           fullWidth
           margin="normal"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          sx={{ mb: 2 }}
+          value={formData.text}
+          onChange={(e) => handleInputChange("text", e.target.value)}
+          helperText="Optional description or value proposition"
+          sx={{ mb: 3 }}
         />
 
         {/* Link URL Field */}
         <TextField
-          label="Link Url"
+          label="Newsletter Signup Link"
           fullWidth
           margin="normal"
-          value={linkUrl}
-          onChange={(e) => setLinkUrl(e.target.value)}
+          value={formData.linkUrl}
+          onChange={(e) => handleInputChange("linkUrl", e.target.value)}
+          error={!!errors.linkUrl}
+          helperText={errors.linkUrl || "Paste your newsletter signup URL"}
           sx={{ mb: 4 }}
         />
-        
+
         <Divider sx={{ mb: 4 }} />
-        
+
         <Typography variant="h6" gutterBottom>
-          Style
+          Style Settings
         </Typography>
 
-        {/* --- Icon Selection Control --- */}
+        {/* Icon Selection Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>**Icon**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Icon</Typography>
           <RadioGroup
             row
             name="icon-select"
-            value={icon}
-            onChange={(e) => setIcon(e.target.value)}
+            value={formData.style.icon}
+            onChange={(e) => handleStyleChange("icon", e.target.value)}
           >
             {Object.keys(iconMap).map((iconName) => {
-              const IconComponent = iconMap[iconName];
+              const { component: IconComponent, label } = iconMap[iconName];
               return (
                 <FormControlLabel
                   key={iconName}
                   value={iconName}
                   control={
-                    <Radio 
+                    <Radio
                       size="small"
-                      icon={iconName === 'none' ? <Box sx={{ width: 15, height: 15, border: '1px solid grey', borderRadius: '50%' }} /> : <IconComponent fontSize="small" />}
-                      checkedIcon={iconName === 'none' ? <Box sx={{ width: 15, height: 15, border: '1px solid black', borderRadius: '50%' }} /> : <IconComponent fontSize="small" />}
+                      icon={
+                        iconName === "none" ? (
+                          <Box
+                            sx={{
+                              width: 24,
+                              height: 24,
+                              border: "1px solid #ccc",
+                              borderRadius: "50%",
+                            }}
+                          />
+                        ) : (
+                          <IconComponent fontSize="small" />
+                        )
+                      }
+                      checkedIcon={
+                        iconName === "none" ? (
+                          <Box
+                            sx={{
+                              width: 24,
+                              height: 24,
+                              border: "2px solid #1976d2",
+                              borderRadius: "50%",
+                            }}
+                          />
+                        ) : (
+                          <IconComponent fontSize="small" />
+                        )
+                      }
                     />
                   }
-                  label={iconName === 'none' ? 'None' : ''}
+                  label={label}
+                  sx={{ mr: 2 }}
                 />
               );
             })}
           </RadioGroup>
         </Stack>
 
-        {/* --- Icon Size Control --- */}
+        {/* Icon Size Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>**Icon size**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Icon size</Typography>
           <ToggleButtonGroup
-            value={iconSize}
+            value={formData.style.iconSize}
             exclusive
             onChange={handleIconSize}
             aria-label="icon size"
             size="small"
           >
-            <ToggleButton value="S" aria-label="small">S</ToggleButton>
-            <ToggleButton value="M" aria-label="medium">M</ToggleButton>
-            <ToggleButton value="L" aria-label="large">L</ToggleButton>
+            <ToggleButton value="S" aria-label="small">
+              S
+            </ToggleButton>
+            <ToggleButton value="M" aria-label="medium">
+              M
+            </ToggleButton>
+            <ToggleButton value="L" aria-label="large">
+              L
+            </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
 
-        {/* --- Icon Color Control --- */}
+        {/* Icon Color Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>**Icon color**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Icon color</Typography>
           <ColorRadioGroup
-            selectedValue={iconColor}
-            onChange={(e) => setIconColor(e.target.value)}
+            selectedValue={formData.style.iconColor}
+            onChange={(e) => handleStyleChange("iconColor", e.target.value)}
             colorOptions={colorMap}
             name="icon-color"
           />
         </Stack>
-        
-        {/* --- Font Color Control --- */}
+
+        {/* Font Color Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>**Font color**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Font color</Typography>
           <RadioGroup
             row
-            value={fontColor}
-            onChange={(e) => setFontColor(e.target.value)}
+            value={formData.style.fontColor}
+            onChange={(e) => handleStyleChange("fontColor", e.target.value)}
             name="font-color"
           >
             <FormControlLabel
               value="dark"
-              control={<Radio sx={{ color: 'black' }} size="small" />}
-              label=""
+              control={<Radio size="small" />}
+              label="Dark"
             />
             <FormControlLabel
               value="light"
-              control={<Radio sx={{ color: 'lightgrey' }} size="small" />}
-              label=""
-            />
-            <FormControlLabel
-              value="custom"
               control={<Radio size="small" />}
-              label="🎨" // Custom/Other option
+              label="Light"
             />
           </RadioGroup>
         </Stack>
-        
-        {/* --- Font Size Control (Slider) --- */}
+
+        {/* Font Size Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>**Font size**</Typography>
-          <Slider
-            value={fontSize}
-            onChange={(e, newValue) => setFontSize(newValue)}
-            step={1}
-            min={1}
-            max={5}
-            marks
-            sx={{ width: 'auto', flexGrow: 1, m: 0 }}
-          />
+          <Typography sx={{ minWidth: "100px" }}>Font size</Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <Slider
+              value={formData.style.fontSize}
+              onChange={(e, newValue) =>
+                handleStyleChange("fontSize", newValue)
+              }
+              step={1}
+              min={1}
+              max={5}
+              marks={[
+                { value: 1, label: "S" },
+                { value: 2, label: "M" },
+                { value: 3, label: "L" },
+                { value: 4, label: "XL" },
+                { value: 5, label: "XXL" },
+              ]}
+              valueLabelDisplay="auto"
+            />
+          </Box>
         </Stack>
 
-        {/* --- Alignment Control (Toggle Button Group) --- */}
+        {/* Alignment Control */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-          <Typography sx={{ minWidth: '90px' }}>**Alignment**</Typography>
+          <Typography sx={{ minWidth: "100px" }}>Alignment</Typography>
           <ToggleButtonGroup
-            value={alignment}
+            value={formData.style.alignment}
             exclusive
             onChange={handleAlignment}
             aria-label="text alignment"
@@ -305,9 +380,188 @@ const JoinNewsletterModal = ({ open, onClose }) => {
             </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
+
+        {/* Preview Section */}
+        <Box
+          sx={{
+            mt: 4,
+            p: 3,
+            backgroundColor: "#f5f5f5",
+            borderRadius: 2,
+            border: "1px solid #e0e0e0",
+          }}
+        >
+          <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+            Preview:
+          </Typography>
+          <Box sx={getPreviewStyles(formData.style)}>
+            <Typography variant="h6" sx={getPreviewTitleStyles(formData.style)}>
+              {formData.title}
+            </Typography>
+
+            {formData.text &&
+              formData.text !== "e.g. Get the best marketing tips" && (
+                <Typography
+                  variant="body2"
+                  sx={getPreviewTextStyles(formData.style)}
+                >
+                  {formData.text}
+                </Typography>
+              )}
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent:
+                  formData.style.alignment === "center"
+                    ? "center"
+                    : formData.style.alignment === "right"
+                    ? "flex-end"
+                    : "flex-start",
+              }}
+            >
+              <Box
+                sx={getPreviewLinkStyles(formData.style)}
+                onMouseEnter={(e) => {
+                  e.target.style.opacity = "0.8";
+                  e.target.style.textDecoration = "underline";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.opacity = "1";
+                  e.target.style.textDecoration = "none";
+                }}
+              >
+                {formData.style.icon !== "none" && (
+                  <Box sx={getPreviewIconStyles(formData.style)}>
+                    {getPreviewIcon(formData.style)}
+                  </Box>
+                )}
+                Subscribe Now
+              </Box>
+            </Box>
+          </Box>
+          {!hasValidLink && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              Newsletter link required to activate subscription
+            </Alert>
+          )}
+        </Box>
       </Box>
     </CustomDialog>
   );
+};
+
+// Helper functions for preview styling
+const getPreviewStyles = (style) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: "8px",
+  textAlign: style.alignment,
+});
+
+const getPreviewTitleStyles = (style) => {
+  const fontSizeMap = {
+    1: "12px",
+    2: "14px",
+    3: "16px",
+    4: "18px",
+    5: "20px",
+  };
+
+  const colorMap = {
+    dark: "#000000",
+    light: "#666666",
+  };
+
+  return {
+    fontSize: fontSizeMap[style.fontSize],
+    color: colorMap[style.fontColor],
+    fontWeight: 600,
+    marginBottom: "4px",
+  };
+};
+
+const getPreviewTextStyles = (style) => {
+  const fontSizeMap = {
+    1: "10px",
+    2: "12px",
+    3: "14px",
+    4: "16px",
+    5: "18px",
+  };
+
+  const colorMap = {
+    dark: "#000000",
+    light: "#666666",
+  };
+
+  return {
+    fontSize: fontSizeMap[style.fontSize],
+    color: colorMap[style.fontColor],
+    fontStyle: "italic",
+  };
+};
+
+const getPreviewLinkStyles = (style) => {
+  const fontSizeMap = {
+    1: "12px",
+    2: "14px",
+    3: "16px",
+    4: "18px",
+    5: "20px",
+  };
+
+  const colorMap = {
+    dark: "#000000",
+    light: "#666666",
+  };
+
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    textDecoration: "none",
+    fontWeight: 500,
+    color: colorMap[style.fontColor],
+    fontSize: fontSizeMap[style.fontSize],
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+  };
+};
+
+const getPreviewIconStyles = (style) => {
+  const sizeMap = {
+    S: { fontSize: "16px" },
+    M: { fontSize: "20px" },
+    L: { fontSize: "24px" },
+  };
+
+  const colorMap = {
+    black: "#000000",
+    purple: "#800080",
+    blue: "#00BFFF",
+    green: "#008000",
+    yellow: "#FFD700",
+    red: "#DC143C",
+  };
+
+  return {
+    ...sizeMap[style.iconSize],
+    color: colorMap[style.iconColor] || "#000000",
+  };
+};
+
+const getPreviewIcon = (style) => {
+  const IconComponent = iconMap[style.icon]?.component;
+  if (!IconComponent) return null;
+
+  const sizeMap = {
+    S: "small",
+    M: "medium",
+    L: "large",
+  };
+
+  return <IconComponent fontSize={sizeMap[style.iconSize]} />;
 };
 
 export default JoinNewsletterModal;

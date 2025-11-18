@@ -24,6 +24,8 @@ import {
   INITIAL_WEBINAR,
   INITIAL_APP_DOWNLOAD,
   INITIAL_JOB_OFFER,
+  INITIAL_NEWSLETTER,
+  INITIAL_CUSTOM_HTML,
 } from "../utils/constant";
 
 const SignatureContext = createContext();
@@ -54,6 +56,15 @@ export const SignatureProvider = ({ children }) => {
   const [webinar, setWebinar] = useState(INITIAL_WEBINAR);
   const [appDownload, setAppDownload] = useState(INITIAL_APP_DOWNLOAD);
   const [jobOffer, setJobOffer] = useState(INITIAL_JOB_OFFER);
+  const [newsletter, setNewsletter] = useState(INITIAL_NEWSLETTER);
+  const [customHtml, setCustomHtml] = useState(INITIAL_CUSTOM_HTML);
+  const updateCustomHtml = useCallback((data) => {
+    setCustomHtml((prev) => ({ ...prev, ...data }));
+  }, []);
+  // Add update function
+  const updateNewsletter = useCallback((data) => {
+    setNewsletter((prev) => ({ ...prev, ...data }));
+  }, []);
 
   const updateAppDownload = useCallback((data) => {
     setAppDownload((prev) => ({ ...prev, ...data }));
@@ -198,6 +209,8 @@ export const SignatureProvider = ({ children }) => {
       webinar,
       appDownload,
       jobOffer,
+      newsletter,
+      customHtml,
     }),
     [
       globalStyles,
@@ -224,6 +237,8 @@ export const SignatureProvider = ({ children }) => {
       webinar,
       appDownload,
       jobOffer,
+      newsletter,
+      customHtml,
     ]
   );
 
@@ -361,6 +376,10 @@ export const SignatureProvider = ({ children }) => {
       updateAppDownload,
       jobOffer,
       updateJobOffer,
+      newsletter,
+      updateNewsletter,
+      customHtml,
+      updateCustomHtml,
     }),
     [
       formData,
@@ -405,6 +424,10 @@ export const SignatureProvider = ({ children }) => {
       updateAppDownload,
       jobOffer,
       updateJobOffer,
+      newsletter,
+      updateNewsletter,
+      customHtml,
+      updateCustomHtml,
     ]
   );
 

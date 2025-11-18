@@ -363,3 +363,33 @@ export const colorMap = {
   red: "#DC143C",
   custom: "transparent",
 };
+
+export const INITIAL_NEWSLETTER = {
+  enabled: false,
+  title: "Subscribe for free:",
+  text: "e.g. Get the best marketing tips",
+  linkUrl: "https://",
+  style: {
+    icon: "envelope",
+    iconSize: "M",
+    iconColor: "black",
+    fontColor: "dark",
+    fontSize: 3,
+    alignment: "left",
+  },
+};
+
+// Add icon map for newsletter
+export const newsletterIconMap = {
+  envelope: "envelope",
+  pencil: "pencil",
+  at: "at",
+  plane: "plane",
+  none: "none",
+};
+
+export const INITIAL_CUSTOM_HTML = {
+  enabled: false,
+  htmlCode: "Enter your HTML code here",
+  // Note: Custom HTML doesn't have style properties since it's raw HTML
+};

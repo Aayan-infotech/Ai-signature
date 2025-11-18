@@ -20,6 +20,12 @@ import MonitorIcon from "@mui/icons-material/Monitor";
 import MicIcon from "@mui/icons-material/Mic";
 import TvIcon from "@mui/icons-material/Tv";
 import LaptopIcon from "@mui/icons-material/Laptop";
+import {
+  EmailOutlined,
+  EditOutlined,
+  AlternateEmail,
+  SendOutlined,
+} from "@mui/icons-material";
 
 export const useSignatureData = (data) => {
   const getValue = (designValue, parentValue, defaultValue = "") =>
@@ -47,6 +53,8 @@ export const useSignatureData = (data) => {
     webinar = {},
     appDownload = {},
     jobOffer = {},
+    newsletter = {},
+    customHtml = {},
   } = data || {};
 
   console.log("socialButtons", socialButtons);
@@ -195,6 +203,9 @@ export const useSignatureData = (data) => {
   const shouldShowWebinar = webinar && webinar.enabled && webinar.linkUrl;
   const shouldShowAppDownload = appDownload && appDownload.enabled;
   const shouldShowJobOffer = jobOffer && jobOffer.enabled;
+  const shouldShowNewsletter = newsletter && newsletter.enabled;
+  const shouldShowCustomHtml =
+    customHtml && customHtml.enabled && customHtml.htmlCode;
 
   const getContrastColor = (hexcolor) => {
     if (!hexcolor) return "#FFFFFF";
@@ -800,6 +811,184 @@ export const useSignatureData = (data) => {
     }
   };
 
+  const getNewsletterStyles = () => {
+    if (!newsletter) return {};
+
+    const baseStyles = {
+      display: "flex",
+      flexDirection: "column",
+      gap: "8px",
+      marginTop: "16px",
+      textAlign: newsletter.style?.alignment || "left",
+    };
+
+    return baseStyles;
+  };
+
+  // Get title styles for newsletter
+  const getNewsletterTitleStyles = () => {
+    if (!newsletter) return {};
+
+    const fontSizeMap = {
+      1: "12px",
+      2: "14px",
+      3: "16px",
+      4: "18px",
+      5: "20px",
+    };
+
+    const colorMap = {
+      dark: "#000000",
+      light: "#666666",
+      custom: newsletter.style?.customColor || "#000000",
+    };
+
+    return {
+      fontSize: fontSizeMap[newsletter.style?.fontSize || 3],
+      color: colorMap[newsletter.style?.fontColor || "dark"],
+      fontWeight: 600,
+      marginBottom: "4px",
+    };
+  };
+
+  // Get text styles for newsletter
+  const getNewsletterTextStyles = () => {
+    if (!newsletter) return {};
+
+    const fontSizeMap = {
+      1: "10px",
+      2: "12px",
+      3: "14px",
+      4: "16px",
+      5: "18px",
+    };
+
+    const colorMap = {
+      dark: "#000000",
+      light: "#666666",
+      custom: newsletter.style?.customColor || "#000000",
+    };
+
+    return {
+      fontSize: fontSizeMap[newsletter.style?.fontSize || 3],
+      color: colorMap[newsletter.style?.fontColor || "dark"],
+      fontStyle: "italic",
+    };
+  };
+
+  // Get newsletter link styles
+  const getNewsletterLinkStyles = () => {
+    if (!newsletter) return {};
+
+    const baseStyles = {
+      textDecoration: "none",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "8px",
+      fontWeight: 500,
+      transition: "all 0.3s ease",
+      cursor: "pointer",
+      fontFamily: getValue(design.detailsFont, fontFamily, "Roboto"),
+      color: newsletter.style?.fontColor === "light" ? "#666666" : "#000000",
+      "&:hover": {
+        opacity: 0.8,
+        textDecoration: "underline",
+      },
+    };
+
+    // Font size mapping
+    const fontSizeMap = {
+      1: "12px",
+      2: "14px",
+      3: "16px",
+      4: "18px",
+      5: "20px",
+    };
+
+    return {
+      ...baseStyles,
+      fontSize: fontSizeMap[newsletter.style?.fontSize || 3],
+    };
+  };
+
+  // Get newsletter icon
+  const getNewsletterIcon = () => {
+    if (
+      !newsletter ||
+      !newsletter.style?.icon ||
+      newsletter.style.icon === "none"
+    ) {
+      return null;
+    }
+
+    const iconSizeMap = {
+      S: "small",
+      M: "medium",
+      L: "large",
+    };
+
+    const colorMap = {
+      black: "#000000",
+      purple: "#800080",
+      blue: "#00BFFF",
+      green: "#008000",
+      yellow: "#FFD700",
+      red: "#DC143C",
+    };
+
+    const IconComponent = {
+      envelope: EmailOutlined,
+      pencil: EditOutlined,
+      at: AlternateEmail,
+      plane: SendOutlined,
+    }[newsletter.style.icon];
+
+    if (!IconComponent) return null;
+
+    return (
+      <IconComponent
+        fontSize={iconSizeMap[newsletter.style.iconSize || "M"]}
+        sx={{ color: colorMap[newsletter.style.iconColor] || "black" }}
+      />
+    );
+  };
+
+  const handleNewsletterClick = () => {
+    if (newsletter?.linkUrl && newsletter.linkUrl !== "https://") {
+      window.open(newsletter.linkUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const getCustomHtmlContent = () => {
+    if (
+      !customHtml ||
+      !customHtml.htmlCode ||
+      customHtml.htmlCode === "Enter your HTML code here"
+    ) {
+      return null;
+    }
+
+    return customHtml.htmlCode;
+  };
+
+  // Handle custom HTML rendering safely
+  const renderCustomHtml = () => {
+    const htmlContent = getCustomHtmlContent();
+    if (!htmlContent) return null;
+
+    return (
+      <div
+        dangerouslySetInnerHTML={{ __html: htmlContent }}
+        style={{
+          marginTop: "16px",
+          // Ensure HTML content doesn't break the layout
+          maxWidth: "100%",
+          overflow: "hidden",
+        }}
+      />
+    );
+  };
+
   return {
     styles,
     displayData,
@@ -866,5 +1055,17 @@ export const useSignatureData = (data) => {
     getJobOfferIntroductionStyles,
     getJobOfferButtonStyles,
     handleJobOfferClick,
+    newsletter,
+    shouldShowNewsletter,
+    getNewsletterStyles,
+    getNewsletterTitleStyles,
+    getNewsletterTextStyles,
+    getNewsletterLinkStyles,
+    getNewsletterIcon,
+    handleNewsletterClick,
+    customHtml,
+    shouldShowCustomHtml,
+    getCustomHtmlContent,
+    renderCustomHtml,
   };
 };
