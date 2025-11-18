@@ -469,8 +469,7 @@ const Template7 = ({ data }) => {
         <Box
           sx={{
             mt: 2,
-            pt: 2,
-            borderTop: "1px solid #e0e0e0",
+           
             textAlign: greenFooter.align || "left",
           }}
         >

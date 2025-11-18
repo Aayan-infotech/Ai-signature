@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import {
   Typography,
   Radio,
@@ -15,7 +15,8 @@ import {
 import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft";
 import FormatAlignCenterIcon from "@mui/icons-material/FormatAlignCenter";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
-import CustomDialog from "./CustomDialog"; // Assuming CustomDialog is accessible
+import CustomDialog from "./CustomDialog";
+import { useSignature } from "../../hooks/useSignature";
 
 // --- Color Data ---
 // Reusing colors from the first modal, adding black for the font color defaults
@@ -47,19 +48,35 @@ const FONT_COLORS = [
  */
 const CustomButtonModal = ({ open, onClose }) => {
   // --- State Management (Defaults set to match the image) ---
-  const [buttonText, setButtonText] = useState("Check out my website");
-  const [buttonUrl, setButtonUrl] = useState("");
-  const [shape, setShape] = useState("rounded_sm"); // Matches the first selected shape
-  const [type, setType] = useState("Full"); // Matches the selected option
-  const [color, setColor] = useState("black"); // Matches the selected button color (black)
-  const [size, setSize] = useState("M"); // Matches the selected option
-  const [fontColor, setFontColor] = useState("black"); // Matches the selected font color (black)
-  const [alignment, setAlignment] = useState("left"); // Matches the selected option
-  const [addArrow, setAddArrow] = useState(true); // Matches the checked box
+   const { customButton, updateCustomButton } = useSignature();
+  const [buttonText, setButtonText] = useState(customButton.buttonText || "Check out my website");
+  const [buttonUrl, setButtonUrl] = useState(customButton.buttonUrl || "");
+  const [shape, setShape] = useState(customButton.shape || "rounded_sm");
+  const [type, setType] = useState(customButton.type || "Full");
+  const [color, setColor] = useState(customButton.color || "black");
+  const [size, setSize] = useState(customButton.size || "M");
+  const [fontColor, setFontColor] = useState(customButton.fontColor || "black");
+  const [alignment, setAlignment] = useState(customButton.alignment || "left");
+  const [addArrow, setAddArrow] = useState(customButton.addArrow !== false);
+
+   useEffect(() => {
+    if (customButton) {
+      setButtonText(customButton.buttonText || "Check out my website");
+      setButtonUrl(customButton.buttonUrl || "");
+      setShape(customButton.shape || "rounded_sm");
+      setType(customButton.type || "Full");
+      setColor(customButton.color || "black");
+      setSize(customButton.size || "M");
+      setFontColor(customButton.fontColor || "black");
+      setAlignment(customButton.alignment || "left");
+      setAddArrow(customButton.addArrow !== false);
+    }
+  }, [customButton, open]);
 
   // --- Handlers ---
   const handleSave = () => {
-    console.log("Saving custom button settings:", {
+    const customButtonData = {
+      enabled: true,
       buttonText,
       buttonUrl,
       shape,
@@ -69,15 +86,11 @@ const CustomButtonModal = ({ open, onClose }) => {
       fontColor,
       alignment,
       addArrow,
-    });
-    // The "Add" button is disabled/grayed out in the image, suggesting an initial state
-    // We will simulate the click but log the 'disabled' visual state.
-    if (buttonUrl) {
-      onClose();
-    } else {
-      console.log("Button is visually disabled as URL is empty.");
-      // Typically, you would prevent closing here and show an error.
-    }
+    };
+
+    console.log("Saving custom button settings:", customButtonData);
+    updateCustomButton(customButtonData);
+    onClose();
   };
 
   // --- Rendering Functions ---
@@ -136,6 +149,7 @@ const CustomButtonModal = ({ open, onClose }) => {
       saveText="Add"
       cancelText="Cancel"
       maxWidth="sm"
+      disableSave={!buttonUrl}
     >
       <Stack spacing={3}>
         {/* Button Details */}
@@ -334,35 +348,6 @@ const CustomButtonModal = ({ open, onClose }) => {
           </Box>
         </Box>
       </Stack>
-
-      {/* Override DialogActions to reflect the disabled state of the 'Add' button in the image */}
-      <Box
-        sx={{
-          p: 2,
-          pt: 1,
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: 1,
-        }}
-      >
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          variant="contained"
-          onClick={handleSave}
-          disabled={!buttonUrl} // Disabled if URL is empty, matching the visual of the image
-          sx={{
-            // Custom style to match the image's grayed-out, disabled 'Add' button appearance
-            bgcolor: "#ccc",
-            color: "rgba(0, 0, 0, 0.26)",
-            "&.Mui-disabled": {
-              bgcolor: "#ccc",
-              color: "rgba(0, 0, 0, 0.26)",
-            },
-          }}
-        >
-          Add
-        </Button>
-      </Box>
     </CustomDialog>
   );
 };

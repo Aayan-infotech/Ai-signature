@@ -16,6 +16,9 @@ import {
   IMAGE_GALLERY,
   ONLINE_MEETING,
   INITIAL_SOCIAL_BUTTONS,
+  INITIAL_BANNER,
+  INITIAL_CUSTOM_BUTTON,
+  INITIAL_UPLOAD_BANNER,
 } from "../utils/constant";
 
 const SignatureContext = createContext();
@@ -36,6 +39,19 @@ export const SignatureProvider = ({ children }) => {
   const [imageGallery, setImageGallery] = useState(IMAGE_GALLERY);
   const [onlineMeeting, setOnlineMeeting] = useState(ONLINE_MEETING);
   const [socialButtons, setSocialButtons] = useState(INITIAL_SOCIAL_BUTTONS);
+  const [banner, setBanner] = useState(INITIAL_BANNER);
+  const [customButton, setCustomButton] = useState(INITIAL_CUSTOM_BUTTON);
+  const [uploadBanner, setUploadBanner] = useState(INITIAL_UPLOAD_BANNER);
+
+  // Update upload banner settings
+  const updateUploadBanner = useCallback((data) => {
+    setUploadBanner((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  // Update custom button settings
+  const updateCustomButton = useCallback((data) => {
+    setCustomButton((prev) => ({ ...prev, ...data }));
+  }, []);
 
   // Update online meeting settings
   const updateOnlineMeeting = useCallback((data) => {
@@ -80,6 +96,10 @@ export const SignatureProvider = ({ children }) => {
 
   const updateYoutubeVideo = useCallback((data) => {
     setYoutubeVideo((prev) => ({ ...prev, ...data }));
+  }, []);
+
+  const updateBanner = useCallback((data) => {
+    setBanner((prev) => ({ ...prev, ...data }));
   }, []);
 
   // In SignatureContext - update updateSocialButtons function
@@ -135,6 +155,9 @@ export const SignatureProvider = ({ children }) => {
       imageGallery,
       onlineMeeting,
       socialButtons,
+      banner,
+      customButton,
+      uploadBanner,
     }),
     [
       globalStyles,
@@ -153,6 +176,9 @@ export const SignatureProvider = ({ children }) => {
       imageGallery,
       onlineMeeting,
       socialButtons,
+      banner,
+      customButton,
+      uploadBanner,
     ]
   );
 
@@ -274,6 +300,12 @@ export const SignatureProvider = ({ children }) => {
       updateOnlineMeeting,
       socialButtons,
       updateSocialButtons,
+      banner,
+      updateBanner,
+      customButton,
+      updateCustomButton,
+      uploadBanner,
+      updateUploadBanner,
     }),
     [
       formData,
@@ -302,6 +334,12 @@ export const SignatureProvider = ({ children }) => {
       updateOnlineMeeting,
       socialButtons,
       updateSocialButtons,
+      banner,
+      updateBanner,
+      customButton,
+      updateCustomButton,
+      uploadBanner,
+      updateUploadBanner,
     ]
   );
 

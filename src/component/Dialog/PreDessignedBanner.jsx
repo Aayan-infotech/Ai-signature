@@ -19,13 +19,20 @@ import PeopleIcon from "@mui/icons-material/People";
 import WorkIcon from "@mui/icons-material/Work";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PublicIcon from "@mui/icons-material/Public";
-import CustomDialog from "./CustomDialog"; // Assuming CustomDialog is accessible
+import CustomDialog from "./CustomDialog";
+import Banner1 from "../../assets/banner/2025-glowing.gif";
+import Banner2 from "../../assets/banner/Happy-NY-pink-25.gif";
+import Banner3 from "../../assets/banner/happy-NY-purple-25.gif";
+import { useSignature } from "../../hooks/useSignature";
 
 // --- Navigation Data ---
 const CATEGORIES = [
   { name: "Featured", icon: StarIcon, subcategories: [] },
-  { name: "Holidays & Events", icon: EventIcon, subcategories: [
-     "Valentine's Day",
+  {
+    name: "Holidays & Events",
+    icon: EventIcon,
+    subcategories: [
+      "Valentine's Day",
       "Easter",
       "Halloween",
       "Thanksgiving",
@@ -33,7 +40,8 @@ const CATEGORIES = [
       "New Year's Day",
       "Mother's Day",
       "Father's Day",
-  ] },
+    ],
+  },
   {
     name: "Sale & Marketing",
     icon: LocalOfferIcon,
@@ -80,23 +88,32 @@ const CATEGORIES = [
 
 // Dummy data for banner previews (using placeholder text/colors)
 const BANNER_PREVIEWS = [
+  // {
+  //   text: "Happy Pride Month!",
+  //   color: "linear-gradient(to right, #f66, #ff9, #6f6, #69f, #96f)",
+  // },
+  // {
+  //   text: "JUNE Pride Month",
+  //   color: "linear-gradient(to right, #ff7e5f, #feb47b)",
+  // },
+  // {
+  //   text: "11th Oct National Coming Out Day",
+  //   color: "linear-gradient(to right, #ff4e50, #f9d423)",
+  // },
+  // {
+  //   text: "LGBT Pride Month THIS JUNE",
+  //   color: "linear-gradient(to right, #40e0d0, #ff8c00)",
+  // },
+  // { text: "LGBTQ Friendly Business", color: "#E91E63" },
   {
-    text: "Happy Pride Month!",
-    color: "linear-gradient(to right, #f66, #ff9, #6f6, #69f, #96f)",
+    img: Banner1,
   },
   {
-    text: "JUNE Pride Month",
-    color: "linear-gradient(to right, #ff7e5f, #feb47b)",
+    img: Banner2,
   },
   {
-    text: "11th Oct National Coming Out Day",
-    color: "linear-gradient(to right, #ff4e50, #f9d423)",
+    img: Banner3,
   },
-  {
-    text: "LGBT Pride Month THIS JUNE",
-    color: "linear-gradient(to right, #40e0d0, #ff8c00)",
-  },
-  { text: "LGBTQ Friendly Business", color: "#E91E63" },
 ];
 
 /**
@@ -108,18 +125,33 @@ const PredesignedBanners = ({ open, onClose }) => {
   const [selectedSubcategory, setSelectedSubcategory] = useState("LGBT"); // Matches the image
   const [selectedBannerSize, setSelectedBannerSize] = useState("M"); // Matches the image
   const [bannerLink, setBannerLink] = useState("");
+  const { banner, updateBanner } = useSignature();
+  const [selectedBannerPreview, setSelectedBannerPreview] = useState(
+    banner.predesigned?.selectedBanner || null
+  );
 
   // --- Handlers ---
   const handleSave = () => {
-    console.log("Saving banner settings:", {
-      category: selectedCategory,
-      subcategory: selectedSubcategory,
-      size: selectedBannerSize,
-      link: bannerLink,
-    });
+    const bannerData = {
+      enabled: true,
+      type: "predesigned",
+      predesigned: {
+        category: selectedCategory,
+        subcategory: selectedSubcategory,
+        size: selectedBannerSize,
+        link: bannerLink,
+        selectedBanner: selectedBannerPreview,
+      },
+    };
+
+    console.log("Saving banner settings:", bannerData);
+    updateBanner(bannerData);
     onClose();
   };
 
+  const handleBannerSelect = (banner) => {
+    setSelectedBannerPreview(banner);
+  };
   // --- Rendering Functions ---
 
   const renderSidebar = () => (
@@ -176,37 +208,38 @@ const PredesignedBanners = ({ open, onClose }) => {
 
   const renderBannerPreviews = () => (
     <Box flexGrow={1}>
-      {/* Scrollable area for banners, mimicking the image layout */}
       <Stack spacing={2}>
         {BANNER_PREVIEWS.map((banner, index) => (
           <Box
             key={index}
+            onClick={() => handleBannerSelect(banner)}
             sx={{
-              height: index < BANNER_PREVIEWS.length - 1 ? 50 : 70, // Varied height to match the image feel
-              background: banner.color,
+              height: 70,
               borderRadius: 1,
-              p: 1,
+              mb: 2,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "1rem",
               cursor: "pointer",
-              border: "2px solid transparent",
+              border:
+                selectedBannerPreview?.img === banner.img
+                  ? "2px solid primary.main"
+                  : "2px solid transparent",
               "&:hover": {
                 borderColor: "primary.main",
               },
             }}
           >
-            {/* Content is simplified; in a real app, this would be an actual image */}
-            <Typography
-              variant="h6"
-              color="white"
-              sx={{ textShadow: "0px 1px 3px rgba(0,0,0,0.5)" }}
-            >
-              {banner.text}
-            </Typography>
+            <img
+              src={banner.img}
+              alt="banner preview"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: "4px",
+              }}
+            />
           </Box>
         ))}
       </Stack>

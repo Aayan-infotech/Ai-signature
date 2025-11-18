@@ -39,6 +39,19 @@ const Template1 = ({ data }) => {
     onlineMeeting,
     shouldShowSocialButtons,
     socialButtons,
+    banner,
+    shouldShowBanner,
+    getBannerStyles,
+    handleBannerClick,
+    customButton,
+    shouldShowCustomButton,
+    getCustomButtonStyles,
+    getCustomButtonArrow,
+    handleCustomButtonClick,
+      uploadBanner,
+    shouldShowUploadBanner,
+    getUploadBannerStyles,
+    handleUploadBannerClick,
   } = useSignatureData(data);
 
   const socialIcons = [
@@ -197,48 +210,106 @@ const Template1 = ({ data }) => {
           </Box>
         </Col>
       </Row>
-      {shouldShowOnlineMeeting && (
-        <Box sx={{ my: 2, textAlign: onlineMeeting.align || "left" }}>
-          <a
-            href={onlineMeeting.schedulerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={getButtonStyles()}
-            onMouseEnter={(e) => {
-              if (onlineMeeting.buttonType !== "Simple") {
-                e.target.style.opacity = "0.8";
-                e.target.style.transform = "translateY(-1px)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (onlineMeeting.buttonType !== "Simple") {
-                e.target.style.opacity = "1";
-                e.target.style.transform = "translateY(0)";
-              }
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {getButtonIcon()}
-              <span>{onlineMeeting.buttonText || "Book a meeting"}</span>
-            </Box>
-          </a>
-
-          {/* Provider badge */}
-          {onlineMeeting.showProviderBadge !== false && (
-            <Typography
-              variant="caption"
+      <Row>
+        <Col md={6}>
+          {shouldShowCustomButton && (
+            <Box
               sx={{
-                display: "block",
-                mt: 0.5,
-                color: "#666",
-                fontSize: "10px",
+                my: 2,
+                textAlign: customButton.alignment || "left",
+                display: "flex",
+                justifyContent:
+                  customButton.alignment === "center"
+                    ? "center"
+                    : customButton.alignment === "right"
+                    ? "flex-end"
+                    : "flex-start",
               }}
             >
-              Powered by {getSchedulingProviderName()}
-            </Typography>
+              {customButton.type === "Simple link" ? (
+                <a
+                  href={customButton.buttonUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={getCustomButtonStyles()}
+                  onMouseEnter={(e) => {
+                    e.target.style.opacity = "0.8";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.opacity = "1";
+                  }}
+                >
+                  {customButton.buttonText}
+                  {getCustomButtonArrow()}
+                </a>
+              ) : (
+                <Button
+                  variant="contained"
+                  href={customButton.buttonUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    ...getCustomButtonStyles(),
+                    textTransform: "none",
+                    "&:hover": {
+                      opacity: 0.9,
+                      transform: "translateY(-1px)",
+                    },
+                  }}
+                >
+                  {customButton.buttonText}
+                  {getCustomButtonArrow()}
+                </Button>
+              )}
+            </Box>
           )}
-        </Box>
-      )}
+        </Col>
+        <Col md={6}>
+          {shouldShowOnlineMeeting && (
+            <Box sx={{ my: 2, textAlign: onlineMeeting.align || "left" }}>
+              <a
+                href={onlineMeeting.schedulerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={getButtonStyles()}
+                onMouseEnter={(e) => {
+                  if (onlineMeeting.buttonType !== "Simple") {
+                    e.target.style.opacity = "0.8";
+                    e.target.style.transform = "translateY(-1px)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (onlineMeeting.buttonType !== "Simple") {
+                    e.target.style.opacity = "1";
+                    e.target.style.transform = "translateY(0)";
+                  }
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  {getButtonIcon()}
+                  <span>{onlineMeeting.buttonText || "Book a meeting"}</span>
+                </Box>
+              </a>
+
+              {/* Provider badge */}
+              {onlineMeeting.showProviderBadge !== false && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    mt: 0.5,
+                    color: "#666",
+                    fontSize: "10px",
+                  }}
+                >
+                  Powered by {getSchedulingProviderName()}
+                </Typography>
+              )}
+            </Box>
+          )}
+        </Col>
+      </Row>
+
       {/* Social Buttons Section */}
       {shouldShowSocialButtons &&
         socialButtons.links &&
@@ -256,14 +327,13 @@ const Template1 = ({ data }) => {
                 <Button
                   key={button.platform}
                   variant="contained"
-                 
                   href={button.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
                     backgroundColor: button.color,
                     color: "white",
-                  
+
                     textTransform: "none",
                     borderRadius:
                       socialButtons.shape === "square"
@@ -522,8 +592,7 @@ const Template1 = ({ data }) => {
         <Box
           sx={{
             mt: 2,
-            pt: 2,
-            borderTop: "1px solid #e0e0e0",
+
             textAlign: greenFooter.align || "left",
           }}
         >
@@ -562,6 +631,65 @@ const Template1 = ({ data }) => {
               {greenFooter.text}
             </Typography>
           </Box>
+        </Box>
+      )}
+
+       {shouldShowUploadBanner && (
+        <Box sx={{ mb: 3 }}>
+          <img
+            src={uploadBanner.imageUrl}
+            alt="Uploaded banner"
+            style={getUploadBannerStyles()}
+            onClick={handleUploadBannerClick}
+            onError={(e) => {
+              console.error("Failed to load uploaded banner image");
+              e.target.style.display = "none";
+            }}
+          />
+        </Box>
+      )}
+      {shouldShowBanner && (
+        <Box sx={{ mb: 2, mt: 1 }}>
+          {banner.type === "predesigned" &&
+          banner.predesigned?.selectedBanner ? (
+            <img
+              src={banner.predesigned.selectedBanner.img}
+              alt="Predesigned banner"
+              style={getBannerStyles()}
+              onClick={handleBannerClick}
+              onError={(e) => {
+                console.error("Failed to load banner image");
+                e.target.style.display = "none";
+              }}
+            />
+          ) : banner.type === "custom" && banner.custom?.imageUrl ? (
+            <img
+              src={banner.custom.imageUrl}
+              alt="Custom banner"
+              style={getBannerStyles()}
+              onClick={handleBannerClick}
+              onError={(e) => {
+                console.error("Failed to load custom banner image");
+                e.target.style.display = "none";
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                ...getBannerStyles(),
+                backgroundColor: "#f5f5f5",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px dashed #ddd",
+                color: "#999",
+              }}
+            >
+              <Typography variant="body2">
+                Banner preview not available
+              </Typography>
+            </Box>
+          )}
         </Box>
       )}
     </Card>

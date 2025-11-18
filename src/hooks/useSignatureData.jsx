@@ -27,6 +27,9 @@ export const useSignatureData = (data) => {
     imageGallery = {},
     onlineMeeting = {},
     socialButtons = {},
+    banner = {},
+    customButton = {},
+    uploadBanner,
   } = data || {};
 
   console.log("socialButtons", socialButtons);
@@ -165,6 +168,10 @@ export const useSignatureData = (data) => {
     socialButtons?.enabled &&
     socialButtons.links &&
     socialButtons.links.length > 0;
+  const shouldShowCustomButton =
+    customButton && customButton.enabled && customButton.buttonUrl;
+  const shouldShowUploadBanner =
+    uploadBanner && uploadBanner.enabled && uploadBanner.imageUrl;
 
   // Add console log for debugging
   console.log("Social buttons state:", {
@@ -298,6 +305,130 @@ export const useSignatureData = (data) => {
     return "0";
   };
 
+  const shouldShowBanner = banner && banner.enabled;
+
+  // Add banner styles based on size
+  const getBannerStyles = () => {
+    const sizeStyles = {
+      S: { height: "50px", fontSize: "12px" },
+      M: { height: "75px", fontSize: "14px" },
+      L: { height: "100px", fontSize: "16px" },
+    };
+
+    return {
+      ...sizeStyles[banner.predesigned?.size || banner.custom?.size || "M"],
+      width: "100%",
+      objectFit: "fill",
+      borderRadius: "4px",
+      cursor:
+        banner.predesigned?.link || banner.custom?.link ? "pointer" : "default",
+    };
+  };
+
+  const handleBannerClick = () => {
+    const link = banner.predesigned?.link || banner.custom?.link;
+    if (link) {
+      window.open(link, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const getCustomButtonStyles = () => {
+    const baseStyles = {
+      textDecoration: "none",
+      display: "inline-block",
+      fontWeight: 500,
+      transition: "all 0.3s ease",
+      border: "none",
+      cursor: "pointer",
+      fontFamily: getValue(design.detailsFont, fontFamily, "Roboto"),
+      color: customButton.fontColor || "#000000",
+    };
+
+    // Size styles
+    const sizeStyles = {
+      S: { padding: "6px 12px", fontSize: "12px" },
+      M: { padding: "8px 16px", fontSize: "14px" },
+      L: { padding: "12px 24px", fontSize: "16px" },
+    };
+
+    // Type styles
+    const typeStyles = {
+      Full: {
+        backgroundColor: customButton.color || "#000000",
+        color: getContrastColor(customButton.color || "#000000"),
+        border: `1px solid ${customButton.color || "#000000"}`,
+      },
+      Light: {
+        backgroundColor: "transparent",
+        color: customButton.color || "#000000",
+        border: `1px solid ${customButton.color || "#000000"}`,
+      },
+      "Simple link": {
+        backgroundColor: "transparent",
+        color: customButton.color || "#000000",
+        border: "none",
+        textDecoration: "underline",
+        padding: "4px 0",
+        ...sizeStyles[customButton.size || "M"],
+      },
+    };
+
+    // Shape styles
+    const shapeStyles = {
+      square: { borderRadius: "0" },
+      rounded_sm: { borderRadius: "4px" },
+      rounded: { borderRadius: "50px" },
+    };
+
+    // For Simple link type, we don't want the full button styling
+    if (customButton.type === "Simple link") {
+      return {
+        ...baseStyles,
+        ...typeStyles["Simple link"],
+      };
+    }
+
+    return {
+      ...baseStyles,
+      ...sizeStyles[customButton.size || "M"],
+      ...typeStyles[customButton.type || "Full"],
+      ...shapeStyles[customButton.shape || "rounded_sm"],
+    };
+  };
+
+  const getCustomButtonArrow = () => {
+    if (!customButton.addArrow) return null;
+
+    return <span style={{ marginLeft: "8px", fontSize: "14px" }}>→</span>;
+  };
+
+  const handleCustomButtonClick = () => {
+    if (customButton.buttonUrl) {
+      window.open(customButton.buttonUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const getUploadBannerStyles = () => {
+    const sizeStyles = {
+      S: { height: "50px", fontSize: "12px", width: "75px" },
+      M: { height: "75px", fontSize: "14px", width: "100px" },
+      L: { height: "100px", fontSize: "16px", width: "150px" },
+    };
+
+    return {
+      ...sizeStyles[uploadBanner.size || "M"],
+      objectFit: "cover",
+      borderRadius: "4px",
+      cursor: uploadBanner.link ? "pointer" : "default",
+    };
+  };
+
+  const handleUploadBannerClick = () => {
+    if (uploadBanner.link) {
+      window.open(uploadBanner.link, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return {
     styles,
     displayData,
@@ -324,5 +455,18 @@ export const useSignatureData = (data) => {
     onlineMeeting,
     socialButtons,
     shouldShowSocialButtons,
+    banner,
+    shouldShowBanner,
+    getBannerStyles,
+    handleBannerClick,
+    customButton,
+    shouldShowCustomButton,
+    getCustomButtonStyles,
+    getCustomButtonArrow,
+    handleCustomButtonClick,
+    uploadBanner,
+    shouldShowUploadBanner,
+    getUploadBannerStyles,
+    handleUploadBannerClick,
   };
 };

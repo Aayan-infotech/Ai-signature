@@ -100,6 +100,9 @@ const CTA = () => {
     updateFormData,
     updateDesignFormData,
     updateSocialButtons,
+    updateBanner,
+    updateCustomButton,
+    updateUploadBanner,
   } = useSignature();
 
   const handleOpen = (type) => {
@@ -193,6 +196,14 @@ const CTA = () => {
     if (type === "social") {
       console.log("Updating social buttons:", formData);
       updateSocialButtons(formData);
+    }
+    if (type === "custom") {
+      console.log("Updating custom button:", formData);
+      updateCustomButton(formData);
+    }
+    if (type === "banner") {
+      console.log("Updating upload banner:", formData);
+      updateUploadBanner(formData);
     }
 
     handleClose(type);

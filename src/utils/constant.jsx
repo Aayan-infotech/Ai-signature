@@ -250,3 +250,41 @@ export const INITIAL_SOCIAL_BUTTONS = {
   shape: "rounded_sm",
   size:20
 };
+
+export const INITIAL_BANNER = {
+  enabled: false,
+  type: "predesigned", // "predesigned" or "custom"
+  predesigned: {
+    category: "Community",
+    subcategory: "LGBT",
+    size: "M",
+    link: "",
+    selectedBanner: null,
+  },
+  custom: {
+    imageUrl: "",
+    link: "",
+    size: "M",
+  },
+};
+
+export const INITIAL_CUSTOM_BUTTON = {
+  enabled: false,
+  buttonText: "Check out my website",
+  buttonUrl: "",
+  shape: "rounded_sm",
+  type: "Full",
+  color: "black",
+  size: "M",
+  fontColor: "black",
+  alignment: "left",
+  addArrow: true,
+};
+
+// In your utils/constant.js file
+export const INITIAL_UPLOAD_BANNER = {
+  enabled: false,
+  imageUrl: "",
+  link: "",
+  size: "M",
+};

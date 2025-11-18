@@ -488,9 +488,9 @@ const Template5 = ({ data = {} }) => {
       {shouldShowGreenFooter && (
         <Box
           sx={{
-            mt: 1,
+           
             pt: 2,
-            borderTop: "1px solid #e0e0e0",
+           
             textAlign: greenFooter.align || "left",
           }}
         >
