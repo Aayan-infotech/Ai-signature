@@ -87,7 +87,7 @@ const Template1 = ({ data }) => {
     getNewsletterTitleStyles,
     shouldShowNewsletter,
     shouldShowCustomHtml,
-    renderCustomHtml
+    renderCustomHtml,
   } = useSignatureData(data);
 
   const socialIcons = [
@@ -181,56 +181,6 @@ const Template1 = ({ data }) => {
                 flexDirection: "column",
               }}
             >
-              {shouldShowCustomButton && (
-                <Box
-                  sx={{
-                    textAlign: customButton.alignment || "left",
-                    display: "flex",
-                    justifyContent:
-                      customButton.alignment === "center"
-                        ? "center"
-                        : customButton.alignment === "right"
-                        ? "flex-end"
-                        : "flex-start",
-                  }}
-                >
-                  {customButton.type === "Simple link" ? (
-                    <a
-                      href={customButton.buttonUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={getCustomButtonStyles()}
-                      onMouseEnter={(e) => {
-                        e.target.style.opacity = "0.8";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.opacity = "1";
-                      }}
-                    >
-                      {customButton.buttonText}
-                      {getCustomButtonArrow()}
-                    </a>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      href={customButton.buttonUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{
-                        ...getCustomButtonStyles(),
-                        textTransform: "none",
-                        "&:hover": {
-                          opacity: 0.9,
-                          transform: "translateY(-1px)",
-                        },
-                      }}
-                    >
-                      {customButton.buttonText}
-                      {getCustomButtonArrow()}
-                    </Button>
-                  )}
-                </Box>
-              )}
               <Box>
                 <Typography
                   variant="h6"
@@ -309,103 +259,99 @@ const Template1 = ({ data }) => {
                     );
                   })}
                 </Box>
-                <Box
-                  sx={{ display: "flex", flexDirection: "row", gap: "20px" }}
-                >
-                  {shouldShowWebinar && (
-                    <Box
-                      sx={{
-                        my: 1,
-                        textAlign: webinar.alignment || "left",
-                      }}
-                    >
-                      <Box sx={{ textAlign: webinar.alignment || "left" }}>
-                        {webinar.title && (
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 600,
-                              color: webinar.fontColor || "black",
-                              fontSize: `${
-                                (webinar.fontSize || 50) / 5 + 10
-                              }px`,
-                              mb: 1,
-                            }}
-                          >
-                            {webinar.title}
-                          </Typography>
-                        )}
-                        <a
-                          href={webinar.linkUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={getWebinarStyles()}
-                          onMouseEnter={(e) => {
-                            e.target.style.opacity = "0.8";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.opacity = "1";
-                          }}
-                        >
-                          {getWebinarIcon()}
-                          {webinar.linkText}
-                        </a>
-                      </Box>
-                    </Box>
-                  )}
-                </Box>
-
-                {shouldShowFeedback && (
-                  <Box
-                    sx={{
-                      my: 1,
-                      textAlign: feedback.alignment || "left",
-                      display: "flex",
-                      justifyContent:
-                        feedback.alignment === "center"
-                          ? "center"
-                          : feedback.alignment === "right"
-                          ? "flex-end"
-                          : "flex-start",
-                    }}
-                  >
-                    <Box sx={{ textAlign: feedback.alignment || "left" }}>
-                      {feedback.title && (
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: 600,
-                            color: feedback.fontColor || "black",
-                            fontSize: `${(feedback.fontSize || 50) / 5 + 10}px`,
-                            mb: 1,
-                          }}
-                        >
-                          {feedback.title}
-                        </Typography>
-                      )}
-                      <a
-                        href={feedback.linkUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={getFeedbackStyles()}
-                        onMouseEnter={(e) => {
-                          e.target.style.opacity = "0.8";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.opacity = "1";
-                        }}
-                      >
-                        {getFeedbackIcon()}
-                        {feedback.linkText}
-                      </a>
-                    </Box>
-                  </Box>
-                )}
               </Box>
             </Box>
           </Box>
         </Col>
       </Row>
+      <Box sx={{ display: "flex", flexDirection: "row", gap: "20px" }}>
+        {shouldShowWebinar && (
+          <Box
+            sx={{
+              my: 1,
+              textAlign: webinar.alignment || "left",
+            }}
+          >
+            <Box sx={{ textAlign: webinar.alignment || "left" }}>
+              {webinar.title && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 600,
+                    color: webinar.fontColor || "black",
+                    fontSize: `${(webinar.fontSize || 50) / 5 + 10}px`,
+                    mb: 1,
+                  }}
+                >
+                  {webinar.title}
+                </Typography>
+              )}
+              <a
+                href={webinar.linkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={getWebinarStyles()}
+                onMouseEnter={(e) => {
+                  e.target.style.opacity = "0.8";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.opacity = "1";
+                }}
+              >
+                {getWebinarIcon()}
+                {webinar.linkText}
+              </a>
+            </Box>
+          </Box>
+        )}
+      </Box>
+
+      {shouldShowFeedback && (
+        <Box
+          sx={{
+            my: 1,
+            textAlign: feedback.alignment || "left",
+            display: "flex",
+            justifyContent:
+              feedback.alignment === "center"
+                ? "center"
+                : feedback.alignment === "right"
+                ? "flex-end"
+                : "flex-start",
+          }}
+        >
+          <Box sx={{ textAlign: feedback.alignment || "left" }}>
+            {feedback.title && (
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 600,
+                  color: feedback.fontColor || "black",
+                  fontSize: `${(feedback.fontSize || 50) / 5 + 10}px`,
+                  mb: 1,
+                }}
+              >
+                {feedback.title}
+              </Typography>
+            )}
+            <a
+              href={feedback.linkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={getFeedbackStyles()}
+              onMouseEnter={(e) => {
+                e.target.style.opacity = "0.8";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.opacity = "1";
+              }}
+            >
+              {getFeedbackIcon()}
+              {feedback.linkText}
+            </a>
+          </Box>
+        </Box>
+      )}
       <Row>
         <Col md={6}>
           {shouldShowVideoConference && (
@@ -859,6 +805,103 @@ const Template1 = ({ data }) => {
           )}
         </Box>
       )}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "18px",
+          alignItems: "end",
+        }}
+      >
+        {shouldShowJobOffer && (
+          <Box sx={getJobOfferStyles()}>
+            <Typography variant="body1" sx={getJobOfferIntroductionStyles()}>
+              {jobOffer.introduction}
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent:
+                  jobOffer.style?.alignment === "center"
+                    ? "center"
+                    : jobOffer.style?.alignment === "right"
+                    ? "flex-end"
+                    : "flex-start",
+              }}
+            >
+              <a
+                href={jobOffer.positionLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={getJobOfferButtonStyles()}
+                onMouseEnter={(e) => {
+                  e.target.style.opacity = "0.9";
+                  e.target.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.opacity = "1";
+                  e.target.style.transform = "translateY(0)";
+                }}
+                onClick={handleJobOfferClick}
+              >
+                {jobOffer.buttonText}
+              </a>
+            </Box>
+          </Box>
+        )}
+
+        {shouldShowCustomButton && (
+          <Box
+            sx={{
+              textAlign: customButton.alignment || "left",
+              display: "flex",
+              justifyContent:
+                customButton.alignment === "center"
+                  ? "center"
+                  : customButton.alignment === "right"
+                  ? "flex-end"
+                  : "flex-start",
+            }}
+          >
+            {customButton.type === "Simple link" ? (
+              <a
+                href={customButton.buttonUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={getCustomButtonStyles()}
+                onMouseEnter={(e) => {
+                  e.target.style.opacity = "0.8";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.opacity = "1";
+                }}
+              >
+                {customButton.buttonText}
+                {getCustomButtonArrow()}
+              </a>
+            ) : (
+              <Button
+                variant="contained"
+                href={customButton.buttonUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  ...getCustomButtonStyles(),
+                  textTransform: "none",
+                  "&:hover": {
+                    opacity: 0.9,
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                {customButton.buttonText}
+                {getCustomButtonArrow()}
+              </Button>
+            )}
+          </Box>
+        )}
+      </Box>
       <Box sx={{ display: "flex", flexDirection: "row", gap: "18px" }}>
         {shouldShowAppDownload && (
           <Box sx={getAppDownloadStyles()}>
@@ -939,43 +982,6 @@ const Template1 = ({ data }) => {
                     </Box>
                   </a>
                 )}
-            </Box>
-          </Box>
-        )}
-        {shouldShowJobOffer && (
-          <Box sx={getJobOfferStyles()}>
-            <Typography variant="body1" sx={getJobOfferIntroductionStyles()}>
-              {jobOffer.introduction}
-            </Typography>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent:
-                  jobOffer.style?.alignment === "center"
-                    ? "center"
-                    : jobOffer.style?.alignment === "right"
-                    ? "flex-end"
-                    : "flex-start",
-              }}
-            >
-              <a
-                href={jobOffer.positionLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={getJobOfferButtonStyles()}
-                onMouseEnter={(e) => {
-                  e.target.style.opacity = "0.9";
-                  e.target.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.opacity = "1";
-                  e.target.style.transform = "translateY(0)";
-                }}
-                onClick={handleJobOfferClick}
-              >
-                {jobOffer.buttonText}
-              </a>
             </Box>
           </Box>
         )}
