@@ -40,8 +40,9 @@ const TemplateRender = () => {
       <Box
         sx={{
           maxHeight: "calc(100vh - 57px)",
-          overflow: "auto",
+          // overflow: "auto",
           width: "100%",
+          paddingBottom: "23px",
         }}
       >
         <Box
@@ -51,7 +52,7 @@ const TemplateRender = () => {
             alignItems: "center",
             height: "100%",
             overflow: "auto",
-            margin:"10px"
+            margin: "10px",
           }}
         >
           <SelectedTemplate data={formData} />
