@@ -226,69 +226,96 @@ const Template8 = ({ data }) => {
 
             <div className="col-lg-6">
               {/* Image Gallery */}
-              {shouldShowImageGallery && (
-                <Box sx={{ my: 1 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: `${imageGallery.spaceBetween || 20}px`,
-                      justifyContent: "flex-start",
-                    }}
-                  >
-                    {imageGallery.images.map((img, idx) => (
-                      <Box
-                        key={idx}
-                        sx={{
-                          width: imageGallery.imageSize || 50,
-                          height: imageGallery.imageSize || 50,
-                          overflow: "hidden",
-                          border: "1px solid #e0e0e0",
-                          borderRadius: getImageBorderRadius(
-                            imageGallery.shape
-                          ),
-                          cursor:
-                            imageGallery.applyLink && imageGallery.link
-                              ? "pointer"
-                              : "default",
-                        }}
-                        onClick={() => {
-                          if (imageGallery.applyLink && imageGallery.link) {
-                            window.open(
-                              imageGallery.link,
-                              "_blank",
-                              "noopener,noreferrer"
-                            );
-                          }
-                        }}
-                      >
-                        <img
-                          src={img}
-                          alt={`Gallery image ${idx + 1}`}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: getImageBorderRadius(
-                              imageGallery.shape
-                            ),
-                          }}
-                        />
-                      </Box>
-                    ))}
-                  </Box>
-                  {imageGallery.galleryTitle && (
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        mt: 1,
-                        fontWeight: 600,
-                        fontSize: "12px",
-                        color: "#333",
+              <Box sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mb: 1,
+                    fontFamily: styles.details.fontFamily,
+                    fontSize: `${styles.details.fontSize}px`,
+                    color: styles.details.color,
+                  }}
+                >
+                  {data.phone}
+                  {data.phone && data.website && " | "}
+                  {data.website && (
+                    <a
+                      href={`https://${data.website}`}
+                      style={{
+                        color: styles.details.color,
+                        textDecoration: "none",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.target.style.textDecoration = "underline")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.target.style.textDecoration = "none")
+                      }
+                    >
+                      {data.website}
+                    </a>
+                  )}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontFamily: styles.details.fontFamily,
+                    fontSize: `${styles.details.fontSize}px`,
+                    color: styles.details.color,
+                  }}
+                >
+                  {data.email}
+                  {data.email && data.address && " | "}
+                  {data.address}
+                </Typography>
+              </Box>
+              {shouldShowCustomButton && (
+                <Box
+                  sx={{
+                    textAlign: customButton.alignment || "left",
+                    display: "flex",
+                    justifyContent:
+                      customButton.alignment === "center"
+                        ? "center"
+                        : customButton.alignment === "right"
+                        ? "flex-end"
+                        : "flex-start",
+                  }}
+                >
+                  {customButton.type === "Simple link" ? (
+                    <a
+                      href={customButton.buttonUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={getCustomButtonStyles()}
+                      onMouseEnter={(e) => {
+                        e.target.style.opacity = "0.8";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.opacity = "1";
                       }}
                     >
-                      {imageGallery.galleryTitle}
-                    </Typography>
+                      {customButton.buttonText}
+                      {getCustomButtonArrow()}
+                    </a>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      href={customButton.buttonUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        ...getCustomButtonStyles(),
+                        textTransform: "none",
+                        "&:hover": {
+                          opacity: 0.9,
+                          transform: "translateY(-1px)",
+                        },
+                      }}
+                    >
+                      {customButton.buttonText}
+                      {getCustomButtonArrow()}
+                    </Button>
                   )}
                 </Box>
               )}
@@ -651,62 +678,56 @@ const Template8 = ({ data }) => {
                 )}
               </Col>
               <Col md={6}>
-                {shouldShowCustomButton && (
-                  <Box
+                {shouldShowGreenFooter && (
+            <Box
+              sx={{
+                pt: 2,
+                textAlign: greenFooter.align || "left",
+                p: 2,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent:
+                    greenFooter.align === "center"
+                      ? "center"
+                      : greenFooter.align === "right"
+                      ? "flex-end"
+                      : "flex-start",
+                  gap: 1,
+                }}
+              >
+                {greenFooter.icon && greenFooter.icon !== "none" && (
+                  <Typography
                     sx={{
-                      textAlign: customButton.alignment || "left",
-                      display: "flex",
-                      justifyContent:
-                        customButton.alignment === "center"
-                          ? "center"
-                          : customButton.alignment === "right"
-                          ? "flex-end"
-                          : "flex-start",
+                      fontSize: `${greenFooter.fontSize || 14}px`,
+                      color: greenFooter.color || "#57c84d",
                     }}
                   >
-                    {customButton.type === "Simple link" ? (
-                      <a
-                        href={customButton.buttonUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={getCustomButtonStyles()}
-                        onMouseEnter={(e) => {
-                          e.target.style.opacity = "0.8";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.opacity = "1";
-                        }}
-                      >
-                        {customButton.buttonText}
-                        {getCustomButtonArrow()}
-                      </a>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        href={customButton.buttonUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={{
-                          ...getCustomButtonStyles(),
-                          textTransform: "none",
-                          "&:hover": {
-                            opacity: 0.9,
-                            transform: "translateY(-1px)",
-                          },
-                        }}
-                      >
-                        {customButton.buttonText}
-                        {getCustomButtonArrow()}
-                      </Button>
-                    )}
-                  </Box>
+                    {getGreenFooterIcon(greenFooter.icon)}
+                  </Typography>
                 )}
-              </Col>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: greenFooter.color || "#57c84d",
+                    fontSize: `${greenFooter.fontSize || 14}px`,
+                    fontStyle: "italic",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {greenFooter.text}
+                </Typography>
+              </Box>
+            </Box>
+          )}</Col>
             </Row>
 
             {/* App Download & Newsletter Section */}
             <Row className="mt-2">
-              <Col md={6}>
+              <Col md={8}>
                 {shouldShowAppDownload && (
                   <Box sx={getAppDownloadStyles()}>
                     <Typography variant="h6" sx={getAppDownloadTitleStyles()}>
@@ -800,7 +821,7 @@ const Template8 = ({ data }) => {
                   </Box>
                 )}
               </Col>
-              <Col md={6}>
+              <Col md={4}>
                 {shouldShowNewsletter && (
                   <Box sx={getNewsletterStyles()}>
                     <Typography variant="h6" sx={getNewsletterTitleStyles()}>
@@ -856,49 +877,72 @@ const Template8 = ({ data }) => {
             {/* Contact Details */}
             <div className="row mt-3">
               <div className="col-7">
-                <Box sx={{ mb: 2 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      mb: 1,
-                      fontFamily: styles.details.fontFamily,
-                      fontSize: `${styles.details.fontSize}px`,
-                      color: styles.details.color,
-                    }}
-                  >
-                    {data.phone}
-                    {data.phone && data.website && " | "}
-                    {data.website && (
-                      <a
-                        href={`https://${data.website}`}
-                        style={{
-                          color: styles.details.color,
-                          textDecoration: "none",
+                {shouldShowImageGallery && (
+                  <Box sx={{ my: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: `${imageGallery.spaceBetween || 20}px`,
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      {imageGallery.images.map((img, idx) => (
+                        <Box
+                          key={idx}
+                          sx={{
+                            width: imageGallery.imageSize || 50,
+                            height: imageGallery.imageSize || 50,
+                            overflow: "hidden",
+                            border: "1px solid #e0e0e0",
+                            borderRadius: getImageBorderRadius(
+                              imageGallery.shape
+                            ),
+                            cursor:
+                              imageGallery.applyLink && imageGallery.link
+                                ? "pointer"
+                                : "default",
+                          }}
+                          onClick={() => {
+                            if (imageGallery.applyLink && imageGallery.link) {
+                              window.open(
+                                imageGallery.link,
+                                "_blank",
+                                "noopener,noreferrer"
+                              );
+                            }
+                          }}
+                        >
+                          <img
+                            src={img}
+                            alt={`Gallery image ${idx + 1}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: getImageBorderRadius(
+                                imageGallery.shape
+                              ),
+                            }}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                    {imageGallery.galleryTitle && (
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mt: 1,
+                          fontWeight: 600,
+                          fontSize: "12px",
+                          color: "#333",
                         }}
-                        onMouseEnter={(e) =>
-                          (e.target.style.textDecoration = "underline")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.target.style.textDecoration = "none")
-                        }
                       >
-                        {data.website}
-                      </a>
+                        {imageGallery.galleryTitle}
+                      </Typography>
                     )}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontFamily: styles.details.fontFamily,
-                      fontSize: `${styles.details.fontSize}px`,
-                      color: styles.details.color,
-                    }}
-                  >
-                    {data.email}
-                    {data.email && data.address && " | "}
-                    {data.address}
-                  </Typography>
-                </Box>
+                  </Box>
+                )}
               </div>
               <div className="col-5">
                 {shouldShowVideo && (
@@ -1027,51 +1071,7 @@ const Template8 = ({ data }) => {
           )}
 
           {/* Green Footer Section */}
-          {shouldShowGreenFooter && (
-            <Box
-              sx={{
-                pt: 2,
-                textAlign: greenFooter.align || "left",
-                p: 2,
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent:
-                    greenFooter.align === "center"
-                      ? "center"
-                      : greenFooter.align === "right"
-                      ? "flex-end"
-                      : "flex-start",
-                  gap: 1,
-                }}
-              >
-                {greenFooter.icon && greenFooter.icon !== "none" && (
-                  <Typography
-                    sx={{
-                      fontSize: `${greenFooter.fontSize || 14}px`,
-                      color: greenFooter.color || "#57c84d",
-                    }}
-                  >
-                    {getGreenFooterIcon(greenFooter.icon)}
-                  </Typography>
-                )}
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: greenFooter.color || "#57c84d",
-                    fontSize: `${greenFooter.fontSize || 14}px`,
-                    fontStyle: "italic",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {greenFooter.text}
-                </Typography>
-              </Box>
-            </Box>
-          )}
+        
 
           {/* Disclaimer Section */}
           {shouldShowDisclaimer && (
