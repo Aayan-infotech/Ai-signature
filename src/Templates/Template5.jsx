@@ -1,11 +1,12 @@
 import React from "react";
-import { Card, Image } from "react-bootstrap";
+import { Card, Image, Row, Col } from "react-bootstrap";
 import {
   Box,
   Typography,
   Link as MUILink,
   IconButton,
   Tooltip,
+  Button,
 } from "@mui/material";
 import {
   Facebook,
@@ -40,6 +41,62 @@ const Template5 = ({ data = {} }) => {
     getImageBorderRadius,
     imageGallery,
     shouldShowImageGallery,
+    shouldShowOnlineMeeting,
+    getButtonStyles,
+    getButtonIcon,
+    getSchedulingProviderName,
+    onlineMeeting,
+    shouldShowSocialButtons,
+    socialButtons,
+    banner,
+    shouldShowBanner,
+    getBannerStyles,
+    handleBannerClick,
+    customButton,
+    shouldShowCustomButton,
+    getCustomButtonStyles,
+    getCustomButtonArrow,
+    handleCustomButtonClick,
+    uploadBanner,
+    shouldShowUploadBanner,
+    getUploadBannerStyles,
+    handleUploadBannerClick,
+    feedback,
+    shouldShowFeedback,
+    getFeedbackIcon,
+    getFeedbackStyles,
+    handleFeedbackClick,
+    videoConference,
+    shouldShowVideoConference,
+    getVideoConferenceStyles,
+    getVideoConferenceIcon,
+    handleVideoConferenceClick,
+    webinar,
+    shouldShowWebinar,
+    getWebinarIcon,
+    getWebinarStyles,
+    handleWebinarClick,
+    shouldShowAppDownload,
+    getAppDownloadButtonStyles,
+    appDownload,
+    getAppDownloadStyles,
+    getAppDownloadTitleStyles,
+    shouldShowJobOffer,
+    getJobOfferStyles,
+    getJobOfferIntroductionStyles,
+    jobOffer,
+    getJobOfferButtonStyles,
+    handleJobOfferClick,
+    getNewsletterIcon,
+    handleNewsletterClick,
+    getNewsletterLinkStyles,
+    newsletter,
+    getNewsletterTextStyles,
+    getNewsletterStyles,
+    getNewsletterTitleStyles,
+    shouldShowNewsletter,
+    shouldShowCustomHtml,
+    renderCustomHtml,
   } = useSignatureData(data);
 
   const {
@@ -75,61 +132,224 @@ const Template5 = ({ data = {} }) => {
         borderRadius: "10px",
       }}
     >
-      {/* ===== Signature Section ===== */}
-      {displayData.type !== "none" && (
+      {/* Banner Section */}
+      {shouldShowBanner && (
         <Box sx={{ mb: 2 }}>
-          {displayData.type === "custom" && displayData.imageData ? (
-            <Box sx={{ textAlign: displayData.alignment }}>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: getFontFamily(displayData.fontStyle),
-                  fontSize: `${displayData.size}px`,
-                  color: displayData.color,
-                  mb: 1,
-                }}
-              >
-                {displayData.signOff}
-              </Typography>
-              <img
-                src={displayData.imageData}
-                alt="Custom signature"
-                style={{ maxWidth: "200px", height: "auto" }}
-              />
-            </Box>
+          {banner.type === "predesigned" &&
+          banner.predesigned?.selectedBanner ? (
+            <img
+              src={banner.predesigned.selectedBanner.img}
+              alt="Predesigned banner"
+              style={getBannerStyles()}
+              onClick={handleBannerClick}
+              onError={(e) => {
+                console.error("Failed to load banner image");
+                e.target.style.display = "none";
+              }}
+            />
+          ) : banner.type === "custom" && banner.custom?.imageUrl ? (
+            <img
+              src={banner.custom.imageUrl}
+              alt="Custom banner"
+              style={getBannerStyles()}
+              onClick={handleBannerClick}
+              onError={(e) => {
+                console.error("Failed to load custom banner image");
+                e.target.style.display = "none";
+              }}
+            />
           ) : (
-            <Typography
-              variant="h6"
+            <Box
               sx={{
-                fontFamily: getFontFamily(displayData.fontStyle),
-                fontSize: `${displayData.size}px`,
-                mb: 1,
-                color: displayData.color,
-                textAlign: displayData.alignment,
+                ...getBannerStyles(),
+                backgroundColor: "#f5f5f5",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px dashed #ddd",
+                color: "#999",
               }}
             >
-              {displayData.signOff}
-              {displayData.type === "signature" && displayData.signAs && (
-                <Typography
-                  component="div"
-                  sx={{
-                    fontFamily: getFontFamily(displayData.fontStyle),
-                    fontSize: `${displayData.size}px`,
-                    color: displayData.color,
-                    mt: 0.5,
-                  }}
-                >
-                  {displayData.signAs}
-                </Typography>
-              )}
-            </Typography>
+              <Typography variant="body2">
+                Banner preview not available
+              </Typography>
+            </Box>
           )}
         </Box>
       )}
 
-      {/* ===== Profile Image ===== */}
+      {/* Upload Banner Section */}
+      {shouldShowUploadBanner && (
+        <Box sx={{ mb: 2 }}>
+          <img
+            src={uploadBanner.imageUrl}
+            alt="Uploaded banner"
+            style={getUploadBannerStyles()}
+            onClick={handleUploadBannerClick}
+            onError={(e) => {
+              console.error("Failed to load uploaded banner image");
+              e.target.style.display = "none";
+            }}
+          />
+        </Box>
+      )}
+      <Row>
+        <Col sx={7}>
+          {/* Signature Section */}
+          {displayData.type !== "none" && (
+            <Box sx={{ mb: 2 }}>
+              {displayData.type === "custom" && displayData.imageData ? (
+                <Box sx={{ textAlign: displayData.alignment }}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontFamily: getFontFamily(displayData.fontStyle),
+                      fontSize: `${displayData.size}px`,
+                      color: displayData.color,
+                      mb: 1,
+                    }}
+                  >
+                    {displayData.signOff}
+                  </Typography>
+                  <img
+                    src={displayData.imageData}
+                    alt="Custom signature"
+                    style={{ maxWidth: "200px", height: "auto" }}
+                  />
+                </Box>
+              ) : (
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: getFontFamily(displayData.fontStyle),
+                    fontSize: `${displayData.size}px`,
+                    mb: 1,
+                    color: displayData.color,
+                    textAlign: displayData.alignment,
+                  }}
+                >
+                  {displayData.signOff}
+                  {displayData.type === "signature" && displayData.signAs && (
+                    <Typography
+                      component="div"
+                      sx={{
+                        fontFamily: getFontFamily(displayData.fontStyle),
+                        fontSize: `${displayData.size}px`,
+                        color: displayData.color,
+                        mt: 0.5,
+                      }}
+                    >
+                      {displayData.signAs}
+                    </Typography>
+                  )}
+                </Typography>
+              )}
+            </Box>
+          )}
+        </Col>
+        <Col sx={5}>
+          {shouldShowCustomButton && (
+            <Box
+              sx={{
+                textAlign: customButton.alignment || "left",
+                display: "flex",
+                justifyContent:
+                  customButton.alignment === "center"
+                    ? "center"
+                    : customButton.alignment === "right"
+                    ? "flex-end"
+                    : "flex-start",
+              }}
+            >
+              {customButton.type === "Simple link" ? (
+                <a
+                  href={customButton.buttonUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={getCustomButtonStyles()}
+                  onMouseEnter={(e) => {
+                    e.target.style.opacity = "0.8";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.opacity = "1";
+                  }}
+                >
+                  {customButton.buttonText}
+                  {getCustomButtonArrow()}
+                </a>
+              ) : (
+                <Button
+                  variant="contained"
+                  href={customButton.buttonUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    ...getCustomButtonStyles(),
+                    textTransform: "none",
+                    "&:hover": {
+                      opacity: 0.9,
+                      transform: "translateY(-1px)",
+                    },
+                  }}
+                >
+                  {customButton.buttonText}
+                  {getCustomButtonArrow()}
+                </Button>
+              )}
+            </Box>
+          )}
+          {shouldShowNewsletter && (
+            <Box sx={getNewsletterStyles()}>
+              <Typography variant="h6" sx={getNewsletterTitleStyles()}>
+                {newsletter.title}
+              </Typography>
+
+              {newsletter.text &&
+                newsletter.text !== "e.g. Get the best marketing tips" && (
+                  <Typography variant="body2" sx={getNewsletterTextStyles()}>
+                    {newsletter.text}
+                  </Typography>
+                )}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent:
+                    newsletter.style?.alignment === "center"
+                      ? "center"
+                      : newsletter.style?.alignment === "right"
+                      ? "flex-end"
+                      : "flex-start",
+                }}
+              >
+                <a
+                  href={newsletter.linkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={getNewsletterLinkStyles()}
+                  onMouseEnter={(e) => {
+                    e.target.style.opacity = "0.8";
+                    e.target.style.textDecoration = "underline";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.opacity = "1";
+                    e.target.style.textDecoration = "none";
+                  }}
+                  onClick={handleNewsletterClick}
+                >
+                  {getNewsletterIcon()}
+                  Subscribe Now
+                </a>
+              </Box>
+            </Box>
+          )}
+        </Col>
+      </Row>
+
+      {/* Main Layout */}
       <div className="row">
-        <div className="col-lg-8">
+        <div className="col-lg-7">
+          {/* Profile Image */}
           {image && (
             <Box
               sx={{
@@ -149,7 +369,7 @@ const Template5 = ({ data = {} }) => {
             </Box>
           )}
 
-          {/* ===== Name, Title, Company ===== */}
+          {/* Name, Title, Company */}
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             {name || "Your Name"}
           </Typography>
@@ -157,7 +377,153 @@ const Template5 = ({ data = {} }) => {
             {title && company ? `${title}, ${company}` : title || company || ""}
           </Typography>
 
-          {/* ===== Contact Details ===== */}
+          {/* Webinar & Feedback Section */}
+          <div className="row mb-2">
+            <div className="col-md-12">
+              {shouldShowWebinar && (
+                <Box sx={{ my: 1 }}>
+                  <Box sx={{ textAlign: webinar.alignment || "left" }}>
+                    {webinar.title && (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: webinar.fontColor || "black",
+                          fontSize: `${(webinar.fontSize || 50) / 5 + 10}px`,
+                          mb: 1,
+                        }}
+                      >
+                        {webinar.title}
+                      </Typography>
+                    )}
+                    <a
+                      href={webinar.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={getWebinarStyles()}
+                      onMouseEnter={(e) => {
+                        e.target.style.opacity = "0.8";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.opacity = "1";
+                      }}
+                    >
+                      {getWebinarIcon()}
+                      {webinar.linkText}
+                    </a>
+                  </Box>
+                </Box>
+              )}
+            </div>
+            <div className="col-md-12">
+              {shouldShowFeedback && (
+                <Box
+                  sx={{
+                    my: 1,
+                    textAlign: feedback.alignment || "left",
+                    display: "flex",
+                    justifyContent:
+                      feedback.alignment === "center"
+                        ? "center"
+                        : feedback.alignment === "right"
+                        ? "flex-end"
+                        : "flex-start",
+                  }}
+                >
+                  <Box sx={{ textAlign: feedback.alignment || "left" }}>
+                    {feedback.title && (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: feedback.fontColor || "black",
+                          fontSize: `${(feedback.fontSize || 50) / 5 + 10}px`,
+                          mb: 1,
+                        }}
+                      >
+                        {feedback.title}
+                      </Typography>
+                    )}
+                    <a
+                      href={feedback.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={getFeedbackStyles()}
+                      onMouseEnter={(e) => {
+                        e.target.style.opacity = "0.8";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.opacity = "1";
+                      }}
+                    >
+                      {getFeedbackIcon()}
+                      {feedback.linkText}
+                    </a>
+                  </Box>
+                </Box>
+              )}
+            </div>
+          </div>
+
+          {/* Social Buttons Section */}
+          {shouldShowSocialButtons &&
+            socialButtons.links &&
+            socialButtons.links.length > 0 && (
+              <Box sx={{ my: 2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    flexWrap: "wrap",
+                    justifyContent: socialButtons.align || "flex-start",
+                  }}
+                >
+                  {socialButtons.links.map((button) => (
+                    <Button
+                      key={button.platform}
+                      variant="contained"
+                      href={button.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        backgroundColor: button.color,
+                        color: "white",
+                        textTransform: "none",
+                        borderRadius:
+                          socialButtons.shape === "square"
+                            ? 0
+                            : socialButtons.shape === "rounded_sm"
+                            ? "4px"
+                            : "50px",
+                        border:
+                          socialButtons.style === "Stroke"
+                            ? "2px solid white"
+                            : "none",
+                        boxShadow:
+                          socialButtons.style === "Stroke"
+                            ? `0 0 0 2px ${button.color}`
+                            : "none",
+                        minWidth: "auto",
+                        px: 2,
+                        py: 1,
+                        fontSize: "12px",
+                        fontWeight: 500,
+                        "&:hover": {
+                          backgroundColor: button.color,
+                          opacity: 0.9,
+                          transform: "translateY(-1px)",
+                        },
+                        transition: "all 0.3s ease",
+                      }}
+                    >
+                      {button.text}
+                    </Button>
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+          {/* Contact Details */}
           <Box
             sx={{
               display: "flex",
@@ -216,7 +582,7 @@ const Template5 = ({ data = {} }) => {
             )}
           </Box>
 
-          {/* ===== Social Media Icons ===== */}
+          {/* Social Media Icons */}
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1 }}>
             {socialIcons.map(({ Icon, color, label }) => {
               const socialUrl = socialLinks[label];
@@ -249,8 +615,55 @@ const Template5 = ({ data = {} }) => {
               );
             })}
           </Box>
+
+          {/* Custom Button & Job Offer Section */}
+          <div className="row mt-2">
+            <div className="col-md-12">
+              {shouldShowJobOffer && (
+                <Box sx={getJobOfferStyles()}>
+                  <Typography
+                    variant="body1"
+                    sx={getJobOfferIntroductionStyles()}
+                  >
+                    {jobOffer.introduction}
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent:
+                        jobOffer.style?.alignment === "center"
+                          ? "center"
+                          : jobOffer.style?.alignment === "right"
+                          ? "flex-end"
+                          : "flex-start",
+                    }}
+                  >
+                    <a
+                      href={jobOffer.positionLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={getJobOfferButtonStyles()}
+                      onMouseEnter={(e) => {
+                        e.target.style.opacity = "0.9";
+                        e.target.style.transform = "translateY(-1px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.opacity = "1";
+                        e.target.style.transform = "translateY(0)";
+                      }}
+                      onClick={handleJobOfferClick}
+                    >
+                      {jobOffer.buttonText}
+                    </a>
+                  </Box>
+                </Box>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="col-lg-4">
+
+        <div className="col-lg-5">
           <div className="row">
             <div className="col-12">
               {shouldShowVideo && (
@@ -266,7 +679,7 @@ const Template5 = ({ data = {} }) => {
                         style={{
                           textDecoration: "none",
                           display: "inline-block",
-                           width:"100%"
+                          width: "100%",
                         }}
                       >
                         <img
@@ -279,7 +692,6 @@ const Template5 = ({ data = {} }) => {
                             width: "100%",
                           }}
                           onError={(e) => {
-                            // Fallback if thumbnail doesn't exist
                             e.target.src = getYoutubeThumbnail(
                               youtubeVideo.videoId,
                               "default"
@@ -313,7 +725,7 @@ const Template5 = ({ data = {} }) => {
                           style={{
                             textDecoration: "none",
                             display: "inline-block",
-                             width:"100%"
+                            width: "100%",
                           }}
                         >
                           <img
@@ -326,7 +738,6 @@ const Template5 = ({ data = {} }) => {
                               width: "100%",
                             }}
                             onError={(e) => {
-                              // Fallback if thumbnail doesn't exist
                               e.target.src = getYoutubeThumbnail(
                                 youtubeVideo.videoId,
                                 "default"
@@ -355,7 +766,7 @@ const Template5 = ({ data = {} }) => {
               )}
             </div>
             <div className="col-lg-12">
-              {/* 🔹 NEW: Image Gallery */}
+              {/* Image Gallery */}
               {shouldShowImageGallery && (
                 <Box sx={{ my: 1 }}>
                   <Box
@@ -423,13 +834,167 @@ const Template5 = ({ data = {} }) => {
                 </Box>
               )}
             </div>
+            {/* Action Buttons Row */}
+
+            <div className="col-md-12">
+              {shouldShowVideoConference && (
+                <Box sx={{ my: 1 }}>
+                  <Button
+                    variant="contained"
+                    href={videoConference.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={getVideoConferenceStyles()}
+                    onClick={handleVideoConferenceClick}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {getVideoConferenceIcon()}
+                      <span>{videoConference.buttonText}</span>
+                    </Box>
+                  </Button>
+                </Box>
+              )}
+            </div>
+            <div className="col-md-12">
+              {shouldShowOnlineMeeting && (
+                <Box sx={{ my: 1, textAlign: onlineMeeting.align || "left" }}>
+                  <a
+                    href={onlineMeeting.schedulerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={getButtonStyles()}
+                    onMouseEnter={(e) => {
+                      if (onlineMeeting.buttonType !== "Simple") {
+                        e.target.style.opacity = "0.8";
+                        e.target.style.transform = "translateY(-1px)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (onlineMeeting.buttonType !== "Simple") {
+                        e.target.style.opacity = "1";
+                        e.target.style.transform = "translateY(0)";
+                      }
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {getButtonIcon()}
+                      <span>
+                        {onlineMeeting.buttonText || "Book a meeting"}
+                      </span>
+                    </Box>
+                  </a>
+
+                  {onlineMeeting.showProviderBadge !== false && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        mt: 0.5,
+                        color: "#666",
+                        fontSize: "10px",
+                      }}
+                    >
+                      Powered by {getSchedulingProviderName()}
+                    </Typography>
+                  )}
+                </Box>
+              )}
+            </div>
+            <div className="col-md-12">
+              {shouldShowAppDownload && (
+                <Box sx={getAppDownloadStyles()}>
+                  <Typography variant="h6" sx={getAppDownloadTitleStyles()}>
+                    {appDownload.title}
+                  </Typography>
+
+                  <Box sx={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                    {appDownload.googlePlayLink &&
+                      appDownload.googlePlayLink !==
+                        "https://play.google.com/store/apps/details?id=APP_ID" && (
+                        <a
+                          href={appDownload.googlePlayLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={getAppDownloadButtonStyles("google")}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "#e9ecef";
+                            e.target.style.transform = "translateY(-1px)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "#f8f9fa";
+                            e.target.style.transform = "translateY(0)";
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                              className="bi bi-google-play"
+                              viewBox="0 0 16 16"
+                            >
+                              <path d="M14.222 9.374c1.037-.61 1.037-2.137 0-2.748L11.528 5.04 8.32 8l3.207 2.96zm-3.595 2.116L7.583 8.68 1.03 14.73c.201 1.029 1.36 1.61 2.303 1.055zM1 13.396V2.603L6.846 8zM1.03 1.27l6.553 6.05 3.044-2.81L3.333.215C2.39-.341 1.231.24 1.03 1.27" />
+                            </svg>
+                            Google Play
+                          </Box>
+                        </a>
+                      )}
+
+                    {appDownload.appStoreLink &&
+                      appDownload.appStoreLink !==
+                        "https://itunes.apple.com/us/app/APP_NAME" && (
+                        <a
+                          href={appDownload.appStoreLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={getAppDownloadButtonStyles("apple")}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "#e9ecef";
+                            e.target.style.transform = "translateY(-1px)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "#f8f9fa";
+                            e.target.style.transform = "translateY(0)";
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                              className="bi bi-apple"
+                              viewBox="0 0 16 16"
+                            >
+                              <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282" />
+                              <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282" />
+                            </svg>
+                            App Store
+                          </Box>
+                        </a>
+                      )}
+                  </Box>
+                </Box>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 🔹 NEW: Video and Image Gallery Section */}
-
-      {/* ===== Quote Section ===== */}
+      {/* Quote Section */}
       {shouldShowQuote && (
         <Box sx={{ my: 1, p: 2, backgroundColor: "#f8f9fa", borderRadius: 1 }}>
           <Typography
@@ -448,7 +1013,7 @@ const Template5 = ({ data = {} }) => {
         </Box>
       )}
 
-      {/* ===== Disclaimer Section ===== */}
+      {/* Disclaimer Section */}
       {shouldShowDisclaimer && (
         <Box sx={{ mb: 1 }}>
           {disclaimerStyle.decorativeLine && (
@@ -484,13 +1049,11 @@ const Template5 = ({ data = {} }) => {
         </Box>
       )}
 
-      {/* 🔹 NEW: Green Footer Section */}
+      {/* Green Footer Section */}
       {shouldShowGreenFooter && (
         <Box
           sx={{
-           
             pt: 2,
-           
             textAlign: greenFooter.align || "left",
           }}
         >
@@ -531,6 +1094,9 @@ const Template5 = ({ data = {} }) => {
           </Box>
         </Box>
       )}
+
+      {/* Custom HTML Section */}
+      {shouldShowCustomHtml && renderCustomHtml()}
     </Card>
   );
 };

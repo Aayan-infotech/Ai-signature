@@ -1,4 +1,11 @@
-import React, { createContext, useState, useCallback, useMemo } from "react";
+// SignatureContext.jsx
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+} from "react";
 import {
   INITIAL_GLOBAL_STYLES,
   INITIAL_USER_INFO,
@@ -9,7 +16,6 @@ import {
   DISCLAIMER_TEXT,
   QUOTE,
   QUOTE_TEXT,
-  QUOTE_CATEGORY_MAP,
   VIDEO,
   GREEN_FOOTER_STYLE,
   GREEN_FOOTER_TEXT,
@@ -28,265 +34,276 @@ import {
   INITIAL_CUSTOM_HTML,
 } from "../utils/constant";
 
-const SignatureContext = createContext();
+const SignatureContext = createContext(null);
+
+/**
+ * Registry of all state keys and their default values.
+ * Add new keys here to auto-include them in persistence and the reducer.
+ */
+const STATE_REGISTRY = {
+  globalStyles: INITIAL_GLOBAL_STYLES,
+  userInfo: INITIAL_USER_INFO,
+  design: INITIAL_DESIGN,
+  socialLinks: INITIAL_SOCIAL_LINKS,
+  styledSignedOff: INITIAL_STYLED_SIGNEDOFF,
+  disclamierStyle: DISCLAIMER,
+  quoteStyle: QUOTE,
+  youtubeVideo: VIDEO,
+  greenFooter: GREEN_FOOTER_STYLE,
+  imageGallery: IMAGE_GALLERY,
+  onlineMeeting: ONLINE_MEETING,
+  socialButtons: INITIAL_SOCIAL_BUTTONS,
+  banner: INITIAL_BANNER,
+  customButton: INITIAL_CUSTOM_BUTTON,
+  uploadBanner: INITIAL_UPLOAD_BANNER,
+  feedback: INITIAL_FEEDBACK,
+  videoConference: INITIAL_VIDEO_CONFERENCE,
+  webinar: INITIAL_WEBINAR,
+  appDownload: INITIAL_APP_DOWNLOAD,
+  jobOffer: INITIAL_JOB_OFFER,
+  newsletter: INITIAL_NEWSLETTER,
+  customHtml: INITIAL_CUSTOM_HTML,
+  // any future state keys should be added here
+};
+
+// Safe session helpers
+const saveToSession = (key, value) => {
+  try {
+    sessionStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    // ignore storage errors (quota etc.)
+  }
+};
+
+const loadFromSession = (key, fallback) => {
+  try {
+    const raw = sessionStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+// Create initial state from registry + sessionStorage
+const getInitialState = () => {
+  const state = {};
+  Object.entries(STATE_REGISTRY).forEach(([k, defaultValue]) => {
+    state[k] = loadFromSession(k, defaultValue);
+  });
+
+  // Add UI-only state that doesn't need persistence:
+  state.selectedTemplate = loadFromSession("selectedTemplate", "template1");
+  return state;
+};
+
+// Reducer: supports SET (replace) and MERGE (merge object into existing key)
+function reducer(state, action) {
+  switch (action.type) {
+    case "SET_KEY": {
+      // replace whole key with a value
+      const { key, value } = action.payload;
+      return { ...state, [key]: value };
+    }
+    case "MERGE_KEY": {
+      // merge object value into state[key]
+      const { key, value } = action.payload;
+      const prev = state[key];
+      // If prev is object, shallow merge; otherwise replace
+      const next =
+        prev && typeof prev === "object" && !Array.isArray(prev)
+          ? { ...prev, ...value }
+          : value;
+      return { ...state, [key]: next };
+    }
+    case "SET_MULTIPLE": {
+      return { ...state, ...action.payload };
+    }
+    case "RESET": {
+      // reset to defaults (and clear sessionStorage)
+      const newState = { ...getInitialState() };
+      Object.keys(newState).forEach((k) => {
+        saveToSession(k, newState[k]);
+      });
+      return newState;
+    }
+    default:
+      return state;
+  }
+}
 
 export const SignatureProvider = ({ children }) => {
-  const [globalStyles, setGlobalStyles] = useState(INITIAL_GLOBAL_STYLES);
-  const [userInfo, setUserInfo] = useState(INITIAL_USER_INFO);
-  const [design, setDesign] = useState(INITIAL_DESIGN);
-  const [socialLinks, setSocialLinks] = useState(INITIAL_SOCIAL_LINKS);
-  const [styledSignedOff, setStyledSignedOff] = useState(
-    INITIAL_STYLED_SIGNEDOFF
+  const [state, dispatch] = useReducer(reducer, null, getInitialState);
+
+  // Generic setters (merge-style updates for most existing code)
+  const setKey = useCallback((key, value) => {
+    dispatch({ type: "SET_KEY", payload: { key, value } });
+  }, []);
+
+  const mergeKey = useCallback((key, value) => {
+    dispatch({ type: "MERGE_KEY", payload: { key, value } });
+  }, []);
+
+  const setMultiple = useCallback((obj) => {
+    dispatch({ type: "SET_MULTIPLE", payload: obj });
+  }, []);
+
+  const resetAll = useCallback(() => {
+    dispatch({ type: "RESET" });
+  }, []);
+
+  // Keep specific update functions to maintain API parity with your previous code:
+  const updateCustomHtml = useCallback(
+    (data) => mergeKey("customHtml", data),
+    [mergeKey]
   );
-  const [disclamierStyle, setDisclamierStyle] = useState(DISCLAIMER);
-  const [selectedTemplate, setSelectedTemplate] = useState("template1");
-  const [quoteStyle, setQuoteStyle] = useState(QUOTE);
-  const [youtubeVideo, setYoutubeVideo] = useState(VIDEO);
-  const [greenFooter, setGreenFooter] = useState(GREEN_FOOTER_STYLE);
-  const [imageGallery, setImageGallery] = useState(IMAGE_GALLERY);
-  const [onlineMeeting, setOnlineMeeting] = useState(ONLINE_MEETING);
-  const [socialButtons, setSocialButtons] = useState(INITIAL_SOCIAL_BUTTONS);
-  const [banner, setBanner] = useState(INITIAL_BANNER);
-  const [customButton, setCustomButton] = useState(INITIAL_CUSTOM_BUTTON);
-  const [uploadBanner, setUploadBanner] = useState(INITIAL_UPLOAD_BANNER);
-  const [feedback, setFeedback] = useState(INITIAL_FEEDBACK);
-  const [videoConference, setVideoConference] = useState(
-    INITIAL_VIDEO_CONFERENCE
+  const updateNewsletter = useCallback(
+    (data) => mergeKey("newsletter", data),
+    [mergeKey]
   );
-  const [webinar, setWebinar] = useState(INITIAL_WEBINAR);
-  const [appDownload, setAppDownload] = useState(INITIAL_APP_DOWNLOAD);
-  const [jobOffer, setJobOffer] = useState(INITIAL_JOB_OFFER);
-  const [newsletter, setNewsletter] = useState(INITIAL_NEWSLETTER);
-  const [customHtml, setCustomHtml] = useState(INITIAL_CUSTOM_HTML);
-  const updateCustomHtml = useCallback((data) => {
-    setCustomHtml((prev) => ({ ...prev, ...data }));
-  }, []);
-  // Add update function
-  const updateNewsletter = useCallback((data) => {
-    setNewsletter((prev) => ({ ...prev, ...data }));
-  }, []);
+  const updateAppDownload = useCallback(
+    (data) => mergeKey("appDownload", data),
+    [mergeKey]
+  );
+  const updateWebinar = useCallback(
+    (data) => mergeKey("webinar", data),
+    [mergeKey]
+  );
+  const updateVideoConference = useCallback(
+    (data) => mergeKey("videoConference", data),
+    [mergeKey]
+  );
+  const updateFeedback = useCallback(
+    (data) => mergeKey("feedback", data),
+    [mergeKey]
+  );
+  const updateUploadBanner = useCallback(
+    (data) => mergeKey("uploadBanner", data),
+    [mergeKey]
+  );
+  const updateCustomButton = useCallback(
+    (data) => mergeKey("customButton", data),
+    [mergeKey]
+  );
+  const updateOnlineMeeting = useCallback(
+    (data) => mergeKey("onlineMeeting", data),
+    [mergeKey]
+  );
+  const updateBanner = useCallback(
+    (data) => mergeKey("banner", data),
+    [mergeKey]
+  );
+  const updateGreenFooter = useCallback(
+    (data) => mergeKey("greenFooter", data),
+    [mergeKey]
+  );
+  const updateImageGallery = useCallback(
+    (data) => mergeKey("imageGallery", data),
+    [mergeKey]
+  );
+  const updateJobOffer = useCallback(
+    (data) => mergeKey("jobOffer", data),
+    [mergeKey]
+  );
+  const updateNewsletterWrapper = updateNewsletter; // alias if needed
+  const updateSocialButtons = useCallback(
+    (data) => mergeKey("socialButtons", data),
+    [mergeKey]
+  );
 
-  const updateAppDownload = useCallback((data) => {
-    setAppDownload((prev) => ({ ...prev, ...data }));
-  }, []);
+  // updateDesignFormData & updateFormData: keep behaviour from original
+  const updateDesignFormData = useCallback(
+    (data) => mergeKey("design", data),
+    [mergeKey]
+  );
 
-  // Update webinar settings
-  const updateWebinar = useCallback((data) => {
-    setWebinar((prev) => ({ ...prev, ...data }));
-  }, []);
+  const updateFormData = useCallback(
+    (data) => {
+      // similar to your previous logic: split into design & social and top-level defaults
+      const {
+        design: designData,
+        socialLinks: socialData,
+        ...rest
+      } = data || {};
+      if (designData) mergeKey("design", designData);
+      if (socialData) mergeKey("socialLinks", socialData);
 
-  // Update video conference settings
-  const updateVideoConference = useCallback((data) => {
-    setVideoConference((prev) => ({ ...prev, ...data }));
-  }, []);
+      // partition rest into globalStyles keys vs userInfo
+      const globalStyleKeys = Object.keys(INITIAL_GLOBAL_STYLES || {});
+      const globalStyleUpdates = {};
+      const userInfoUpdates = {};
 
-  // Update feedback settings
-  const updateFeedback = useCallback((data) => {
-    setFeedback((prev) => ({ ...prev, ...data }));
-  }, []);
+      Object.entries(rest).forEach(([key, value]) => {
+        if (globalStyleKeys.includes(key)) {
+          globalStyleUpdates[key] = value;
+        } else {
+          userInfoUpdates[key] = value;
+        }
+      });
 
-  // Update upload banner settings
-  const updateUploadBanner = useCallback((data) => {
-    setUploadBanner((prev) => ({ ...prev, ...data }));
-  }, []);
+      if (Object.keys(globalStyleUpdates).length > 0) {
+        mergeKey("globalStyles", globalStyleUpdates);
+      }
+      if (Object.keys(userInfoUpdates).length > 0) {
+        mergeKey("userInfo", userInfoUpdates);
+      }
+    },
+    [mergeKey]
+  );
 
-  // Update custom button settings
-  const updateCustomButton = useCallback((data) => {
-    setCustomButton((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  // Update online meeting settings
-  const updateOnlineMeeting = useCallback((data) => {
-    setOnlineMeeting((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  const getDisclaimerText = useCallback(() => {
-    const { type, customText } = disclamierStyle;
-
-    if (type === "custom" && customText) {
-      return customText;
+  // Persist to sessionStorage on any state change (single effect)
+  useEffect(() => {
+    // persist all keys except any UI-only transient keys if needed
+    Object.keys(STATE_REGISTRY).forEach((k) => {
+      try {
+        saveToSession(k, state[k]);
+      } catch (e) {
+        // ignore
+      }
+    });
+    // Also persist selectedTemplate if present
+    if ("selectedTemplate" in state) {
+      saveToSession("selectedTemplate", state.selectedTemplate);
     }
+  }, [state]);
 
-    return DISCLAIMER_TEXT[type] || "";
-  }, [disclamierStyle]);
+  // Utility getters that mirror your previous logic
+  const getDisclaimerText = useCallback(() => {
+    const { type, customText } = state.disclamierStyle || {};
+    if (type === "custom" && customText) return customText;
+    return (DISCLAIMER_TEXT && DISCLAIMER_TEXT[type]) || "";
+  }, [state.disclamierStyle]);
 
   const getQuoteText = useCallback(() => {
-    const { category, customText } = quoteStyle;
-
-    if (category === "custom" && customText) {
-      return customText;
-    }
-
-    return QUOTE_TEXT[category] || "";
-  }, [quoteStyle]);
+    const { category, customText } = state.quoteStyle || {};
+    if (category === "custom" && customText) return customText;
+    return (QUOTE_TEXT && QUOTE_TEXT[category]) || "";
+  }, [state.quoteStyle]);
 
   const getGreenFooterText = useCallback(() => {
-    const { category, customText } = greenFooter;
-    console.log("category", category);
-    console.log("121212", GREEN_FOOTER_TEXT[category]);
-    if (category === "custom" && customText) {
-      return customText;
-    }
-
-    return GREEN_FOOTER_TEXT[category] || "";
-  }, [greenFooter]);
-
-  // Update quote style
-  const updateQuoteStyle = useCallback((data) => {
-    setQuoteStyle((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  const updateYoutubeVideo = useCallback((data) => {
-    setYoutubeVideo((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  const updateBanner = useCallback((data) => {
-    setBanner((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  // In SignatureContext - update updateSocialButtons function
-  const updateSocialButtons = useCallback((data) => {
-    console.log("Context: Updating social buttons with:", data);
-    setSocialButtons((prev) => {
-      const updated = { ...prev, ...data };
-      console.log("Context: Social buttons updated to:", updated);
-      return updated;
-    });
-  }, []);
+    const { category, customText } = state.greenFooter || {};
+    if (category === "custom" && customText) return customText;
+    return (GREEN_FOOTER_TEXT && GREEN_FOOTER_TEXT[category]) || "";
+  }, [state.greenFooter]);
 
   const getYoutubeVideoId = useCallback((url) => {
     if (!url) return null;
-
     const regex =
       /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = url.match(regex);
     return match ? match[1] : null;
   }, []);
 
-  const updateGreenFooter = useCallback((data) => {
-    setGreenFooter((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  const updateImageGallery = useCallback((data) => {
-    setImageGallery((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  const updateJobOffer = useCallback((data) => {
-    setJobOffer((prev) => ({ ...prev, ...data }));
-  }, []);
-  // Combined formData for backward compatibility
-  const formData = useMemo(
-    () => ({
-      ...globalStyles,
-      ...userInfo,
-      design,
-      socialLinks,
-      styledSignedOff,
-      disclaimerStyle: {
-        ...disclamierStyle,
-        text: getDisclaimerText(), // Include computed text in formData
-      },
-      quoteStyle: {
-        ...quoteStyle,
-        text: getQuoteText(),
-      },
-      youtubeVideo: {
-        ...youtubeVideo,
-        videoId: getYoutubeVideoId(youtubeVideo.url),
-      },
-      greenFooter: {
-        ...greenFooter,
-        text: getGreenFooterText(),
-      },
-      imageGallery,
-      onlineMeeting,
-      socialButtons,
-      banner,
-      customButton,
-      uploadBanner,
-      feedback,
-      videoConference,
-      webinar,
-      appDownload,
-      jobOffer,
-      newsletter,
-      customHtml,
-    }),
-    [
-      globalStyles,
-      userInfo,
-      design,
-      socialLinks,
-      styledSignedOff,
-      disclamierStyle,
-      getDisclaimerText,
-      quoteStyle,
-      getQuoteText,
-      youtubeVideo,
-      getYoutubeVideoId,
-      greenFooter,
-      getGreenFooterText,
-      imageGallery,
-      onlineMeeting,
-      socialButtons,
-      banner,
-      customButton,
-      uploadBanner,
-      feedback,
-      videoConference,
-      webinar,
-      appDownload,
-      jobOffer,
-      newsletter,
-      customHtml,
-    ]
-  );
-
-  const updateFormData = useCallback((data) => {
-    const { design: designData, socialLinks: socialData, ...rest } = data;
-
-    if (designData) setDesign((prev) => ({ ...prev, ...designData }));
-    if (socialData) setSocialLinks((prev) => ({ ...prev, ...socialData }));
-
-    const globalStyleKeys = Object.keys(INITIAL_GLOBAL_STYLES);
-    const globalStyleUpdates = {};
-    const userInfoUpdates = {};
-
-    Object.entries(rest).forEach(([key, value]) => {
-      if (globalStyleKeys.includes(key)) {
-        globalStyleUpdates[key] = value;
-      } else {
-        userInfoUpdates[key] = value;
-      }
-    });
-
-    if (Object.keys(globalStyleUpdates).length > 0) {
-      setGlobalStyles((prev) => ({ ...prev, ...globalStyleUpdates }));
-    }
-    if (Object.keys(userInfoUpdates).length > 0) {
-      setUserInfo((prev) => ({ ...prev, ...userInfoUpdates }));
-    }
-  }, []);
-
-  const updateDesignFormData = useCallback((data) => {
-    setDesign((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  const updateStyledSignedOff = useCallback((data) => {
-    setStyledSignedOff((prev) => ({ ...prev, ...data }));
-  }, []);
-
-  const updateDisclaimerStyle = useCallback((data) => {
-    setDisclamierStyle((prev) => ({ ...prev, ...data }));
-  }, []);
-
+  // getStyleValue & getComputedStyles (keeps parity with your earlier code)
   const getStyleValue = useCallback(
     (designKey, parentKey, defaultValue = "") => {
-      const designValue = design[designKey];
-      const parentValue = globalStyles[parentKey] || userInfo[parentKey];
+      const designValue =
+        (state.design && state.design[designKey]) || undefined;
+      const parentValue =
+        (state.globalStyles && state.globalStyles[parentKey]) ||
+        (state.userInfo && state.userInfo[parentKey]);
       return designValue || parentValue || defaultValue;
     },
-    [design, globalStyles, userInfo]
+    [state.design, state.globalStyles, state.userInfo]
   );
 
   const getComputedStyles = useCallback(() => {
@@ -314,125 +331,168 @@ export const SignatureProvider = ({ children }) => {
         color: getStyleValue("detailsColor", "detailsColor", "#000000"),
       },
       social: {
-        size: design.socialSize || 16,
-        space: design.socialSpace || 8,
-        colorMode: design.socialColorMode || "web",
-        customColor: design.socialCustomColor || "#1877F2",
+        size: (state.design && state.design.socialSize) || 16,
+        space: (state.design && state.design.socialSpace) || 8,
+        colorMode: (state.design && state.design.socialColorMode) || "web",
+        customColor:
+          (state.design && state.design.socialCustomColor) || "#1877F2",
       },
-      imageShape: design.imageShape || "rounded-2",
-      imageSize: design.imageSize || "100px",
-      imagePosition: design.imagePosition || "start",
+      imageShape: (state.design && state.design.imageShape) || "rounded-2",
+      imageSize: (state.design && state.design.imageSize) || "100px",
+      imagePosition: (state.design && state.design.imagePosition) || "start",
       detailsLabel: "left",
       detailsDirection: "left",
       detailsSeparator: "left",
       template: {
-        color: design.color || "#000000",
+        color: (state.design && state.design.color) || "#000000",
       },
     };
-  }, [design, getStyleValue]);
+  }, [state.design, getStyleValue]);
 
-  const value = useMemo(
-    () => ({
+  // formData: combined structure for backward compatibility (derived)
+  const formData = useMemo(() => {
+    const youtubeUrl = (state.youtubeVideo && state.youtubeVideo.url) || "";
+    return {
+      ...state.globalStyles,
+      ...state.userInfo,
+      design: state.design,
+      socialLinks: state.socialLinks,
+      styledSignedOff: state.styledSignedOff,
+      disclaimerStyle: {
+        ...state.disclamierStyle,
+        text: getDisclaimerText(),
+      },
+      quoteStyle: {
+        ...state.quoteStyle,
+        text: getQuoteText(),
+      },
+      youtubeVideo: {
+        ...state.youtubeVideo,
+        videoId: getYoutubeVideoId(youtubeUrl),
+      },
+      greenFooter: {
+        ...state.greenFooter,
+        text: getGreenFooterText(),
+      },
+      imageGallery: state.imageGallery,
+      onlineMeeting: state.onlineMeeting,
+      socialButtons: state.socialButtons,
+      banner: state.banner,
+      customButton: state.customButton,
+      uploadBanner: state.uploadBanner,
+      feedback: state.feedback,
+      videoConference: state.videoConference,
+      webinar: state.webinar,
+      appDownload: state.appDownload,
+      jobOffer: state.jobOffer,
+      newsletter: state.newsletter,
+      customHtml: state.customHtml,
+      selectedTemplate: state.selectedTemplate,
+    };
+  }, [
+    state,
+    getDisclaimerText,
+    getQuoteText,
+    getGreenFooterText,
+    getYoutubeVideoId,
+  ]);
+
+  // Keep API comparable to earlier implementation
+  const contextValue = useMemo(() => {
+    return {
+      // state keys
+      ...state,
+
+      // derived
       formData,
+
+      // generic
+      setKey,
+      mergeKey,
+      setMultiple,
+      resetAll,
+
+      // specific convenience functions for backward compatibility
       updateFormData,
       updateDesignFormData,
-      selectedTemplate,
-      setSelectedTemplate,
+      setSelectedTemplate: (t) => setKey("selectedTemplate", t),
+      selectedTemplate: state.selectedTemplate,
       getComputedStyles,
       getStyleValue,
-      styledSignedOff,
-      updateStyledSignedOff,
-      disclamierStyle,
-      updateDisclaimerStyle,
+      styledSignedOff: state.styledSignedOff,
+      updateStyledSignedOff: (d) => mergeKey("styledSignedOff", d),
+      disclamierStyle: state.disclamierStyle,
+      updateDisclaimerStyle: (d) => mergeKey("disclamierStyle", d),
       getDisclaimerText,
-      quoteStyle,
-      updateQuoteStyle,
+      quoteStyle: state.quoteStyle,
+      updateQuoteStyle: (d) => mergeKey("quoteStyle", d),
       getQuoteText,
-      youtubeVideo,
-      updateYoutubeVideo,
+      youtubeVideo: state.youtubeVideo,
+      updateYoutubeVideo: (d) => mergeKey("youtubeVideo", d),
       getYoutubeVideoId,
-      greenFooter,
+      greenFooter: state.greenFooter,
       updateGreenFooter,
       getGreenFooterText,
-      imageGallery,
+      imageGallery: state.imageGallery,
       updateImageGallery,
-      onlineMeeting,
+      onlineMeeting: state.onlineMeeting,
       updateOnlineMeeting,
-      socialButtons,
+      socialButtons: state.socialButtons,
       updateSocialButtons,
-      banner,
+      banner: state.banner,
       updateBanner,
-      customButton,
+      customButton: state.customButton,
       updateCustomButton,
-      uploadBanner,
+      uploadBanner: state.uploadBanner,
       updateUploadBanner,
-      feedback,
+      feedback: state.feedback,
       updateFeedback,
-      videoConference,
+      videoConference: state.videoConference,
       updateVideoConference,
-      webinar,
+      webinar: state.webinar,
       updateWebinar,
-      appDownload,
+      appDownload: state.appDownload,
       updateAppDownload,
-      jobOffer,
+      jobOffer: state.jobOffer,
       updateJobOffer,
-      newsletter,
-      updateNewsletter,
-      customHtml,
+      newsletter: state.newsletter,
+      updateNewsletter: updateNewsletterWrapper,
+      customHtml: state.customHtml,
       updateCustomHtml,
-    }),
-    [
-      formData,
-      updateFormData,
-      updateDesignFormData,
-      selectedTemplate,
-      getComputedStyles,
-      getStyleValue,
-      styledSignedOff,
-      updateStyledSignedOff,
-      disclamierStyle,
-      updateDisclaimerStyle,
-      getDisclaimerText,
-      quoteStyle,
-      updateQuoteStyle,
-      getQuoteText,
-      youtubeVideo,
-      updateYoutubeVideo,
-      getYoutubeVideoId,
-      greenFooter,
-      updateGreenFooter,
-      getGreenFooterText,
-      imageGallery,
-      updateImageGallery,
-      onlineMeeting,
-      updateOnlineMeeting,
-      socialButtons,
-      updateSocialButtons,
-      banner,
-      updateBanner,
-      customButton,
-      updateCustomButton,
-      uploadBanner,
-      updateUploadBanner,
-      feedback,
-      updateFeedback,
-      videoConference,
-      updateVideoConference,
-      webinar,
-      updateWebinar,
-      appDownload,
-      updateAppDownload,
-      jobOffer,
-      updateJobOffer,
-      newsletter,
-      updateNewsletter,
-      customHtml,
-      updateCustomHtml,
-    ]
-  );
+    };
+  }, [
+    state,
+    formData,
+    setKey,
+    mergeKey,
+    setMultiple,
+    resetAll,
+    updateFormData,
+    updateDesignFormData,
+    getComputedStyles,
+    getStyleValue,
+    getDisclaimerText,
+    getQuoteText,
+    getGreenFooterText,
+    updateGreenFooter,
+    updateImageGallery,
+    updateOnlineMeeting,
+    updateSocialButtons,
+    updateBanner,
+    updateCustomButton,
+    updateUploadBanner,
+    updateFeedback,
+    updateVideoConference,
+    updateWebinar,
+    updateAppDownload,
+    updateJobOffer,
+    updateNewsletterWrapper,
+    updateCustomHtml,
+    getYoutubeVideoId,
+  ]);
 
   return (
-    <SignatureContext.Provider value={value}>
+    <SignatureContext.Provider value={contextValue}>
       {children}
     </SignatureContext.Provider>
   );
