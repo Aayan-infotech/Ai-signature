@@ -227,7 +227,7 @@ const CustomizationTab = ({
 export default function Design() {
   const { formData, updateFormData, updateDesignFormData } = useSignature();
   const [tabValue, setTabValue] = useState(0);
-  const [showCustomization, setShowCustomization] = useState(false);
+  const [showCustomization, setShowCustomization] = useState(true);
 
   // Get design values
   const designValues = useMemo(() => formData.design || {}, [formData.design]);
@@ -292,15 +292,7 @@ export default function Design() {
           <Typography variant="body1" color="text.secondary" gutterBottom>
             Customize each detail individually
           </Typography>
-          <Typography
-            variant="body2"
-            color="primary"
-            gutterBottom
-            sx={{ textAlign: "end", cursor: "pointer", fontWeight: 500 }}
-            onClick={() => setShowCustomization(!showCustomization)}
-          >
-            {showCustomization ? "Hide" : "Show"}
-          </Typography>
+        
         </Box>
 
         {/* Customization Tabs */}
@@ -399,80 +391,6 @@ export default function Design() {
             </ToggleButton>
             <ToggleButton value="end" aria-label="top">
               <AlignVerticalTopIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </SettingRow>
-      </Box>
-      <hr />
-      {/* Details Section */}
-      <Box sx={{ mt: 3 }}>
-        <SectionHeader title="Details" />
-
-        {/* Label */}
-        <SettingRow label="Label">
-          <ToggleButtonGroup
-            value={designValues.label || "left"}
-            exclusive
-            onChange={handleToggleChange("label")}
-            aria-label="label"
-          >
-            <ToggleButton value="fullText" aria-label="text">
-              <Typography sx={{ color: "primary.main", mb: 0 }}>
-                Phone
-              </Typography>
-            </ToggleButton>
-            <ToggleButton value="text" aria-label="letter">
-              <Typography sx={{ mb: 0 }}>P</Typography>
-            </ToggleButton>
-            <ToggleButton value="icon" aria-label="icon">
-              <CallIcon style={{ height: "20px" }} />
-            </ToggleButton>
-            <ToggleButton value="none" aria-label="none">
-              <Typography sx={{ mb: 0 }}>None</Typography>
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </SettingRow>
-
-        {/* Direction */}
-        <SettingRow label="Direction">
-          <ToggleButtonGroup
-            value={designValues.direction || "left"}
-            exclusive
-            onChange={handleToggleChange("direction")}
-            aria-label="direction"
-          >
-            <ToggleButton value="left" aria-label="horizontal">
-              <HorizontalRule style={{ height: "20px" }} />
-            </ToggleButton>
-            <ToggleButton value="center" aria-label="vertical">
-              <HorizontalRule
-                style={{ height: "20px", transform: "rotate(90deg)" }}
-              />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </SettingRow>
-
-        {/* Separator */}
-        <SettingRow label="Separator">
-          <ToggleButtonGroup
-            value={designValues.separator || "left"}
-            exclusive
-            onChange={handleToggleChange("separator")}
-            aria-label="separator"
-          >
-            <ToggleButton value="left" aria-label="line">
-              <HorizontalRule
-                style={{ height: "20px", transform: "rotate(90deg)" }}
-              />
-            </ToggleButton>
-            <ToggleButton value="center" aria-label="circle">
-              <CircleIcon style={{ height: "20px" }} />
-            </ToggleButton>
-            <ToggleButton value="right" aria-label="square">
-              <SquareIcon style={{ height: "20px" }} />
-            </ToggleButton>
-            <ToggleButton value="none" aria-label="none">
-              <Typography sx={{ mb: 0 }}>None</Typography>
             </ToggleButton>
           </ToggleButtonGroup>
         </SettingRow>
